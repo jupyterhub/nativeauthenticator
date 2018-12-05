@@ -7,5 +7,5 @@ jobs:
       - run: 
           name: Running flake8
           command: |
-            pip install flake8
+            sudo pip install flake8
             flake8 .
