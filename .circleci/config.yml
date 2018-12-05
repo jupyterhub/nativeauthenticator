@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.7.0
+    working_directory: ~/nativeauthenticator
     steps:
       - run: 
           name: Running flake8
