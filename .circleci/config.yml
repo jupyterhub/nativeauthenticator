@@ -9,3 +9,6 @@ jobs:
           command: |
             sudo pip install flake8
             flake8 .
+      - run: 
+          name: Installing dev-dependencies
+          command: sudo pip install -r dev-requirements.txt
