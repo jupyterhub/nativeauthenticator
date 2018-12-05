@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.7.0
     steps:
       - run: 
-        name: Running flake8
-        command: |
-          pip install flake8
-          flake8 .
+          name: Running flake8
+          command: |
+            pip install flake8
+            flake8 .
