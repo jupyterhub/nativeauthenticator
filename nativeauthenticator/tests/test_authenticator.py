@@ -19,5 +19,5 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 async def test_basic(tmpcwd):
     auth = NativeAuthenticator()
     response = await auth.authenticate(Mock(), {'username': 'name',
-                                          'password': '123'})
+                                                'password': '123'})
     assert response == 'name'
