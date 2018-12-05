@@ -7,10 +7,8 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: Running flake8
-          command: |
-            sudo pip install flake8
-            flake8 .
-      - run: 
-          name: Installing dev-dependencies
+          name: Installing dependencies
           command: sudo pip install -r dev-requirements.txt
+      - run: 
+          name: Running flake8
+          command: flake8 .
