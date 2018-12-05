@@ -14,4 +14,4 @@ jobs:
           command: flake8 .
       - run: 
           name: Running tests
-          command: pytest
+          command: pytest nativeauthenticator
