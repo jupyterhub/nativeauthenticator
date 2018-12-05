@@ -5,6 +5,7 @@ jobs:
       - image: circleci/python:3.7.0
     working_directory: ~/nativeauthenticator
     steps:
+      - checkout
       - run: 
           name: Running flake8
           command: |
