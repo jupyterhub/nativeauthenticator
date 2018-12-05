@@ -1,0 +1,11 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7.0
+    steps:
+      - run: 
+        name: Running flake8
+        command: |
+          pip install flake8
+          flake8 .
