@@ -128,7 +128,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'NativeAuthenticator.tex', u'Native Authenticator Documentation',
+    (master_doc, 'NativeAuthenticator.tex',
+     u'Native Authenticator Documentation',
      u'Leticia Portella', 'manual'),
 ]
 
