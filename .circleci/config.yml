@@ -16,5 +16,8 @@ jobs:
           name: Running flake8
           command: flake8 .
       - run: 
+          name: Running code coverage 
+          command: codecov
+      - run: 
           name: Running tests
           command: pytest nativeauthenticator
