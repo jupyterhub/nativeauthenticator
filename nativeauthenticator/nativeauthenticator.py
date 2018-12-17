@@ -9,7 +9,7 @@ from tornado import gen
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 
 
-class SignInHandler(BaseHandler):
+class SignUpHandler(BaseHandler):
     """Render the sign in page."""
 
     def __init__(self, *args, **kwargs):
@@ -28,7 +28,7 @@ class SignInHandler(BaseHandler):
 
     async def get(self):
         self._register_template_path()
-        html = self.render_template('signin.html')
+        html = self.render_template('signup.html')
         self.finish(html)
 
 
@@ -40,6 +40,6 @@ class NativeAuthenticator(Authenticator):
 
     def get_handlers(self, app):
         native_handlers = [
-            (r'/signin', SignInHandler)
+            (r'/signup', SignUpHandler)
         ]
         return super().get_handlers(app) + native_handlers
