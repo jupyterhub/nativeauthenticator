@@ -31,6 +31,14 @@ class SignUpHandler(BaseHandler):
         html = self.render_template('signup.html')
         self.finish(html)
 
+    async def post(self):
+        html = self.render_template(
+                 'signup.html',
+                 result=True,
+                 result_message='Your information have been sent to the admin',
+        )
+        self.finish(html)
+
 
 class NativeAuthenticator(Authenticator):
 
