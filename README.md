@@ -1,5 +1,9 @@
 # Native Authenticator
 
+
+![![Circle Ci Badge](https://img.shields.io/circleci/project/github/jupyterhub/nativeauthenticator.svg)](https://circleci.com/gh/jupyterhub/nativeauthenticator)
+![Code Cov](https://img.shields.io/codecov/c/github/jupyterhub/nativeauthenticator.svg)
+
 [JupyterHub](http://github.com/jupyter/jupyterhub/) authenticator
 
 
