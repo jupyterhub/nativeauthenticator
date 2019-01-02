@@ -1,6 +1,45 @@
 {% extends "page.html" %}
 {% block main %}
 
-Signin webpage
+  <div class="container">
+    <form action="{{post_url}}" method="post" role="form">
+      <h2>
+      Sign Up
+      </h2>
+      <div>
+        <div class="form-group">
+          <label>Username:</label>
+          <input
+          type="password"
+          class="form-control"
+          name="password"
+          id="password_input"
+          tabindex="2"
+          />
+          <label for='password_input'>Password:</label>
+          <input
+          type="password"
+          class="form-control"
+          name="password"
+          id="password_input"
+          tabindex="2"
+          />
+        </div>
+        <div class="form-group">
+          <input
+          type="submit"
+          id="login_submit"
+          class='btn btn-jupyter'
+          value='Create User'
+          tabindex="3"
+          />
+        </div>
+      </div>
+    </form>
+    {% if result %}
+      <div class="alert alert-info" role="alert">{{result_message}}</div>
+    {% endif %}
+  </div>
+
 
 {% endblock %}
