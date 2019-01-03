@@ -28,3 +28,9 @@ async def test_basic(tmpcwd, app):
     response = await auth.authenticate(Mock(), {'username': 'name',
                                                 'password': '123'})
     assert response == 'name'
+
+
+async def test_handlers(app):
+    auth = NativeAuthenticator(db=app.db)
+    handlers = auth.get_handlers(app)
+    assert handlers[1][0] == '/signup'
