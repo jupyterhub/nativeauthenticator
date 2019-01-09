@@ -30,7 +30,8 @@ class SignUpHandler(BaseHandler):
 
     async def post(self):
         username = self.get_body_argument('username', strip=False)
-        user = self.authenticator.get_or_create_user(username)
+        password = self.get_body_argument('password', strip=False)
+        user = self.authenticator.get_or_create_user(username, password)
         html = self.render_template(
                  'signup.html',
                  result=bool(user),

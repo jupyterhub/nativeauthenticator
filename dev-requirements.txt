@@ -2,3 +2,4 @@ codecov
 flake8
 pytest
 pytest-asyncio
+notebook==5.7.2
