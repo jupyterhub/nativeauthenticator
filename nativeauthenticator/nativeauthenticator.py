@@ -21,11 +21,14 @@ class NativeAuthenticator(Authenticator):
     def authenticate(self, handler, data):
         return data['username']
 
-    def get_or_create_user(self, username):
+    def get_or_create_user(self, username, password):
         user = User.find(self.db, username)
         if not user:
             user = User(name=username, admin=False)
             self.db.add(user)
+
+        user_info = UserInfo(username=username, password=password)
+        self.db.add(user_info)
         return user
 
     def get_handlers(self, app):

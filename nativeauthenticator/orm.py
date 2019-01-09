@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, ForeignKey, Integer,
+    Column, Integer, String
 )
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -9,12 +9,12 @@ Base = declarative_base()
 class UserInfo(Base):
     __tablename__ = 'users_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'),
-                     nullable=False),
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
 
     @classmethod
-    def find(cls, db, name):
+    def find(cls, db, username):
         """Find a user info record by name.
         Returns None if not found.
         """
-        return db.query(cls).filter(cls.name == name).first()
+        return db.query(cls).filter(cls.username == username).first()
