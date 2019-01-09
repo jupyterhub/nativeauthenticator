@@ -1,3 +1,4 @@
+import bcrypt
 from jupyterhub.orm import User
 from jupyterhub.auth import Authenticator
 
@@ -27,7 +28,8 @@ class NativeAuthenticator(Authenticator):
             user = User(name=username, admin=False)
             self.db.add(user)
 
-        user_info = UserInfo(username=username, password=password)
+        encoded_pw = bcrypt.hashpw(password.encode(),bcrypt.gensalt())
+        user_info = UserInfo(username=username, password=encoded_pw)
         self.db.add(user_info)
         return user
 
