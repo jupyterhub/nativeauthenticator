@@ -1,3 +1,4 @@
+import bcrypt
 from sqlalchemy import (
     Column, Integer, String
 )
@@ -18,3 +19,7 @@ class UserInfo(Base):
         Returns None if not found.
         """
         return db.query(cls).filter(cls.username == username).first()
+
+    def is_valid_password(self, password):
+        encoded_pw = bcrypt.hashpw(password.encode(), self.password)
+        return encoded_pw == self.password
