@@ -21,7 +21,7 @@ class NativeAuthenticator(Authenticator):
     @gen.coroutine
     def authenticate(self, handler, data):
         user = UserInfo.find(self.db, data['username'])
-        if user.is_valid_password(data['password']):
+        if user and user.is_valid_password(data['password']):
             return data['username']
 
     def get_or_create_user(self, username, password):
