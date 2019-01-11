@@ -1,10 +1,10 @@
 import bcrypt
-from sqlalchemy import (
-    Column, Integer, String
-)
-from sqlalchemy.ext.declarative import declarative_base
+from jupyterhub.orm import Base, User
 
-Base = declarative_base()
+from sqlalchemy import (
+    Column, ForeignKey, Integer, String
+)
+from sqlalchemy.orm import relationship
 
 
 class UserInfo(Base):
@@ -12,6 +12,8 @@ class UserInfo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship(User)
 
     @classmethod
     def find(cls, db, username):
