@@ -65,3 +65,4 @@ async def test_handlers(app):
     auth = NativeAuthenticator(db=app.db)
     handlers = auth.get_handlers(app)
     assert handlers[1][0] == '/signup'
+    assert handlers[2][0] == '/authorize'
