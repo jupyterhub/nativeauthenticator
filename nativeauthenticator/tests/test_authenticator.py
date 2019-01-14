@@ -51,10 +51,20 @@ async def test_failed_authentication_wrong_password(tmpcwd, app):
     assert not response
 
 
+async def test_failed_authentication_not_authorized(tmpcwd, app):
+    '''Test if authentication fails with a wrong password'''
+    auth = NativeAuthenticator(db=app.db)
+    auth.get_or_create_user('John Snow', 'password')
+    response = await auth.authenticate(app, {'username': 'John Snow',
+                                             'password': 'password'})
+    assert not response
+
+
 async def test_succeded_authentication(tmpcwd, app):
     '''Test a successfull authentication'''
     auth = NativeAuthenticator(db=app.db)
     user = auth.get_or_create_user('John Snow', 'password')
+    UserInfo.change_authorization(app.db, 'John Snow')
     response = await auth.authenticate(app, {'username': 'John Snow',
                                              'password': 'password'})
     assert response == user.name
