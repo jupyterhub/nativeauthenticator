@@ -31,7 +31,6 @@ class NativeAuthenticator(Authenticator):
     def add_new_table(self):
         inspector = inspect(self.db.bind)
         if 'users_info' not in inspector.get_table_names():
-            User.info = relationship(UserInfo, backref='users')
             UserInfo.__table__.create(self.db.bind)
 
     @gen.coroutine
@@ -59,13 +58,13 @@ class NativeAuthenticator(Authenticator):
             return
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {'user': user, 'username': username, 'password': encoded_pw}
+        infos = {'username': username, 'password': encoded_pw}
         if username in self.admin_users:
             infos.update({'is_authorized': True})
 
         user_info = UserInfo(**infos)
         self.db.add(user_info)
-        return user
+        return user_info
 
     def get_handlers(self, app):
         native_handlers = [

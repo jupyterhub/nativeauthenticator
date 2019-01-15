@@ -28,9 +28,7 @@ async def test_auth_get_or_create(tmpcwd, app):
     '''Test if method get_or_create_user creates a new user'''
     auth = NativeAuthenticator(db=app.db)
     user = auth.get_or_create_user('John Snow', 'password')
-    main_user = User.find(app.db, 'John Snow')
     user_info = UserInfo.find(app.db, 'John Snow')
-    assert user == main_user
     assert user_info.username == 'John Snow'
 
 
@@ -47,7 +45,7 @@ async def test_auth_get_or_create_strong_password_success(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     auth.check_password_strength = True
     user = auth.get_or_create_user('John Snow', 'Password123')
-    assert user.name == 'John Snow'
+    assert user.username == 'John Snow'
 
 
 async def test_failed_authentication_user_doesnt_exist(tmpcwd, app):
@@ -83,7 +81,7 @@ async def test_succeded_authentication(tmpcwd, app):
     UserInfo.change_authorization(app.db, 'John Snow')
     response = await auth.authenticate(app, {'username': 'John Snow',
                                              'password': 'password'})
-    assert response == user.name
+    assert response == user.username
 
 
 async def test_handlers(app):
