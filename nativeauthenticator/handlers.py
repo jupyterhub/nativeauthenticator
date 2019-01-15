@@ -35,10 +35,17 @@ class SignUpHandler(LocalBase):
         username = self.get_body_argument('username', strip=False)
         password = self.get_body_argument('password', strip=False)
         user = self.authenticator.get_or_create_user(username, password)
+
+        result_message = 'Your information have been sent to the admin'
+        if not user:
+            result_message = """Something went wrong. Be sure your password
+                                have a upper case letter, a lower case
+                                and a number."""
+
         html = self.render_template(
             'signup.html',
             result=bool(user),
-            result_message='Your information have been sent to the admin',
+            result_message=result_message,
         )
         self.finish(html)
 
