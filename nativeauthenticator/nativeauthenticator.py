@@ -1,10 +1,8 @@
 import bcrypt
 import re
-from jupyterhub.orm import User
 from jupyterhub.auth import Authenticator
 
 from sqlalchemy import inspect
-from sqlalchemy.orm import relationship
 from tornado import gen
 from traitlets import Bool
 

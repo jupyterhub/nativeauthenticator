@@ -1,5 +1,4 @@
 import pytest
-from jupyterhub.orm import User
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
@@ -27,7 +26,7 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 async def test_auth_get_or_create(tmpcwd, app):
     '''Test if method get_or_create_user creates a new user'''
     auth = NativeAuthenticator(db=app.db)
-    user = auth.get_or_create_user('John Snow', 'password')
+    auth.get_or_create_user('John Snow', 'password')
     user_info = UserInfo.find(app.db, 'John Snow')
     assert user_info.username == 'John Snow'
 
