@@ -13,8 +13,6 @@ class UserInfo(Base):
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
     is_authorized = Column(Boolean, default=False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship(User)
 
     @classmethod
     def find(cls, db, username):
