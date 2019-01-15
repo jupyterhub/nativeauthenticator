@@ -1,14 +1,14 @@
 import os
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
+from jupyterhub.utils import admin_only
 
+from .orm import UserInfo
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 
 
-class SignUpHandler(BaseHandler):
-    """Render the sign in page."""
-
+class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
         self._loaded = False
         super().__init__(*args, **kwargs)
@@ -23,6 +23,9 @@ class SignUpHandler(BaseHandler):
         env.loader = ChoiceLoader([previous_loader, loader])
         self._loaded = True
 
+
+class SignUpHandler(LocalBase):
+    """Render the sign in page."""
     async def get(self):
         self._register_template_path()
         html = self.render_template('signup.html')
@@ -33,8 +36,25 @@ class SignUpHandler(BaseHandler):
         password = self.get_body_argument('password', strip=False)
         user = self.authenticator.get_or_create_user(username, password)
         html = self.render_template(
-                 'signup.html',
-                 result=bool(user),
-                 result_message='Your information have been sent to the admin',
+            'signup.html',
+            result=bool(user),
+            result_message='Your information have been sent to the admin',
         )
         self.finish(html)
+
+
+class AuthorizationHandler(LocalBase):
+    """Render the sign in page."""
+    @admin_only
+    async def get(self):
+        self._register_template_path()
+        html = self.render_template('autorization-area.html',
+                                    users=self.db.query(UserInfo).all())
+        self.finish(html)
+
+
+class ChangeAuthorizationHandler(LocalBase):
+    @admin_only
+    async def get(self, slug):
+        UserInfo.change_authorization(self.db, slug)
+        self.redirect('/authorize')

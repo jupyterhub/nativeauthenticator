@@ -6,7 +6,8 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import relationship
 from tornado import gen
 
-from .handlers import SignUpHandler
+from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
+                       SignUpHandler)
 from .orm import UserInfo
 
 
@@ -27,7 +28,9 @@ class NativeAuthenticator(Authenticator):
     @gen.coroutine
     def authenticate(self, handler, data):
         user = UserInfo.find(self.db, data['username'])
-        if user and user.is_valid_password(data['password']):
+        if not user:
+            return
+        if user.is_authorized and user.is_valid_password(data['password']):
             return data['username']
 
     def get_or_create_user(self, username, password):
@@ -37,12 +40,18 @@ class NativeAuthenticator(Authenticator):
             self.db.add(user)
 
         encoded_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-        user_info = UserInfo(user=user, username=username, password=encoded_pw)
+        infos = {'user': user, 'username': username, 'password': encoded_pw}
+        if username in self.admin_users:
+            infos.update({'is_authorized': True})
+
+        user_info = UserInfo(**infos)
         self.db.add(user_info)
         return user
 
     def get_handlers(self, app):
         native_handlers = [
-            (r'/signup', SignUpHandler)
+            (r'/signup', SignUpHandler),
+            (r'/authorize', AuthorizationHandler),
+            (r'/authorize/([^/]*)', ChangeAuthorizationHandler)
         ]
         return super().get_handlers(app) + native_handlers
