@@ -1,5 +1,4 @@
 import bcrypt
-import re
 from jupyterhub.auth import Authenticator
 
 from sqlalchemy import inspect
