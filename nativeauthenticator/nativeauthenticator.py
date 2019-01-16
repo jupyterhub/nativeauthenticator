@@ -6,6 +6,7 @@ from sqlalchemy import inspect
 from tornado import gen
 from traitlets import Bool
 
+from .common_credentials import COMMON_CREDENTIALS
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
                        SignUpHandler)
 from .orm import UserInfo
@@ -41,9 +42,8 @@ class NativeAuthenticator(Authenticator):
 
     def is_password_strong(self, password):
         checks = [
-            re.search(r'[A-Z]', password),
-            re.search(r'[a-z]', password),
-            re.search(r'\d', password),
+            len(password) >= 8,
+            password not in COMMON_CREDENTIALS
         ]
         return all(checks)
 

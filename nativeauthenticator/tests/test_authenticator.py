@@ -35,7 +35,7 @@ async def test_auth_get_or_create_strong_password_failed(tmpcwd, app):
     '''Test if method get_or_create_user returns None if password is weak'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_password_strength = True
-    user = auth.get_or_create_user('John Snow', 'password')
+    user = auth.get_or_create_user('John Snow', 'qwerty')
     assert not user
 
 

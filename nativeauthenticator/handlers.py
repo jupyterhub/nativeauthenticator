@@ -39,8 +39,8 @@ class SignUpHandler(LocalBase):
         result_message = 'Your information have been sent to the admin'
         if not user:
             result_message = """Something went wrong. Be sure your password
-                                have a upper case letter, a lower case
-                                and a number."""
+                                has at least 8 characters and is not
+                                too common."""
 
         html = self.render_template(
             'signup.html',
