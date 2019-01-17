@@ -3,7 +3,7 @@ from jupyterhub.auth import Authenticator
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool
+from traitlets import Bool, Integer
 
 from .common_credentials import COMMON_CREDENTIALS
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
@@ -18,6 +18,12 @@ class NativeAuthenticator(Authenticator):
         default=False,
         help="""Creates a verification of password strength
         when a new user makes signup"""
+    )
+    password_length = Integer(
+        config=True,
+        default=8,
+        help="""Check if the length of the password is at least this size on
+        SignUp"""
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -41,7 +47,7 @@ class NativeAuthenticator(Authenticator):
 
     def is_password_strong(self, password):
         checks = [
-            len(password) >= 8,
+            len(password) >= self.password_length,
             password not in COMMON_CREDENTIALS
         ]
         return all(checks)

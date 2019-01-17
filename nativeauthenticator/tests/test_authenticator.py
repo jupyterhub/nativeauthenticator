@@ -23,7 +23,7 @@ pytestmark = pytest.mark.asyncio
 pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 
 
-async def test_auth_get_or_create(tmpcwd, app):
+async def test_create_user(tmpcwd, app):
     '''Test if method get_or_create_user creates a new user'''
     auth = NativeAuthenticator(db=app.db)
     auth.get_or_create_user('John Snow', 'password')
@@ -31,7 +31,7 @@ async def test_auth_get_or_create(tmpcwd, app):
     assert user_info.username == 'John Snow'
 
 
-async def test_auth_get_or_create_strong_password_failed(tmpcwd, app):
+async def test_create_user_weak_password(tmpcwd, app):
     '''Test if method get_or_create_user returns None if password is weak'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_password_strength = True
@@ -39,11 +39,23 @@ async def test_auth_get_or_create_strong_password_failed(tmpcwd, app):
     assert not user
 
 
-async def test_auth_get_or_create_strong_password_success(tmpcwd, app):
+async def test_create_user_strong_password(tmpcwd, app):
     '''Test if method get_or_create_user creates user if password is strong'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_password_strength = True
     user = auth.get_or_create_user('John Snow', 'Password123')
+    assert user.username == 'John Snow'
+
+
+async def test_create_user_strong_password_more_characters(tmpcwd, app):
+    '''Test if new user has a password with more characters'''
+    auth = NativeAuthenticator(db=app.db)
+    auth.check_password_strength = True
+    auth.password_length = 20
+    user = auth.get_or_create_user('John Snow', 'Password123')
+    assert not user
+    user = auth.get_or_create_user(
+        'John Snow', 'averyverylongpasswordtocheckforsecurity')
     assert user.username == 'John Snow'
 
 
