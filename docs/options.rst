@@ -4,11 +4,11 @@ Feature Options
 Password Strength
 ----------------
 
-You can add a verification for password strength on Sign Up by adding the following parameter to your config file:
+By default, when a user signs up through Native Authenticator there is no password strength verification. If you need this, you can add a verification for password strength by adding the following parameter to your config file:
 
 .. code-block:: python
 
     c.Authenticator.check_password_strength = True
 
-The authenticator will then verify if the user password contains at least one upper case letter, one lower case letter and a number. The default is false.
+The Authenticator will verify if the password has at least 8 characters and if it not a common password. The list of the common passwords it checks is available `on this link <https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-10000.txt>`_ >._  
 
