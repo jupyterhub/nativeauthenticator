@@ -60,7 +60,7 @@ If you are and admin, be sure that your username is listed on the `admin_users` 
 
 .. code-block:: python
 
-    c.Authenticator.admin_users = set({'<username>'})
+    c.Authenticator.admin_users = {'username'}
 
 If you create a new user that is listed as an admin on the config file, it will automatically have access to the system just after the signup. 
 
