@@ -43,7 +43,7 @@ async def test_create_user_strong_password(tmpcwd, app):
     '''Test if method get_or_create_user creates user if password is strong'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_password_strength = True
-    user = auth.get_or_create_user('John Snow', 'Password123')
+    user = auth.get_or_create_user('John Snow', 'agameofthrones')
     assert user.username == 'John Snow'
 
 

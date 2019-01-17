@@ -1,11 +1,11 @@
 import bcrypt
+import os
 from jupyterhub.auth import Authenticator
 
 from sqlalchemy import inspect
 from tornado import gen
 from traitlets import Bool, Integer
 
-from .common_credentials import COMMON_CREDENTIALS
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
                        SignUpHandler)
 from .orm import UserInfo
@@ -13,6 +13,7 @@ from .orm import UserInfo
 
 class NativeAuthenticator(Authenticator):
 
+    COMMON_PASSWORDS = None
     check_password_strength = Bool(
         config=True,
         default=False,
@@ -45,10 +46,20 @@ class NativeAuthenticator(Authenticator):
         if user.is_authorized and user.is_valid_password(data['password']):
             return data['username']
 
+    def is_password_common(self, password):
+        common_credentials_file = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'common-credentials.txt'
+        )
+        if self.COMMON_PASSWORDS == None:
+            with open(common_credentials_file) as f:
+                self.COMMON_PASSWORDS = f.read().splitlines()
+        return password.lower() in self.COMMON_PASSWORDS
+
     def is_password_strong(self, password):
         checks = [
             len(password) >= self.password_length,
-            password not in COMMON_CREDENTIALS
+            not self.is_password_common(password),
         ]
         return all(checks)
 
