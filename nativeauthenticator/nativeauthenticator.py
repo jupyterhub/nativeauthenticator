@@ -51,7 +51,7 @@ class NativeAuthenticator(Authenticator):
             os.path.dirname(os.path.abspath(__file__)),
             'common-credentials.txt'
         )
-        if self.COMMON_PASSWORDS == None:
+        if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
                 self.COMMON_PASSWORDS = f.read().splitlines()
         return password.lower() in self.COMMON_PASSWORDS
