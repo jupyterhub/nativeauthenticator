@@ -1,6 +1,10 @@
 Quickstart
 ==========
 
+
+Installation
+------------
+
 Native Authenticator is a plugin Authenticator for the 
 `JupyterHub <https://github.com/jupyterhub/>`_. Be sure you have JupyterHub 
 already running on your machine before installing this authenticator.
