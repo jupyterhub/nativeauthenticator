@@ -14,17 +14,17 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
-    check_password_strength = Bool(
+    check_common_password = Bool(
         config=True,
         default=False,
         help="""Creates a verification of password strength
         when a new user makes signup"""
     )
-    password_length = Integer(
+    minimum_password_length = Integer(
         config=True,
-        default=8,
+        default=1,
         help="""Check if the length of the password is at least this size on
-        SignUp"""
+        signup"""
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -54,13 +54,14 @@ class NativeAuthenticator(Authenticator):
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
                 self.COMMON_PASSWORDS = f.read().splitlines()
-        return password.lower() in self.COMMON_PASSWORDS
+        return password in self.COMMON_PASSWORDS
 
     def is_password_strong(self, password):
-        checks = [
-            len(password) >= self.password_length,
-            not self.is_password_common(password),
-        ]
+        checks = [len(password) > self.minimum_password_length]
+
+        if self.check_common_password:
+            checks.append(not self.is_password_common(password))
+
         return all(checks)
 
     def get_or_create_user(self, username, pw):
@@ -68,7 +69,7 @@ class NativeAuthenticator(Authenticator):
         if user:
             return user
 
-        if self.check_password_strength and not self.is_password_strong(pw):
+        if not self.is_password_strong(pw):
             return
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())

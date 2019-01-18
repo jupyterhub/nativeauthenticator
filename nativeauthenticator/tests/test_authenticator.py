@@ -31,27 +31,26 @@ async def test_create_user(tmpcwd, app):
     assert user_info.username == 'John Snow'
 
 
-async def test_create_user_weak_password(tmpcwd, app):
-    '''Test if method get_or_create_user returns None if password is weak'''
+async def test_create_user_with_common_password(tmpcwd, app):
+    '''Test if method get_or_create_user returns None if password is common'''
     auth = NativeAuthenticator(db=app.db)
-    auth.check_password_strength = True
+    auth.check_common_password = True
     user = auth.get_or_create_user('John Snow', 'qwerty')
     assert not user
 
 
-async def test_create_user_strong_password(tmpcwd, app):
-    '''Test if method get_or_create_user creates user if password is strong'''
+async def test_create_user_with_uncommon_password(tmpcwd, app):
+    '''Test if method get_or_create_user creates user if pw is not common'''
     auth = NativeAuthenticator(db=app.db)
-    auth.check_password_strength = True
+    auth.check_common_password = True
     user = auth.get_or_create_user('John Snow', 'agameofthrones')
     assert user.username == 'John Snow'
 
 
-async def test_create_user_strong_password_more_characters(tmpcwd, app):
+async def test_create_user_long_password(tmpcwd, app):
     '''Test if new user has a password with more characters'''
     auth = NativeAuthenticator(db=app.db)
-    auth.check_password_strength = True
-    auth.password_length = 20
+    auth.minimum_password_length = 20
     user = auth.get_or_create_user('John Snow', 'Password123')
     assert not user
     user = auth.get_or_create_user(
