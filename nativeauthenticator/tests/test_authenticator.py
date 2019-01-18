@@ -1,4 +1,5 @@
 import pytest
+import time
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
@@ -72,3 +73,16 @@ async def test_handlers(app):
     handlers = auth.get_handlers(app)
     assert handlers[1][0] == '/signup'
     assert handlers[2][0] == '/authorize'
+
+
+async def test_exceed_atemps_of_login(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    username = 'John Snow'
+    auth.get_or_create_user(username, 'password')
+
+    assert not auth.exceed_atempts_of_login(username)
+    assert not auth.exceed_atempts_of_login(username)
+    assert not auth.exceed_atempts_of_login(username)
+    assert auth.exceed_atempts_of_login(username)
+    time.sleep(65)
+    assert not auth.exceed_atempts_of_login(username)
