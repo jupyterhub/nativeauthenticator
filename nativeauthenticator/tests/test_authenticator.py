@@ -77,22 +77,28 @@ async def test_handlers(app):
 
 async def test_exceed_atempts_of_login(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
+    auth.allowed_failed_logins = 3
+    auth.secs_before_next_try = 10
+
     username = 'John Snow'
     auth.get_or_create_user(username, 'password')
 
-    assert not auth.exceed_atempts_of_login(username)
-    assert not auth.exceed_atempts_of_login(username)
-    assert not auth.exceed_atempts_of_login(username)
+    for i in range(3):
+        assert not auth.exceed_atempts_of_login(username)
+
     assert auth.exceed_atempts_of_login(username)
-    time.sleep(65)
+    time.sleep(12)
     assert not auth.exceed_atempts_of_login(username)
 
 
 async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
-    infos = {'username': 'John Snow', 'password': 'wrongpassword'}
+    auth.allowed_failed_logins = 3
+    auth.secs_before_next_try = 10
 
+    infos = {'username': 'John Snow', 'password': 'wrongpassword'}
     auth.get_or_create_user(infos['username'], 'password')
+    UserInfo.change_authorization(app.db, 'John Snow')
 
     for i in range(3):
         response = await auth.authenticate(app, infos)
@@ -102,6 +108,6 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     response = await auth.authenticate(app, infos)
     assert not response
 
-    time.sleep(65)
+    time.sleep(12)
     response = await auth.authenticate(app, infos)
-    assert not response
+    assert response

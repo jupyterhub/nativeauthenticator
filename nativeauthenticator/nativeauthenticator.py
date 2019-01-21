@@ -30,7 +30,14 @@ class NativeAuthenticator(Authenticator):
     allowed_failed_logins = Integer(
         config=True,
         default=0,
-        help="""shudhsud"""
+        help="""Configures the number of failed attempts a user can have
+                before being blocked."""
+    )
+    secs_before_next_try = Integer(
+        config=True,
+        default=600,
+        help="""Configures the number of seconds a user has to wait
+                after being blocked. Default is 600."""
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -53,11 +60,11 @@ class NativeAuthenticator(Authenticator):
             return False
 
         time_last_attempt = now - login_attempts['time']
-        if time_last_attempt.seconds > 60:
+        if time_last_attempt.seconds > self.secs_before_next_try:
             self.login_attempts.pop(username)
             return False
 
-        if login_attempts['count'] < 3:
+        if login_attempts['count'] < self.allowed_failed_logins:
             self.login_attempts[username]['count'] += 1
             self.login_attempts[username]['time'] = now
             return False
@@ -70,8 +77,12 @@ class NativeAuthenticator(Authenticator):
         password = data['password']
 
         user = UserInfo.find(self.db, username)
-        if not user or self.exceed_atempts_of_login(username):
+        if not user:
             return
+
+        if self.allowed_failed_logins:
+            if self.exceed_atempts_of_login(username):
+                return
 
         if user.is_authorized and user.is_valid_password(password):
             return username
