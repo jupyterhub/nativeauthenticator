@@ -70,7 +70,7 @@ class NativeAuthenticator(Authenticator):
         password = data['password']
 
         user = UserInfo.find(self.db, username)
-        if not user:
+        if not user or self.exceed_atempts_of_login(username):
             return
 
         if user.is_authorized and user.is_valid_password(password):

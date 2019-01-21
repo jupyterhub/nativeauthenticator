@@ -75,7 +75,7 @@ async def test_handlers(app):
     assert handlers[2][0] == '/authorize'
 
 
-async def test_exceed_atemps_of_login(tmpcwd, app):
+async def test_exceed_atempts_of_login(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     username = 'John Snow'
     auth.get_or_create_user(username, 'password')
@@ -86,3 +86,22 @@ async def test_exceed_atemps_of_login(tmpcwd, app):
     assert auth.exceed_atempts_of_login(username)
     time.sleep(65)
     assert not auth.exceed_atempts_of_login(username)
+
+
+async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    infos = {'username': 'John Snow', 'password': 'wrongpassword'}
+
+    auth.get_or_create_user(infos['username'], 'password')
+
+    for i in range(3):
+        response = await auth.authenticate(app, infos)
+        assert not response
+
+    infos['password'] = 'password'
+    response = await auth.authenticate(app, infos)
+    assert not response
+
+    time.sleep(65)
+    response = await auth.authenticate(app, infos)
+    assert not response
