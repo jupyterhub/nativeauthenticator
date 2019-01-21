@@ -31,67 +31,39 @@ async def test_create_user(tmpcwd, app):
     assert user_info.username == 'John Snow'
 
 
-async def test_create_user_with_common_password(tmpcwd, app):
-    '''Test if method get_or_create_user returns None if password is common'''
+@pytest.mark.parametrize("password,min_len,expected", [
+    ("qwerty", 1, False),
+    ("agameofthrones", 1, True),
+    ("agameofthrones", 15, False),
+    ("averyveryverylongpassword", 15, True),
+])
+async def test_create_user_with_strong_passwords(password, min_len, expected,
+                                                 tmpcwd, app):
+    '''Test if method get_or_create_user and strong passwords'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_common_password = True
-    user = auth.get_or_create_user('John Snow', 'qwerty')
-    assert not user
+    auth.minimum_password_length = min_len
+    user = auth.get_or_create_user('John Snow', password)
+    assert bool(user) == expected
 
 
-async def test_create_user_with_uncommon_password(tmpcwd, app):
-    '''Test if method get_or_create_user creates user if pw is not common'''
-    auth = NativeAuthenticator(db=app.db)
-    auth.check_common_password = True
-    user = auth.get_or_create_user('John Snow', 'agameofthrones')
-    assert user.username == 'John Snow'
-
-
-async def test_create_user_long_password(tmpcwd, app):
-    '''Test if new user has a password with more characters'''
-    auth = NativeAuthenticator(db=app.db)
-    auth.minimum_password_length = 20
-    user = auth.get_or_create_user('John Snow', 'Password123')
-    assert not user
-    user = auth.get_or_create_user(
-        'John Snow', 'averyverylongpasswordtocheckforsecurity')
-    assert user.username == 'John Snow'
-
-
-async def test_failed_authentication_user_doesnt_exist(tmpcwd, app):
+@pytest.mark.parametrize("username,password,authorized,expected", [
+    ("name", '123', False, False),
+    ("John Snow", '123', True, False),
+    ("Snow", 'password', True, False),
+    ("John Snow", 'password', False, False),
+    ("John Snow", 'password', True, True),
+])
+async def test_authentication(username, password, authorized, expected,
+                              tmpcwd, app):
     '''Test if authentication fails with a unexistent user'''
     auth = NativeAuthenticator(db=app.db)
-    response = await auth.authenticate(app, {'username': 'name',
-                                             'password': '123'})
-    assert not response
-
-
-async def test_failed_authentication_wrong_password(tmpcwd, app):
-    '''Test if authentication fails with a wrong password'''
-    auth = NativeAuthenticator(db=app.db)
     auth.get_or_create_user('John Snow', 'password')
-    response = await auth.authenticate(app, {'username': 'John Snow',
-                                             'password': '123'})
-    assert not response
-
-
-async def test_failed_authentication_not_authorized(tmpcwd, app):
-    '''Test if authentication fails with a wrong password'''
-    auth = NativeAuthenticator(db=app.db)
-    auth.get_or_create_user('John Snow', 'password')
-    response = await auth.authenticate(app, {'username': 'John Snow',
-                                             'password': 'password'})
-    assert not response
-
-
-async def test_succeded_authentication(tmpcwd, app):
-    '''Test a successfull authentication'''
-    auth = NativeAuthenticator(db=app.db)
-    user = auth.get_or_create_user('John Snow', 'password')
-    UserInfo.change_authorization(app.db, 'John Snow')
-    response = await auth.authenticate(app, {'username': 'John Snow',
-                                             'password': 'password'})
-    assert response == user.username
+    if authorized:
+        UserInfo.change_authorization(app.db, 'John Snow')
+    response = await auth.authenticate(app, {'username': username,
+                                             'password': password})
+    assert bool(response) == expected
 
 
 async def test_handlers(app):
