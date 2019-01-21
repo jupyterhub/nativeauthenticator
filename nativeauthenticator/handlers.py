@@ -38,9 +38,10 @@ class SignUpHandler(LocalBase):
 
         result_message = 'Your information have been sent to the admin'
         if not user:
-            result_message = """Something went wrong. Be sure your password
-                                has at least 8 characters and is not
-                                too common."""
+            result_message = f"""Something went wrong. Be sure your password
+                                has at least
+                                {self.authenticator.minimum_password_length}
+                                characters and is not too common."""
 
         html = self.render_template(
             'signup.html',
