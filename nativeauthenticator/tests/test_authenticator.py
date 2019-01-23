@@ -75,20 +75,33 @@ async def test_handlers(app):
     assert handlers[2][0] == '/authorize'
 
 
-async def test_exceed_atempts_of_login(tmpcwd, app):
+async def test_add_new_attempt_of_login(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
-    auth.allowed_failed_logins = 3
-    auth.secs_before_next_try = 10
 
-    username = 'John Snow'
-    auth.get_or_create_user(username, 'password')
+    assert not auth.login_attempts
+    auth.add_login_attempt('username')
+    assert auth.login_attempts['username']['count'] == 1
+    auth.add_login_attempt('username')
+    assert auth.login_attempts['username']['count'] == 2
 
-    for i in range(3):
-        assert not auth.exceed_atempts_of_login(username)
 
-    assert auth.exceed_atempts_of_login(username)
-    time.sleep(12)
-    assert not auth.exceed_atempts_of_login(username)
+async def test_authentication_login_count(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    infos = {'username': 'johnsnow', 'password': 'password'}
+    wrong_infos = {'username': 'johnsnow', 'password': 'wrong_password'}
+    auth.get_or_create_user(infos['username'], infos['password'])
+    UserInfo.change_authorization(app.db, 'johnsnow')
+
+    assert not auth.login_attempts
+
+    await auth.authenticate(app, wrong_infos)
+    assert auth.login_attempts['johnsnow']['count'] == 1
+
+    await auth.authenticate(app, wrong_infos)
+    assert auth.login_attempts['johnsnow']['count'] == 2
+
+    await auth.authenticate(app, infos)
+    assert not auth.login_attempts.get('johnsnow')
 
 
 async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):

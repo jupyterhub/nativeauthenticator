@@ -33,7 +33,7 @@ class NativeAuthenticator(Authenticator):
         help="""Configures the number of failed attempts a user can have
                 before being blocked."""
     )
-    secs_before_next_try = Integer(
+    seconds_before_next_try = Integer(
         config=True,
         default=600,
         help="""Configures the number of seconds a user has to wait
@@ -52,24 +52,38 @@ class NativeAuthenticator(Authenticator):
         if 'users_info' not in inspector.get_table_names():
             UserInfo.__table__.create(self.db.bind)
 
-    def exceed_atempts_of_login(self, username):
-        now = datetime.now()
+    def add_login_attempt(self, username):
+        if not self.login_attempts.get(username):
+            self.login_attempts[username] = {'count': 1,
+                                             'time': datetime.now()}
+        else:
+            self.login_attempts[username]['count'] += 1
+            self.login_attempts[username]['time'] = datetime.now()
+
+    def can_try_to_login_again(self, username):
         login_attempts = self.login_attempts.get(username)
         if not login_attempts:
-            self.login_attempts[username] = {'count': 1, 'time': now}
+            return True
+
+        time_last_attempt = datetime.now() - login_attempts['time']
+        if time_last_attempt.seconds > self.seconds_before_next_try:
+            return True
+
+        return False
+
+    def is_blocked(self, username):
+        logins = self.login_attempts.get(username)
+
+        if not logins or logins['count'] < self.allowed_failed_logins:
             return False
 
-        time_last_attempt = now - login_attempts['time']
-        if time_last_attempt.seconds > self.secs_before_next_try:
-            self.login_attempts.pop(username)
+        if self.can_try_to_login_again(username):
             return False
-
-        if login_attempts['count'] < self.allowed_failed_logins:
-            self.login_attempts[username]['count'] += 1
-            self.login_attempts[username]['time'] = now
-            return False
-
         return True
+
+    def successful_login(self, username):
+        if self.login_attempts.get(username):
+            self.login_attempts.pop(username)
 
     @gen.coroutine
     def authenticate(self, handler, data):
@@ -81,11 +95,14 @@ class NativeAuthenticator(Authenticator):
             return
 
         if self.allowed_failed_logins:
-            if self.exceed_atempts_of_login(username):
+            if self.is_blocked(username):
                 return
 
         if user.is_authorized and user.is_valid_password(password):
+            self.successful_login(username)
             return username
+
+        self.add_login_attempt(username)
 
     def is_password_common(self, password):
         common_credentials_file = os.path.join(
