@@ -1,6 +1,22 @@
 {% extends "page.html" %}
 {% block main %}
 
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    var button = document.getElementById('eye');
+    button.addEventListener("click", function(e){
+        var pwd = document.getElementById("pwd");
+        if(pwd.getAttribute("type")=="password"){
+            pwd.setAttribute("type","text");
+            button.textContent = "🔑";
+        } else {
+            pwd.setAttribute("type","password");
+            button.textContent = "👁";
+        }
+    });
+});
+</script>
+
   <div class="container">
     <form action="{{post_url}}" method="post" role="form">
       <h2>
@@ -17,14 +33,21 @@
           tabindex="2"
           />
           <label for='password_input'>Password:</label>
-          <input
-          type="password"
-          class="form-control"
-          name="password"
-          id="password_input"
-          tabindex="2"
-          />
-        </div>
+          <div class="input-group">
+            <input
+            type="password"
+            class="form-control"
+            name="password"
+            id="pwd"
+            tabindex="2"
+            />
+            <span class="input-group-addon">
+              <button style="border:0;" type="button" id="eye">
+                👁
+              </button>
+            </span>
+          </div>
+          </div>
         <div class="form-group">
           <input
           type="submit"
