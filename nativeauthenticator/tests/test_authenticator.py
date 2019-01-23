@@ -1,4 +1,5 @@
 import pytest
+import time
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
@@ -72,3 +73,54 @@ async def test_handlers(app):
     handlers = auth.get_handlers(app)
     assert handlers[1][0] == '/signup'
     assert handlers[2][0] == '/authorize'
+
+
+async def test_add_new_attempt_of_login(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+
+    assert not auth.login_attempts
+    auth.add_login_attempt('username')
+    assert auth.login_attempts['username']['count'] == 1
+    auth.add_login_attempt('username')
+    assert auth.login_attempts['username']['count'] == 2
+
+
+async def test_authentication_login_count(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    infos = {'username': 'johnsnow', 'password': 'password'}
+    wrong_infos = {'username': 'johnsnow', 'password': 'wrong_password'}
+    auth.get_or_create_user(infos['username'], infos['password'])
+    UserInfo.change_authorization(app.db, 'johnsnow')
+
+    assert not auth.login_attempts
+
+    await auth.authenticate(app, wrong_infos)
+    assert auth.login_attempts['johnsnow']['count'] == 1
+
+    await auth.authenticate(app, wrong_infos)
+    assert auth.login_attempts['johnsnow']['count'] == 2
+
+    await auth.authenticate(app, infos)
+    assert not auth.login_attempts.get('johnsnow')
+
+
+async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.allowed_failed_logins = 3
+    auth.secs_before_next_try = 10
+
+    infos = {'username': 'John Snow', 'password': 'wrongpassword'}
+    auth.get_or_create_user(infos['username'], 'password')
+    UserInfo.change_authorization(app.db, 'John Snow')
+
+    for i in range(3):
+        response = await auth.authenticate(app, infos)
+        assert not response
+
+    infos['password'] = 'password'
+    response = await auth.authenticate(app, infos)
+    assert not response
+
+    time.sleep(12)
+    response = await auth.authenticate(app, infos)
+    assert response
