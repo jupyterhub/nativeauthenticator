@@ -18,6 +18,7 @@ Indices and tables
    :caption: Contents:
 
    quickstart
+   options
 
 
 Installation
