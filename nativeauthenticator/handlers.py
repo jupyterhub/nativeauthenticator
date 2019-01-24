@@ -34,9 +34,9 @@ class SignUpHandler(LocalBase):
     def get_result_message(self, message_type):
         messages = {
             'normal': 'Your information have been sent to the admin',
-            'error': (f'Something went wrong. Be sure your password has at '
+            'error': ('Something went wrong. Be sure your password has at '
                       f'least {self.authenticator.minimum_password_length} '
-                      f'characters and is not too common.'),
+                      'characters and is not too common.'),
             'success':  ('The signup was successful. You can now go to '
                          'home page and log in the system'),
         }
