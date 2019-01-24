@@ -24,12 +24,25 @@ pytestmark = pytest.mark.asyncio
 pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 
 
-async def test_create_user(tmpcwd, app):
-    '''Test if method get_or_create_user creates a new user'''
+@pytest.mark.parametrize("is_admin,open_signup,expected_authorization", [
+    (False, False, False),
+    (True, False, True),
+    (False, True, True),
+])
+async def test_create_user(is_admin, open_signup, expected_authorization,
+                           tmpcwd, app):
+    '''Test method get_or_create_user for new user and authorization '''
     auth = NativeAuthenticator(db=app.db)
-    auth.get_or_create_user('John Snow', 'password')
-    user_info = UserInfo.find(app.db, 'John Snow')
-    assert user_info.username == 'John Snow'
+
+    if is_admin:
+        auth.admin_users = ({'johnsnow'})
+    if open_signup:
+        auth.open_signup = True
+
+    auth.get_or_create_user('johnsnow', 'password')
+    user = UserInfo.find(app.db, 'johnsnow')
+    assert user.username == 'johnsnow'
+    assert user.is_authorized == expected_authorization
 
 
 @pytest.mark.parametrize("password,min_len,expected", [

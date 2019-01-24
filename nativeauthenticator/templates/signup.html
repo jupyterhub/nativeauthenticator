@@ -59,9 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </form>
-    {% if result %}
-      <div class="alert alert-info" role="alert">{{result_message}}</div>
-    {% endif %}
+    <div class="alert {{alert}}" role="alert">{{result_message}}</div>
   </div>
 
 

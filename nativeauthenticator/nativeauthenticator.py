@@ -18,26 +18,32 @@ class NativeAuthenticator(Authenticator):
     check_common_password = Bool(
         config=True,
         default=False,
-        help="""Creates a verification of password strength
-        when a new user makes signup"""
+        help=("Creates a verification of password strength "
+              "when a new user makes signup")
     )
     minimum_password_length = Integer(
         config=True,
         default=1,
-        help="""Check if the length of the password is at least this size on
-        signup"""
+        help=("Check if the length of the password is at least this size on "
+              "signup")
     )
     allowed_failed_logins = Integer(
         config=True,
         default=0,
-        help="""Configures the number of failed attempts a user can have
-                before being blocked."""
+        help=("Configures the number of failed attempts a user can have "
+              "before being blocked.")
     )
     seconds_before_next_try = Integer(
         config=True,
         default=600,
-        help="""Configures the number of seconds a user has to wait
-                after being blocked. Default is 600."""
+        help=("Configures the number of seconds a user has to wait "
+              "after being blocked. Default is 600.")
+    )
+    open_signup = Bool(
+        config=True,
+        default=False,
+        help=("Allows every user that made sign up to automatically log in "
+              "the system without needing admin authorization")
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -132,7 +138,7 @@ class NativeAuthenticator(Authenticator):
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
-        if username in self.admin_users:
+        if username in self.admin_users or self.open_signup:
             infos.update({'is_authorized': True})
 
         user_info = UserInfo(**infos)

@@ -35,4 +35,16 @@ You can also define the number of seconds a user must wait before trying again. 
 
 .. code-block:: python
 
-    c.Authenticator.secs_before_next_try = 1200
+    c.Authenticator.seconds_before_next_try = 1200
+
+
+Open SignUp
+-----------
+
+By default all users that make sign up on Native Authenticator need an admin approval so 
+they can actually log in the system. You can change this behavior by adding an option of 
+open signup, where all users that do sign up can already log in the system. To do so, just add this line to the config file:
+
+.. code-block:: python
+
+    c.Authenticator.open_signup = True
