@@ -71,3 +71,8 @@ Authorize new users
 
 To authorize new users to enter the system or to manage those that already have access to the system you can go to `<ip:port>/hub/authorize`. 
 
+
+Change password
+---------------
+
+Users that are logged in the system can easily change their password by going to: `/hub/change-password`.
