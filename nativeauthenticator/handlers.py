@@ -72,8 +72,11 @@ class AuthorizationHandler(LocalBase):
     @admin_only
     async def get(self):
         self._register_template_path()
-        html = self.render_template('autorization-area.html',
-                                    users=self.db.query(UserInfo).all())
+        html = self.render_template(
+            'autorization-area.html',
+            ask_email=self.authenticator.ask_email_on_signup,
+            users=self.db.query(UserInfo).all(),
+        )
         self.finish(html)
 
 
