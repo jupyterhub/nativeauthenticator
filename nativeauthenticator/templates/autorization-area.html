@@ -10,6 +10,7 @@
       <thead>
         <tr>
           <th>Username</th>
+          <th>Email</th>
           <th>Is Authorized?</th>
         </tr>
       </thead>
@@ -18,6 +19,7 @@
         {% if user.is_authorized %}
         <tr class="success">
           <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
           <td>Yes</td>
           <td>
             <a class="btn btn-default" 
@@ -27,6 +29,7 @@
         {% else %}
         <tr>
           <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
           <td>No</td>
           <td>
             <a class="btn btn-jupyter" 

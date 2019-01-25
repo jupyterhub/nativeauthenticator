@@ -45,6 +45,11 @@ class NativeAuthenticator(Authenticator):
         help=("Allows every user that made sign up to automatically log in "
               "the system without needing admin authorization")
     )
+    ask_email_on_signup = Bool(
+        config=True,
+        default=False,
+        help="Asks for email on signup"
+    )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)

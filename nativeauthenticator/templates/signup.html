@@ -31,7 +31,19 @@ document.addEventListener('DOMContentLoaded', function() {
           name="username"
           id="username_input"
           tabindex="2"
+          required
           />
+          {% if ask_email %}
+            <label>Email:</label>
+            <input
+            type=""
+            class="form-control"
+            name="email"
+            id="email_input"
+            tabindex="2"
+            required
+            />
+          {% endif %}
           <label for='password_input'>Password:</label>
           <div class="input-group">
             <input
@@ -40,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name="password"
             id="pwd"
             tabindex="2"
+            required
             />
             <span class="input-group-addon">
               <button style="border:0;" type="button" id="eye">
