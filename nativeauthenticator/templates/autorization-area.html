@@ -34,6 +34,11 @@
               role="button">Authorize</a>
           </td>
         {% endif %}
+          <td>
+            <a class="btn btn-jupyter" 
+               href="/hub/delete/{{ user.username }}" 
+              role="button">Remove user</a>
+          </td>
         </tr>
       {% endfor %}
       </tbody>
