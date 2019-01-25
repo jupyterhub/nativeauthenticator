@@ -33,36 +33,31 @@ class SignUpHandler(LocalBase):
         html = self.render_template('signup.html')
         self.finish(html)
 
-    def get_result_message(self, message_type):
-        messages = {
-            'normal': 'Your information have been sent to the admin',
-            'error': ('Something went wrong. Be sure your password has at '
-                      f'least {self.authenticator.minimum_password_length} '
-                      'characters and is not too common.'),
-            'success':  ('The signup was successful. You can now go to '
-                         'home page and log in the system'),
-        }
-        return messages[message_type]
+    def get_result_message(self, user):
+        alert = 'alert-info'
+        message = 'Your information have been sent to the admin'
+
+        if self.authenticator.open_signup:
+            alert = 'alert-success'
+            message = ('The signup was successful. You can now go to '
+                       'home page and log in the system')
+        if not user:
+            alert = 'alert-danger'
+            message = ('Something went wrong. Be sure your password has at '
+                       f'least {self.authenticator.minimum_password_length} '
+                       'characters and is not too common.')
+        return alert, message
 
     async def post(self):
         username = self.get_body_argument('username', strip=False)
         password = self.get_body_argument('password', strip=False)
         user = self.authenticator.get_or_create_user(username, password)
 
-        alert = 'alert-info'
-        result_message = self.get_result_message('normal')
-
-        if self.authenticator.open_signup:
-            alert = 'alert-success'
-            result_message = self.get_result_message('success')
-
-        if not user:
-            alert = 'alert-danger'
-            result_message = self.get_result_message('error')
+        alert, message = self.get_result_message(user)
 
         html = self.render_template(
             'signup.html',
-            result_message=result_message,
+            result_message=message,
             alert=alert
         )
         self.finish(html)
