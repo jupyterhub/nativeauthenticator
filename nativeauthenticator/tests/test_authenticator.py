@@ -86,6 +86,7 @@ async def test_handlers(app):
     handlers = auth.get_handlers(app)
     assert handlers[1][0] == '/signup'
     assert handlers[2][0] == '/authorize'
+    assert handlers[4][0] == '/change-password'
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):
@@ -137,3 +138,12 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     time.sleep(12)
     response = await auth.authenticate(app, infos)
     assert response
+
+
+async def test_change_password(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    user = auth.get_or_create_user('johnsnow', 'password')
+    assert user.is_valid_password('password')
+    auth.change_password('johnsnow', 'newpassword')
+    assert not user.is_valid_password('password')
+    assert user.is_valid_password('newpassword')

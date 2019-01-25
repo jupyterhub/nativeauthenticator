@@ -8,7 +8,7 @@ from tornado import gen
 from traitlets import Bool, Integer
 
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
-                       SignUpHandler)
+                       ChangePasswordHandler, SignUpHandler)
 from .orm import UserInfo
 
 
@@ -145,10 +145,16 @@ class NativeAuthenticator(Authenticator):
         self.db.add(user_info)
         return user_info
 
+    def change_password(self, username, new_password):
+        user = UserInfo.find(self.db, username)
+        user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+        self.db.commit()
+
     def get_handlers(self, app):
         native_handlers = [
             (r'/signup', SignUpHandler),
             (r'/authorize', AuthorizationHandler),
-            (r'/authorize/([^/]*)', ChangeAuthorizationHandler)
+            (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
+            (r'/change-password', ChangePasswordHandler),
         ]
         return super().get_handlers(app) + native_handlers
