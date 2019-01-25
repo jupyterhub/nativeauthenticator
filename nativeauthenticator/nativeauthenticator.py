@@ -133,7 +133,8 @@ class NativeAuthenticator(Authenticator):
         if user:
             return user
 
-        if not self.is_password_strong(pw):
+        if not self.is_password_strong(pw) or \
+           not self.validate_username(username):
             return
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
@@ -149,6 +150,12 @@ class NativeAuthenticator(Authenticator):
         user = UserInfo.find(self.db, username)
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         self.db.commit()
+
+    def validate_username(self, username):
+        invalid_chars = [',', ' ']
+        if any((char in username) for char in invalid_chars):
+            return False
+        return super().validate_username(username)
 
     def get_handlers(self, app):
         native_handlers = [
