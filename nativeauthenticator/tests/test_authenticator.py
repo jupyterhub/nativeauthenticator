@@ -45,6 +45,13 @@ async def test_create_user(is_admin, open_signup, expected_authorization,
     assert user.is_authorized == expected_authorization
 
 
+async def test_create_user_bas_characters(tmpcwd, app):
+    '''Test method get_or_create_user with bad characters on username'''
+    auth = NativeAuthenticator(db=app.db)
+    assert not auth.get_or_create_user('john snow', 'password')
+    assert not auth.get_or_create_user('john,snow', 'password')
+
+
 @pytest.mark.parametrize("password,min_len,expected", [
     ("qwerty", 1, False),
     ("agameofthrones", 1, True),
@@ -57,24 +64,24 @@ async def test_create_user_with_strong_passwords(password, min_len, expected,
     auth = NativeAuthenticator(db=app.db)
     auth.check_common_password = True
     auth.minimum_password_length = min_len
-    user = auth.get_or_create_user('John Snow', password)
+    user = auth.get_or_create_user('johnsnow', password)
     assert bool(user) == expected
 
 
 @pytest.mark.parametrize("username,password,authorized,expected", [
     ("name", '123', False, False),
-    ("John Snow", '123', True, False),
+    ("johnsnow", '123', True, False),
     ("Snow", 'password', True, False),
-    ("John Snow", 'password', False, False),
-    ("John Snow", 'password', True, True),
+    ("johnsnow", 'password', False, False),
+    ("johnsnow", 'password', True, True),
 ])
 async def test_authentication(username, password, authorized, expected,
                               tmpcwd, app):
     '''Test if authentication fails with a unexistent user'''
     auth = NativeAuthenticator(db=app.db)
-    auth.get_or_create_user('John Snow', 'password')
+    auth.get_or_create_user('johnsnow', 'password')
     if authorized:
-        UserInfo.change_authorization(app.db, 'John Snow')
+        UserInfo.change_authorization(app.db, 'johnsnow')
     response = await auth.authenticate(app, {'username': username,
                                              'password': password})
     assert bool(response) == expected
@@ -123,9 +130,9 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     auth.allowed_failed_logins = 3
     auth.secs_before_next_try = 10
 
-    infos = {'username': 'John Snow', 'password': 'wrongpassword'}
+    infos = {'username': 'johnsnow', 'password': 'wrongpassword'}
     auth.get_or_create_user(infos['username'], 'password')
-    UserInfo.change_authorization(app.db, 'John Snow')
+    UserInfo.change_authorization(app.db, 'johnsnow')
 
     for i in range(3):
         response = await auth.authenticate(app, infos)
