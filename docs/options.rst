@@ -48,3 +48,14 @@ open signup, where all users that do sign up can already log in the system. To d
 .. code-block:: python
 
     c.Authenticator.open_signup = True
+
+
+Ask for extra information on SignUp
+-----------------------------------
+
+Native Authenticator is based on username and password only. But if you need extra information about the users, you can add them on the sign up. For now, you can ask for email by adding the following line:
+
+
+.. code-block:: python
+
+    c.Authenticator.ask_email_on_signup = True

@@ -45,6 +45,11 @@ class NativeAuthenticator(Authenticator):
         help=("Allows every user that made sign up to automatically log in "
               "the system without needing admin authorization")
     )
+    ask_email_on_signup = Bool(
+        config=True,
+        default=False,
+        help="Asks for email on signup"
+    )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -128,7 +133,7 @@ class NativeAuthenticator(Authenticator):
 
         return all(checks)
 
-    def get_or_create_user(self, username, pw):
+    def get_or_create_user(self, username, pw, **kwargs):
         user = UserInfo.find(self.db, username)
         if user:
             return user
@@ -138,6 +143,7 @@ class NativeAuthenticator(Authenticator):
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
+        infos.update(kwargs)
         if username in self.admin_users or self.open_signup:
             infos.update({'is_authorized': True})
 

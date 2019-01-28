@@ -1,9 +1,9 @@
 import bcrypt
+import re
 from jupyterhub.orm import Base
 
-from sqlalchemy import (
-    Boolean, Column, Integer, String
-)
+from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import validates
 
 
 class UserInfo(Base):
@@ -12,6 +12,7 @@ class UserInfo(Base):
     username = Column(String, nullable=False)
     password = Column(String, nullable=False)
     is_authorized = Column(Boolean, default=False)
+    email = Column(String)
 
     @classmethod
     def find(cls, db, username):
@@ -31,3 +32,9 @@ class UserInfo(Base):
         user.is_authorized = not user.is_authorized
         db.commit()
         return user
+
+    @validates('email')
+    def validate_email(self, key, address):
+        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$",
+                        address)
+        return address
