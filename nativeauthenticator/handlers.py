@@ -46,9 +46,17 @@ class SignUpHandler(LocalBase):
                        'home page and log in the system')
         if not user:
             alert = 'alert-danger'
-            message = ('Something went wrong. Be sure your password has at '
-                       f'least {self.authenticator.minimum_password_length} '
-                       'characters and is not too common.')
+            pw_len = self.authenticator.minimum_password_length
+
+            if pw_len:
+                message = ("Something went wrong. Be sure your password has "
+                           f"at least {pw_len} characters, doesn't have "
+                           "spaces or commas and is not too common.")
+            else:
+                message = ("Something went wrong. Be sure your password "
+                           " doesn't have spaces or commas and is not too "
+                           "common.")
+
         return alert, message
 
     async def post(self):

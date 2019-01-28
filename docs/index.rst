@@ -46,7 +46,9 @@ Then, you must create the configuration file for JupyterHub:
 
 And change the default Authenticator class for our Native Authenticator class:
 
-`c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'`
+.. code-block:: python
+
+    c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
 
 
 Run your JupyterHub normally, and the authenticator will be running with it.
@@ -66,10 +68,16 @@ If you are and admin, be sure that your username is listed on the `admin_users` 
 If you create a new user that is listed as an admin on the config file, it will automatically have access to the system just after the signup. 
 
 
+Usernames restrictions
+----------------------
+
+Usernames can't contain commas, whitespaces, slashes or be empty. If any of these are in the username on signup, the user won't be able to do the signup. 
+
+
 Authorize new users
 -------------------
 
-To authorize new users to enter the system or to manage those that already have access to the system you can go to `<ip:port>/hub/authorize`. 
+To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize`. 
 
 
 Change password
