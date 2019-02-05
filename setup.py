@@ -9,7 +9,7 @@ setup(
     author_email='leportella@protonmail.com',
     license='3 Clause BSD',
     packages=find_packages(),
-    install_requires=['jupyterhub>=0.8'],
+    install_requires=['jupyterhub>=0.8', 'bcrypt'],
     package_data={
         'templates': ['*.html'],
         'common-credentials': ['common-credentials.txt'],
