@@ -50,8 +50,9 @@ class SignUpHandler(LocalBase):
 
             if pw_len:
                 message = ("Something went wrong. Be sure your password has "
-                           f"at least {pw_len} characters, doesn't have "
-                           "spaces or commas and is not too common.")
+                           "at least {} characters, doesn't have spaces or "
+                           "commas and is not too common.").format(pw_len)
+
             else:
                 message = ("Something went wrong. Be sure your password "
                            " doesn't have spaces or commas and is not too "
