@@ -2,6 +2,7 @@ import os
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import admin_only
+from urllib import parse
 
 from tornado import web
 
@@ -61,9 +62,9 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
-        username = self.get_body_argument('username', strip=False)
-        password = self.get_body_argument('password', strip=False)
-        user = self.authenticator.get_or_create_user(username, password)
+        body = self.request.body.decode('utf-8')
+        body_arguments = dict(parse.parse_qsl(body))
+        user = self.authenticator.get_or_create_user(**body_arguments)
 
         alert, message = self.get_result_message(user)
 
