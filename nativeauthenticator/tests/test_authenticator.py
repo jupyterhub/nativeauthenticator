@@ -1,5 +1,6 @@
 import pytest
 import time
+from jupyterhub.orm import User
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
@@ -40,9 +41,11 @@ async def test_create_user(is_admin, open_signup, expected_authorization,
         auth.open_signup = True
 
     auth.get_or_create_user('johnsnow', 'password')
-    user = UserInfo.find(app.db, 'johnsnow')
-    assert user.username == 'johnsnow'
-    assert user.is_authorized == expected_authorization
+    user_info = UserInfo.find(app.db, 'johnsnow')
+    user = User.find(app.db, 'johnsnow')
+    assert user_info.username == 'johnsnow'
+    assert user.name == 'johnsnow'
+    assert user_info.is_authorized == expected_authorization
 
 
 async def test_create_user_bas_characters(tmpcwd, app):
@@ -154,3 +157,14 @@ async def test_change_password(tmpcwd, app):
     auth.change_password('johnsnow', 'newpassword')
     assert not user.is_valid_password('password')
     assert user.is_valid_password('newpassword')
+
+
+async def test_delete_user(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.get_or_create_user('johnsnow', 'password')
+
+    user = User.find(app.db, 'johnsnow')
+    auth.delete_user(user)
+
+    user_info = UserInfo.find(app.db, 'johnsnow')
+    assert not user_info
