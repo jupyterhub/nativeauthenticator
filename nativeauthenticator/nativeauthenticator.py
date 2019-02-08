@@ -2,6 +2,7 @@ import bcrypt
 import os
 from datetime import datetime
 from jupyterhub.auth import Authenticator
+from jupyterhub.orm import User
 
 from sqlalchemy import inspect
 from tornado import gen
@@ -149,7 +150,11 @@ class NativeAuthenticator(Authenticator):
             infos.update({'is_authorized': True})
 
         user_info = UserInfo(**infos)
-        self.db.add(user_info)
+        user = User(name=username)
+
+        self.db.add_all([user_info, user])
+        self.db.commit()
+
         return user_info
 
     def change_password(self, username, new_password):
@@ -171,3 +176,9 @@ class NativeAuthenticator(Authenticator):
             (r'/change-password', ChangePasswordHandler),
         ]
         return super().get_handlers(app) + native_handlers
+
+    def delete_user(self, user):
+        user_info = UserInfo.find(self.db, user.name)
+        self.db.delete(user_info)
+        self.db.commit()
+        return super().delete_user(user)
