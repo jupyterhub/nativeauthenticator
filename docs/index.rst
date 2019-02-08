@@ -6,81 +6,24 @@
 Welcome to Native Authenticator's documentation!
 ================================================
 
-Welcome to Native Authenticator's documentation! 
+A simple authenticator for small-medium size `JupyterHub <https://github.com/jupyterhub/>`_ applications.
 
-Native Authenticator is a plugin Authenticator for the `JupyterHub <https://github.com/jupyterhub/>`_. Be sure you have JupyterHub already running on your machine before installing this authenticator.
+Native Authenticator provides the following features:
+
+* New users can signup on the system;
+* New users can be blocked of accessing the system and need an admin authorization;
+* Option of increase password security by avoiding common passwords or minimum password length;
+* Option to block users after a number attempts of login;
+* Option of open signup and no need for initial authorization;
+* Option of adding more information about users on signup.
+
 
 Indices and tables
 ==================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
    quickstart
    options
-
-
-Installation
-------------
-
-Native Authenticator is a plugin Authenticator for the
-`JupyterHub <https://github.com/jupyterhub/>`_. Be sure you have JupyterHub
-already running on your machine before installing this authenticator.
-
-You must install this authenticator throught the project's repository. This is
-a temporary solution until we have the package on the `Pypi <https://pypi.org/>`_:
-
-.. code-block:: bash
-
-   $ git clone https://github.com/jupyterhub/nativeauthenticator.git
-   $ pip install -e .
-
-
-Then, you must create the configuration file for JupyterHub:
-
-.. code-block:: bash
-
-    $ jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
-
-
-And change the default Authenticator class for our Native Authenticator class:
-
-.. code-block:: python
-
-    c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
-
-
-Run your JupyterHub normally, and the authenticator will be running with it.
-
-
-User creation
--------------
-
-To access the system you must go to `/hub/signup` and create a username and a password. Be default, all users that sings up to the system need an Admin authorization to access the system. 
-
-If you are and admin, be sure that your username is listed on the `admin_users` on the config file such as:
-
-.. code-block:: python
-
-    c.Authenticator.admin_users = {'username'}
-
-If you create a new user that is listed as an admin on the config file, it will automatically have access to the system just after the signup. 
-
-
-Usernames restrictions
-----------------------
-
-Usernames can't contain commas, whitespaces, slashes or be empty. If any of these are in the username on signup, the user won't be able to do the signup. 
-
-
-Authorize new users
--------------------
-
-To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize`. 
-
-
-Change password
----------------
-
-Users that are logged in the system can easily change their password by going to: `/hub/change-password`.
