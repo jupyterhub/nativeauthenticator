@@ -61,9 +61,12 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
-        username = self.get_body_argument('username', strip=False)
-        password = self.get_body_argument('password', strip=False)
-        user = self.authenticator.get_or_create_user(username, password)
+        user_info = {
+            'username': self.get_body_argument('username', strip=False),
+            'pw': self.get_body_argument('pw', strip=False),
+            'email': self.get_body_argument('email', '', strip=False),
+        }
+        user = self.authenticator.get_or_create_user(**user_info)
 
         alert, message = self.get_result_message(user)
 
