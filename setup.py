@@ -11,7 +11,7 @@ setup(
     packages=find_packages(),
     install_requires=['jupyterhub>=0.8', 'bcrypt'],
     package_data={
-        'templates': ['*.html'],
+        '': ['*.html'],
         'common-credentials': ['common-credentials.txt'],
     }
 )
