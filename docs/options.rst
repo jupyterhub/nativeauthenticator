@@ -24,7 +24,7 @@ You can also add a minimum password length that the user must have. To do this a
 
 If any of this configuration is available, the user will receive this message on SignUp:
 
-.. image:: https://i.imgur.com/FIPrW0t.png
+.. image:: _static/wrong_signup.png
 
 
 Block users after failed logins
@@ -43,7 +43,7 @@ You can also define the number of seconds a user must wait before trying again. 
     c.Authenticator.seconds_before_next_try = 1200
 
 
-.. image:: https://i.imgur.com/EgGZgbX.png
+.. image:: _static/block_user_failed_logins.png
 
 Open SignUp
 -----------

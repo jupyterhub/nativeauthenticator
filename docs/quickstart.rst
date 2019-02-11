@@ -44,12 +44,12 @@ Default workflow
 A new user that wants access to a system running the Native Authenticator must enter the SignUp page and create a new username and password. By default, this user will not have access to the system, they will the authorization of an admin to actually be able to login the system. Thus, when making the signup the user will receive a message letting them know that their information was sent to an admin. 
 
 
-.. image:: https://i.imgur.com/1R4Uwha.png
+.. image:: _static/native_auth_flow.png
 
 
 The admin must acces the authorization panel and authorize the user so they be able to login:
 
-.. image:: https://i.imgur.com/gWzRo8y.png
+.. image:: _static/authorization_area.png
 
 
 Adding new users
@@ -75,7 +75,7 @@ Authorize or unauthorize users
 
 To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize`. Authorized users will have a green background with a button for unauthorize them while unauthorized users will have a white background and an authorization button. 
 
-.. image:: https://i.imgur.com/gWzRo8y.png
+.. image:: _static/authorization_area.png
 
 
 Change password
@@ -83,4 +83,4 @@ Change password
 
 Users that are logged in the system can easily change their password by going to: `/hub/change-password`.
 
-.. image:: https://i.imgur.com/0FFuNkC.png
+.. image:: _static/change-password.png
