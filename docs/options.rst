@@ -1,10 +1,11 @@
-Feature Options
-===============
+Optional Configuration
+======================
+
 
 Password Strength
 -----------------
 
-By default, when a user signs up through Native Authenticator there is no password strength verification. There are two methods that you can add to increase password strength: a verification for commmon passowords and a minimum length of password. 
+By default, when a user signs up through Native Authenticator there is no password strength verification, so any type of password is valid. There are two methods that you can add to increase password strength: a verification for commmon passowords and a minimum length of password. 
 
 To verify if the password is not common (such as 'qwerty' or '1234'), you can add the following line to your config file:
 
@@ -20,6 +21,10 @@ You can also add a minimum password length that the user must have. To do this a
 .. code-block:: python
 
     c.Authenticator.minimim_password_length = 10
+
+If any of this configuration is available, the user will receive this message on SignUp:
+
+.. image:: _static/wrong_signup.png
 
 
 Block users after failed logins
@@ -38,6 +43,8 @@ You can also define the number of seconds a user must wait before trying again. 
     c.Authenticator.seconds_before_next_try = 1200
 
 
+.. image:: _static/block_user_failed_logins.png
+
 Open SignUp
 -----------
 
@@ -53,7 +60,7 @@ open signup, where all users that do sign up can already log in the system. To d
 Ask for extra information on SignUp
 -----------------------------------
 
-Native Authenticator is based on username and password only. But if you need extra information about the users, you can add them on the sign up. For now, you can ask for email by adding the following line:
+Native Authenticator is based on username and password only. But if you need extra information about the users, you can add them on the sign up. For now, the only extra information you can ask is email. To do so, you can add the following line on the config file:
 
 
 .. code-block:: python
