@@ -1,6 +1,9 @@
+import os
 from setuptools import setup, find_packages
 
-setup(
+pjoin = os.path.join
+
+setup_args = dict(
     name='jupyterhub-nativeauthenticator',
     version='0.0.1',
     description='JupyterHub Native Authenticator',
@@ -11,7 +14,17 @@ setup(
     packages=find_packages(),
     install_requires=['jupyterhub>=0.8', 'bcrypt'],
     package_data={
-        'templates': ['*.html'],
-        'common-credentials': ['common-credentials.txt'],
+        'nativeauthenticator': [
+            pjoin('templates', '*.html'),
+            'common-credentials.txt'
+        ],
     }
 )
+
+
+def main():
+    setup(**setup_args)
+
+
+if __name__ == '__main__':
+    main()
