@@ -9,10 +9,10 @@ from sqlalchemy.orm import validates
 class UserInfo(Base):
     __tablename__ = 'users_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    username = Column(String(128), nullable=False)
+    password = Column(String(128), nullable=False)
     is_authorized = Column(Boolean, default=False)
-    email = Column(String)
+    email = Column(String(128))
 
     @classmethod
     def find(cls, db, username):
@@ -23,8 +23,9 @@ class UserInfo(Base):
     def is_valid_password(self, password):
         """Checks if a password passed matches the
         password stored"""
-        encoded_pw = bcrypt.hashpw(password.encode(), self.password)
-        return encoded_pw == self.password
+        check_pwd = self.password.encode() if type(self.password) != bytes else self.password
+        encoded_pw = bcrypt.hashpw(password.encode(), check_pwd)
+        return encoded_pw == check_pwd
 
     @classmethod
     def change_authorization(cls, db, username):
@@ -35,6 +36,8 @@ class UserInfo(Base):
 
     @validates('email')
     def validate_email(self, key, address):
+        if not address:
+            return
         assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$",
                         address)
         return address
