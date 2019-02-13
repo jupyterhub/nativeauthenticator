@@ -2,7 +2,6 @@ import bcrypt
 import os
 from datetime import datetime
 from jupyterhub.auth import Authenticator
-from jupyterhub.orm import User
 
 from sqlalchemy import inspect
 from tornado import gen
@@ -151,11 +150,10 @@ class NativeAuthenticator(Authenticator):
 
         try:
             user_info = UserInfo(**infos)
-            user = User(name=username)
         except AssertionError:
             return
 
-        self.db.add_all([user_info, user])
+        self.db.add(user_info)
         self.db.commit()
         return user_info
 
