@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='jupyterhub-nativeauthenticator',
-    version='0.0.2',
+    version='0.0.3',
     description='JupyterHub Native Authenticator',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -15,7 +15,5 @@ setup(
     license='3 Clause BSD',
     packages=find_packages(),
     install_requires=['jupyterhub>=0.8', 'bcrypt'],
-    package_data={
-        '': ['*.html', 'common-credentials.txt'],
-    }
+    include_package_data=True,
 )
