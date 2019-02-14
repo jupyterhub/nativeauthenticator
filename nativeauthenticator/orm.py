@@ -2,7 +2,7 @@ import bcrypt
 import re
 from jupyterhub.orm import Base
 
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
 from sqlalchemy.orm import validates
 
 
@@ -10,7 +10,7 @@ class UserInfo(Base):
     __tablename__ = 'users_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String)
 
