@@ -1,3 +1,4 @@
+import dbm
 import pytest
 import time
 from jupyterhub.tests.mocking import MockHub
@@ -165,3 +166,26 @@ async def test_delete_user(tmpcwd, app):
 
     user_info = UserInfo.find(app.db, 'johnsnow')
     assert not user_info
+
+
+async def test_import_from_firstuse(tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db['user1'] = 'password'
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.add_data_from_firstuse()
+    assert UserInfo.find(app.db, 'user1')
+
+
+@pytest.mark.parametrize("user,pwd", [
+    ('user1', 'password'),
+    ('user 1', 'somethingelsereallysecure'),
+])
+async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db[user] = pwd
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.check_common_password = True
+    with pytest.raises(ValueError):
+        auth.add_data_from_firstuse()
