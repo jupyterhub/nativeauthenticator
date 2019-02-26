@@ -169,25 +169,35 @@ async def test_delete_user(tmpcwd, app):
     assert not user_info
 
 
-async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
-    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
+    with dbm.open('passwords', 'c', 0o600) as db:
         db['user1'] = 'password'
 
+    firstuse_file = Path('passwords.db')
+    auth = NativeAuthenticator(db=app.db)
+
+    # remove file extension so dbm won't freak out
+    auth.firstuse_db_path = str(firstuse_file.absolute())[:-3]
+
+    auth.add_data_from_firstuse()
+    assert UserInfo.find(app.db, 'user1')
+    assert firstuse_file.exists()
+
+
+async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
+    with dbm.open('passwords', 'c', 0o600) as db:
+        db['user1'] = 'password'
+
+    firstuse_file = Path('passwords.db')
     auth = NativeAuthenticator(db=app.db)
     auth.delete_firstuse_db_after_import = True
+
+    # remove file extension so dbm won't freak out
+    auth.firstuse_db_path = str(firstuse_file.absolute())[:-3]
+
     auth.add_data_from_firstuse()
     assert UserInfo.find(app.db, 'user1')
-    assert not Path('passwords.dbm.db').exists()
-
-
-async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
-    with dbm.open('passwords.dbm', 'c', 0o600) as db:
-        db['user1'] = 'password'
-
-    auth = NativeAuthenticator(db=app.db)
-    auth.add_data_from_firstuse()
-    assert UserInfo.find(app.db, 'user1')
-    assert Path('passwords.dbm.db').exists()
+    assert not firstuse_file.exists()
 
 
 @pytest.mark.parametrize("user,pwd", [
