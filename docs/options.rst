@@ -94,3 +94,10 @@ avoiding common passwords. If usernames or passwords imported from the
 FirstUse Authenticator don't comply with these verifications, the importating will raise an 
 error.
 
+You can also remove FirstUse's database file after the importation to Native Authenticator, to avoid leaving unused files on the system. To do so, you must add the following line to the configuration file:
+
+
+.. code-block:: python
+
+    c.Authenticator.delete_firstuse_db_after_import = True
+
