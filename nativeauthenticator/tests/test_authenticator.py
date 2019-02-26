@@ -179,6 +179,7 @@ async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
     assert UserInfo.find(app.db, 'user1')
     assert not Path('passwords.dbm.db').exists()
 
+
 async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
     with dbm.open('passwords.dbm', 'c', 0o600) as db:
         db['user1'] = 'password'
