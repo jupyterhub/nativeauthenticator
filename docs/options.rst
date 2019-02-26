@@ -86,7 +86,7 @@ By default, Native Authenticator assumes that the path for the database is the s
 
 .. code-block:: python
 
-    c.Authenticator.dbm_path = '/home/user/passwords.dbm'
+    c.Authenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
 
 Native Authenticator ensures that usernames are sanitized, so they won't have commas 
 or white spaces. Additionaly, you can add password verification such as 

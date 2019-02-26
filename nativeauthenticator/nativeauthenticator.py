@@ -56,7 +56,7 @@ class NativeAuthenticator(Authenticator):
         default=False,
         help="Import users from FirstUse Authenticator database"
     )
-    dbm_path = Unicode(
+    firstuse_dbm_path = Unicode(
         'passwords.dbm',
         config=True,
         help="""
@@ -200,7 +200,7 @@ class NativeAuthenticator(Authenticator):
         return super().delete_user(user)
 
     def add_data_from_firstuse(self):
-        with dbm.open(self.dbm_path, 'c', 0o600) as db:
+        with dbm.open(self.firstuse_dbm_path, 'c', 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
                 new_user = self.get_or_create_user(user.decode(), password)
