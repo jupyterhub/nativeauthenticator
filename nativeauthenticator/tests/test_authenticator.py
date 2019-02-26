@@ -2,6 +2,7 @@ import dbm
 import pytest
 import time
 from jupyterhub.tests.mocking import MockHub
+from pathlib import Path
 
 from nativeauthenticator import NativeAuthenticator
 from ..orm import UserInfo
@@ -168,13 +169,24 @@ async def test_delete_user(tmpcwd, app):
     assert not user_info
 
 
-async def test_import_from_firstuse(tmpcwd, app):
+async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db['user1'] = 'password'
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.delete_firstuse_db_after_import = True
+    auth.add_data_from_firstuse()
+    assert UserInfo.find(app.db, 'user1')
+    assert not Path('passwords.dbm.db').exists()
+
+async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
     with dbm.open('passwords.dbm', 'c', 0o600) as db:
         db['user1'] = 'password'
 
     auth = NativeAuthenticator(db=app.db)
     auth.add_data_from_firstuse()
     assert UserInfo.find(app.db, 'user1')
+    assert Path('passwords.dbm.db').exists()
 
 
 @pytest.mark.parametrize("user,pwd", [

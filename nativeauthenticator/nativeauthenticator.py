@@ -42,18 +42,18 @@ class NativeAuthenticator(Authenticator):
     )
     open_signup = Bool(
         config=True,
-        default=False,
+        default_value=False,
         help=("Allows every user that made sign up to automatically log in "
               "the system without needing admin authorization")
     )
     ask_email_on_signup = Bool(
         config=True,
-        default=False,
+        default_value=False,
         help="Asks for email on signup"
     )
     import_from_firstuse = Bool(
         config=True,
-        default=False,
+        default_value=False,
         help="Import users from FirstUse Authenticator database"
     )
     firstuse_dbm_path = Unicode(
@@ -62,6 +62,11 @@ class NativeAuthenticator(Authenticator):
         help="""
         Path to store the db file of FirstUse with username / pwd hash in
         """
+    )
+    delete_firstuse_db_after_import = Bool(
+        config=True,
+        default_value=False,
+        help="Deletes FirstUse Authenticator database after the import"
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -209,3 +214,6 @@ class NativeAuthenticator(Authenticator):
                                restrictions or username problems before trying
                                again'''.format(user)
                     raise ValueError(error)
+
+        if self.delete_firstuse_db_after_import:
+            os.remove(self.firstuse_dbm_path + '.db')
