@@ -1,0 +1,44 @@
+{% extends "page.html" %}
+{% block main %}
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    var button = document.getElementById('eye');
+    button.addEventListener("click", function(e) {
+        var pwd = document.getElementById("password_input");
+        if (pwd.getAttribute("type") == "password") {
+            pwd.setAttribute("type", "text");
+            button.textContent = "🔑";
+        } else {
+            pwd.setAttribute("type", "password");
+            button.textContent = "👁";
+        }
+    });
+});
+</script>
+{% block login %}
+<div id="login-main" class="container">
+    <form action="{{login_url}}?next={{next}}" method="post" role="form">
+        <div class="auth-form-header">
+            Sign In
+        </div>
+        <div class='auth-form-body'>
+            <label for="username_input">Username:</label>
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <label for='password_input'>Password:</label>
+            <div class="input-group">
+                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye">
+                        👁
+                    </button>
+                </span>
+            </div>
+            <input type="submit" id="login_submit" class='btn btn-jupyter' value='Sign In' tabindex="3" />
+            <div style="padding-top: 25px;">
+                Don't have an user? <a href="/signup">Signup!</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock login %}
+{% endblock %}
