@@ -1,8 +1,8 @@
 import dbm
+import os
 import pytest
 import time
 from jupyterhub.tests.mocking import MockHub
-from pathlib import Path
 
 from nativeauthenticator import NativeAuthenticator
 from ..orm import UserInfo
@@ -170,34 +170,28 @@ async def test_delete_user(tmpcwd, app):
 
 
 async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
-    with dbm.open('passwords', 'c', 0o600) as db:
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
         db['user1'] = 'password'
 
-    firstuse_file = Path('passwords.db')
     auth = NativeAuthenticator(db=app.db)
-
-    # remove file extension so dbm won't freak out
-    auth.firstuse_db_path = str(firstuse_file.absolute())[:-3]
-
     auth.add_data_from_firstuse()
+
+    files = os.listdir()
     assert UserInfo.find(app.db, 'user1')
-    assert firstuse_file.exists()
+    assert ('passwords.dbm' in files) or ('passwords.dbm.db' in files)
 
 
 async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
-    with dbm.open('passwords', 'c', 0o600) as db:
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
         db['user1'] = 'password'
 
-    firstuse_file = Path('passwords.db')
     auth = NativeAuthenticator(db=app.db)
     auth.delete_firstuse_db_after_import = True
 
-    # remove file extension so dbm won't freak out
-    auth.firstuse_db_path = str(firstuse_file.absolute())[:-3]
-
     auth.add_data_from_firstuse()
+    files = os.listdir()
     assert UserInfo.find(app.db, 'user1')
-    assert not firstuse_file.exists()
+    assert ('passwords.dbm' not in files) and ('passwords.dbm.db' not in files)
 
 
 @pytest.mark.parametrize("user,pwd", [

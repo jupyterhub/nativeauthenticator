@@ -3,6 +3,7 @@ import dbm
 import os
 from datetime import datetime
 from jupyterhub.auth import Authenticator
+from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
@@ -204,6 +205,18 @@ class NativeAuthenticator(Authenticator):
         self.db.commit()
         return super().delete_user(user)
 
+    def delete_dbm_db(self):
+        db_path = Path(self.firstuse_db_path)
+        db_dir = db_path.cwd()
+        db_name = db_path.name
+        db_complete_path = str(db_path.absolute())
+
+        # necessary for BSD implementation of dbm lib
+        if db_name + '.db' in os.listdir(db_dir):
+            os.remove(db_complete_path + '.db')
+        else:
+            os.remove(db_complete_path)
+
     def add_data_from_firstuse(self):
         with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
             for user in db.keys():
@@ -216,4 +229,4 @@ class NativeAuthenticator(Authenticator):
                     raise ValueError(error)
 
         if self.delete_firstuse_db_after_import:
-            os.remove(self.firstuse_db_path + '.db')
+            self.delete_dbm_db()
