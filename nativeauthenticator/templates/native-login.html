@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
             Sign In
         </div>
         <div class='auth-form-body'>
+            <p id='insecure-login-warning' class='hidden'>
+                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
+                We strongly recommend enabling HTTPS for JupyterHub.
+            </p>
+            {% if login_error %}
+            <p class="login_error">
+                {{login_error}}
+            </p>
+            {% endif %}
             <label for="username_input">Username:</label>
             <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
             <label for='password_input'>Password:</label>
@@ -41,4 +50,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </form>
 </div>
 {% endblock login %}
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script>
+if (window.location.protocol === "http:") {
+    // unhide http warning
+    var warning = document.getElementById('insecure-login-warning');
+    warning.className = warning.className.replace(/\bhidden\b/, '');
+}
+</script>
 {% endblock %}
