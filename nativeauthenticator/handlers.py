@@ -1,9 +1,12 @@
 import os
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
+from jupyterhub.handlers.login import LoginHandler
 from jupyterhub.utils import admin_only
 
 from tornado import web
+from tornado.escape import url_escape
+from tornado.httputil import url_concat
 
 from .orm import UserInfo
 
@@ -119,3 +122,21 @@ class ChangePasswordHandler(LocalBase):
             result_message='Your password has been changed successfully',
         )
         self.finish(html)
+
+
+class LoginHandler(LoginHandler, LocalBase):
+
+    def _render(self, login_error=None, username=None):
+        self._register_template_path()
+        return self.render_template(
+            'native-login.html',
+            next=url_escape(self.get_argument('next', default='')),
+            username=username,
+            login_error=login_error,
+            custom_html=self.authenticator.custom_html,
+            login_url=self.settings['login_url'],
+            authenticator_login_url=url_concat(
+                self.authenticator.login_url(self.hub.base_url),
+                {'next': self.get_argument('next', '')},
+            ),
+        )

@@ -91,6 +91,7 @@ async def test_handlers(app):
     '''Test if all handlers are available on the Authenticator'''
     auth = NativeAuthenticator(db=app.db)
     handlers = auth.get_handlers(app)
+    assert handlers[0][0] == '/login'
     assert handlers[1][0] == '/signup'
     assert handlers[2][0] == '/authorize'
     assert handlers[4][0] == '/change-password'

@@ -8,7 +8,7 @@ from tornado import gen
 from traitlets import Bool, Integer
 
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
-                       ChangePasswordHandler, SignUpHandler)
+                       ChangePasswordHandler, LoginHandler, SignUpHandler)
 from .orm import UserInfo
 
 
@@ -170,12 +170,13 @@ class NativeAuthenticator(Authenticator):
 
     def get_handlers(self, app):
         native_handlers = [
+            (r'/login', LoginHandler),
             (r'/signup', SignUpHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
             (r'/change-password', ChangePasswordHandler),
         ]
-        return super().get_handlers(app) + native_handlers
+        return native_handlers
 
     def delete_user(self, user):
         user_info = UserInfo.find(self.db, user.name)

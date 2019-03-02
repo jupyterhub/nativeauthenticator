@@ -1,79 +1,52 @@
 {% extends "page.html" %}
 {% block main %}
-
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
     var button = document.getElementById('eye');
-    button.addEventListener("click", function(e){
+    button.addEventListener("click", function(e) {
         var pwd = document.getElementById("pwd");
-        if(pwd.getAttribute("type")=="password"){
-            pwd.setAttribute("type","text");
+        if (pwd.getAttribute("type") == "password") {
+            pwd.setAttribute("type", "text");
             button.textContent = "🔑";
         } else {
-            pwd.setAttribute("type","password");
+            pwd.setAttribute("type", "password");
             button.textContent = "👁";
         }
     });
 });
 </script>
-
-  <div class="container">
+{% block login %}
+<div id="login-main" class="container">
     <form action="{{post_url}}" method="post" role="form">
-      <h2>
-      Sign Up
-      </h2>
-      <div>
-        <div class="form-group">
-          <label>Username:</label>
-          <input
-          type=""
-          class="form-control"
-          name="username"
-          id="username_input"
-          tabindex="2"
-          required
-          />
-          {% if ask_email %}
-            <label>Email:</label>
-            <input
-            type=""
-            class="form-control"
-            name="email"
-            id="email_input"
-            tabindex="2"
-            required
-            />
-          {% endif %}
-          <label for='password_input'>Password:</label>
-          <div class="input-group">
-            <input
-            type="password"
-            class="form-control"
-            name="pw"
-            id="pwd"
-            tabindex="2"
-            required
-            />
-            <span class="input-group-addon">
-              <button style="border:0;" type="button" id="eye">
-                👁
-              </button>
-            </span>
-          </div>
-          </div>
-        <div class="form-group">
-          <input
-          type="submit"
-          id="signup_submit"
-          class='btn btn-jupyter'
-          value='Create User'
-          tabindex="3"
-          />
+        <div class="auth-form-header">
+            Sign Up
         </div>
-      </div>
-    </form>
-    <div class="alert {{alert}}" role="alert">{{result_message}}</div>
-  </div>
-
-
+        <div class='auth-form-body'>
+            <label>Username:</label>
+            <input type="" class="form-control" name="username" id="username_input" tabindex="2" required />
+            {% if ask_email %}
+            <label>Email:</label>
+            <input type="" class="form-control" name="email" id="email_input" tabindex="2" required />
+            {% endif %}
+            <label for='password_input'>Password:</label>
+            <div class="input-group">
+                <input type="password" class="form-control" name="pw" id="pwd" tabindex="2" required />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye">
+                        👁
+                    </button>
+                </span>
+            </div>
+            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
+            <div style="padding-top: 25px;">
+                Already have an user? <a href="/login">Login!</a>
+            </div>
+            {% if alert %}
+            <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">{{result_message}}</div>
+            {% endif %}
+        </div>
+</div>
+</form>
+</div>
+{% endblock login %}
 {% endblock %}
