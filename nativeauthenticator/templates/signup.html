@@ -44,11 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
             {% if alert %}
             <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">
                 {{result_message}}
-                {% if second_factor_auth %}
+                {% if two_factor_auth %}
                     <p><p/>
                     <strong>Attention!</strong> This system requires two factor authentication.
                     <br/>
-                    Your two factor authentication code is <strong>{{ second_factor_auth_value }}</strong>. Be sure to keep it safe :)
+                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep it safe :)
                 {% endif %}
             </div>
             {% endif %}

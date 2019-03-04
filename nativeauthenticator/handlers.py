@@ -82,8 +82,8 @@ class SignUpHandler(LocalBase):
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
             alert=alert,
-            second_factor_auth=self.authenticator.add_two_factor_authentication,
-            second_factor_auth_value=otp_secret,
+            two_factor_auth=self.authenticator.add_two_factor_authentication,
+            two_factor_auth_value=otp_secret,
         )
         self.finish(html)
 
@@ -141,7 +141,7 @@ class LoginHandler(LoginHandler, LocalBase):
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings['login_url'],
-            second_factor_auth=self.authenticator.add_two_factor_authentication,
+            two_factor_auth=self.authenticator.add_two_factor_authentication,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {'next': self.get_argument('next', '')},

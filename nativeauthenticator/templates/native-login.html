@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <label for="username_input">Username:</label>
             <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" 
             tabindex="1" autofocus="autofocus" />
-            {% if second_factor_auth %}
+            {% if two_factor_auth %}
             <label for="2auth_input">Second auth factor:</label>
             <input id="2auth_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2auth" tabindex="1" autofocus="autofocus" />
             {% endif %}
