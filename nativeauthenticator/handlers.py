@@ -73,11 +73,17 @@ class SignUpHandler(LocalBase):
 
         alert, message = self.get_result_message(user)
 
+        otp_secret = ''
+        if user:
+            otp_secret = user.otp_secret
+
         html = self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
-            alert=alert
+            alert=alert,
+            second_factor_auth=self.authenticator.add_two_factor_authentication,
+            second_factor_auth_value=otp_secret,
         )
         self.finish(html)
 
