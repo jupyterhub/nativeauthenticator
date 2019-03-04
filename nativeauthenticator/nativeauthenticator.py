@@ -50,12 +50,11 @@ class NativeAuthenticator(Authenticator):
     ask_email_on_signup = Bool(
         False,
         config=True,
-        default_value=False,
         help="Asks for email on signup"
     )
     import_from_firstuse = Bool(
+        False,
         config=True,
-        default_value=False,
         help="Import users from FirstUse Authenticator database"
     )
     firstuse_db_path = Unicode(
