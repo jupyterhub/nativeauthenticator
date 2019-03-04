@@ -66,3 +66,38 @@ Native Authenticator is based on username and password only. But if you need ext
 .. code-block:: python
 
     c.Authenticator.ask_email_on_signup = True
+
+
+Import users from FirstUse Authenticator
+----------------------------------------
+
+If you are using `FirstUse Authenticator <https://github.com/jupyterhub/firstuseauthenticator>` and wish to change to Native Authenticator, you can import users from that authenticator to Native authenticator with minimum work!
+
+To do so, you have to add the following line on the configuration file:
+
+.. code-block:: python
+
+    c.Authenticator.import_from_firstuse = True
+
+**Remark: unless you have configured the open signup configuration, the users will be created but they will not be able to login, because they don't have authorization by default.**
+
+
+By default, Native Authenticator assumes that the path for the database is the same directory. If that's not the case, you can change the path the file through this variables:
+
+.. code-block:: python
+
+    c.Authenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
+
+Native Authenticator ensures that usernames are sanitized, so they won't have commas 
+or white spaces. Additionaly, you can add password verification such as 
+avoiding common passwords. If usernames or passwords imported from the 
+FirstUse Authenticator don't comply with these verifications, the importating will raise an 
+error.
+
+You can also remove FirstUse's database file after the importation to Native Authenticator, to avoid leaving unused files on the system. To do so, you must add the following line to the configuration file:
+
+
+.. code-block:: python
+
+    c.Authenticator.delete_firstuse_db_after_import = True
+

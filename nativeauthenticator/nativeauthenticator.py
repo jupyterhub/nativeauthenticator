@@ -1,11 +1,13 @@
 import bcrypt
+import dbm
 import os
 from datetime import datetime
 from jupyterhub.auth import Authenticator
+from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer
+from traitlets import Bool, Integer, Unicode
 
 from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
                        ChangePasswordHandler, LoginHandler, SignUpHandler)
@@ -41,14 +43,31 @@ class NativeAuthenticator(Authenticator):
     )
     open_signup = Bool(
         config=True,
-        default=False,
+        default_value=False,
         help=("Allows every user that made sign up to automatically log in "
               "the system without needing admin authorization")
     )
     ask_email_on_signup = Bool(
         config=True,
-        default=False,
+        default_value=False,
         help="Asks for email on signup"
+    )
+    import_from_firstuse = Bool(
+        config=True,
+        default_value=False,
+        help="Import users from FirstUse Authenticator database"
+    )
+    firstuse_db_path = Unicode(
+        'passwords.dbm',
+        config=True,
+        help="""
+        Path to store the db file of FirstUse with username / pwd hash in
+        """
+    )
+    delete_firstuse_db_after_import = Bool(
+        config=True,
+        default_value=False,
+        help="Deletes FirstUse Authenticator database after the import"
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -57,6 +76,9 @@ class NativeAuthenticator(Authenticator):
         self.login_attempts = dict()
         if add_new_table:
             self.add_new_table()
+
+        if self.import_from_firstuse:
+            self.add_data_from_firstuse()
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
@@ -183,3 +205,29 @@ class NativeAuthenticator(Authenticator):
         self.db.delete(user_info)
         self.db.commit()
         return super().delete_user(user)
+
+    def delete_dbm_db(self):
+        db_path = Path(self.firstuse_db_path)
+        db_dir = db_path.cwd()
+        db_name = db_path.name
+        db_complete_path = str(db_path.absolute())
+
+        # necessary for BSD implementation of dbm lib
+        if db_name + '.db' in os.listdir(db_dir):
+            os.remove(db_complete_path + '.db')
+        else:
+            os.remove(db_complete_path)
+
+    def add_data_from_firstuse(self):
+        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
+            for user in db.keys():
+                password = db[user].decode()
+                new_user = self.get_or_create_user(user.decode(), password)
+                if not new_user:
+                    error = '''User {} was not created. Check password
+                               restrictions or username problems before trying
+                               again'''.format(user)
+                    raise ValueError(error)
+
+        if self.delete_firstuse_db_after_import:
+            self.delete_dbm_db()
