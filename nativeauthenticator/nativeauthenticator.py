@@ -69,10 +69,10 @@ class NativeAuthenticator(Authenticator):
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import"
     )
-    add_two_factor_authentication = Bool(
-        False,
+    allow_2fa = Bool(
+        True,
         config=True,
-        help="Requires users to have a second factor authentication"
+        help=""
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -140,8 +140,8 @@ class NativeAuthenticator(Authenticator):
             user.is_authorized,
             user.is_valid_password(password)
         ]
-        if self.add_two_factor_authentication:
-            validations.append(user.is_valid_token(data.get('2auth')))
+        if self.allow_2fa:
+            validations.append(user.is_valid_token(data.get('2fa')))
 
         if all(validations):
             self.successful_login(username)

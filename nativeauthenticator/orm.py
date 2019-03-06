@@ -16,6 +16,7 @@ class UserInfo(Base):
     password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String)
+    has_2fa = Column(Boolean, default=False)
     otp_secret = Column(String(10))
 
     def __init__(self, **kwargs):

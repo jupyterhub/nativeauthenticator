@@ -26,18 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 Warning: JupyterHub seems to be served over an unsecured HTTP connection.
                 We strongly recommend enabling HTTPS for JupyterHub.
             </p>
+
             {% if login_error %}
             <p class="login_error">
                 {{login_error}}
             </p>
             {% endif %}
             <label for="username_input">Username:</label>
-            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" 
-            tabindex="1" autofocus="autofocus" />
-            {% if two_factor_auth %}
-            <label for="2auth_input">Second auth factor:</label>
-            <input id="2auth_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2auth" tabindex="1" autofocus="autofocus" />
-            {% endif %}
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <p></p>
             <label for='password_input'>Password:</label>
             <div class="input-group">
                 <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
