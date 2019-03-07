@@ -140,7 +140,7 @@ class NativeAuthenticator(Authenticator):
             user.is_authorized,
             user.is_valid_password(password)
         ]
-        if self.allow_2fa:
+        if user.has_2fa:
             validations.append(user.is_valid_token(data.get('2fa')))
 
         if all(validations):

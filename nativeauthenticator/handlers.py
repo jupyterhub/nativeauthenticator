@@ -145,6 +145,7 @@ class LoginHandler(LoginHandler, LocalBase):
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings['login_url'],
+            two_factor_auth=self.authenticator.allow_2fa,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {'next': self.get_argument('next', '')},

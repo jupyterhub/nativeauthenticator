@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 Warning: JupyterHub seems to be served over an unsecured HTTP connection.
                 We strongly recommend enabling HTTPS for JupyterHub.
             </p>
-
             {% if login_error %}
             <p class="login_error">
                 {{login_error}}
@@ -44,9 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </span>
             </div>
+            {% if two_factor_auth %}
+            <p></p>
+            <label for="2fa_input">Two Factor Authentication:</label>
+            <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2fa" tabindex="1" autofocus="autofocus" placeholder="If you don't have 2FA, leave empty" />
+            {% endif %}
             <input type="submit" id="login_submit" class='btn btn-jupyter' value='Sign In' tabindex="3" />
             <div style="padding-top: 25px;">
-                Don't have an user? <a href="/signup">Signup!</a>
+                <p>Don't have an user? <a href="/signup">Signup!</a></p>
             </div>
         </div>
     </form>
