@@ -70,7 +70,7 @@ class NativeAuthenticator(Authenticator):
         help="Deletes FirstUse Authenticator database after the import"
     )
     allow_2fa = Bool(
-        True,
+        False,
         config=True,
         help=""
     )
