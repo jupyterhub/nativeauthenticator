@@ -48,13 +48,13 @@ class NativeAuthenticator(Authenticator):
               "the system without needing admin authorization")
     )
     ask_email_on_signup = Bool(
+        False,
         config=True,
-        default_value=False,
         help="Asks for email on signup"
     )
     import_from_firstuse = Bool(
+        False,
         config=True,
-        default_value=False,
         help="Import users from FirstUse Authenticator database"
     )
     firstuse_db_path = Unicode(
@@ -68,6 +68,11 @@ class NativeAuthenticator(Authenticator):
         config=True,
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import"
+    )
+    allow_2fa = Bool(
+        False,
+        config=True,
+        help=""
     )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
@@ -131,7 +136,14 @@ class NativeAuthenticator(Authenticator):
             if self.is_blocked(username):
                 return
 
-        if user.is_authorized and user.is_valid_password(password):
+        validations = [
+            user.is_authorized,
+            user.is_valid_password(password)
+        ]
+        if user.has_2fa:
+            validations.append(user.is_valid_token(data.get('2fa')))
+
+        if all(validations):
             self.successful_login(username)
             return username
 

@@ -36,6 +36,7 @@ class SignUpHandler(LocalBase):
         html = self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
+            two_factor_auth=self.authenticator.allow_2fa,
         )
         self.finish(html)
 
@@ -68,16 +69,25 @@ class SignUpHandler(LocalBase):
             'username': self.get_body_argument('username', strip=False),
             'pw': self.get_body_argument('pw', strip=False),
             'email': self.get_body_argument('email', '', strip=False),
+            'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
         user = self.authenticator.get_or_create_user(**user_info)
 
         alert, message = self.get_result_message(user)
 
+        otp_secret, user_2fa = '', ''
+        if user:
+            otp_secret = user.otp_secret
+            user_2fa = user.has_2fa
+
         html = self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
-            alert=alert
+            alert=alert,
+            two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_auth_user=user_2fa,
+            two_factor_auth_value=otp_secret,
         )
         self.finish(html)
 
@@ -135,6 +145,7 @@ class LoginHandler(LoginHandler, LocalBase):
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings['login_url'],
+            two_factor_auth=self.authenticator.allow_2fa,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
                 {'next': self.get_argument('next', '')},

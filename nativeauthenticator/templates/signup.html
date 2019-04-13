@@ -37,12 +37,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </span>
             </div>
+            <p></p>
+            {% if two_factor_auth %}
+            <label>Add two factor authentication:</label>
+            <input type="checkbox" name="2fa" value="2fa">
+            {% endif %}
             <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
             <div style="padding-top: 25px;">
                 Already have an user? <a href="/login">Login!</a>
             </div>
             {% if alert %}
-            <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">{{result_message}}</div>
+            <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">
+                {{result_message}}
+                {% if two_factor_auth_user %}
+                <p>
+                    <p />
+                    <strong>Attention!</strong> You have configured two factor authentication.
+                    <br />
+                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep it safe :)
+                    {% endif %}
+            </div>
             {% endif %}
         </div>
 </div>

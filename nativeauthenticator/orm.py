@@ -1,7 +1,10 @@
+import base64
 import bcrypt
+import os
 import re
 from jupyterhub.orm import Base
 
+import onetimepass
 from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
 from sqlalchemy.orm import validates
 
@@ -13,6 +16,13 @@ class UserInfo(Base):
     password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String)
+    has_2fa = Column(Boolean, default=False)
+    otp_secret = Column(String(10))
+
+    def __init__(self, **kwargs):
+        super(UserInfo, self).__init__(**kwargs)
+        if not self.otp_secret:
+            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     @classmethod
     def find(cls, db, username):
@@ -40,3 +50,6 @@ class UserInfo(Base):
         assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$",
                         address)
         return address
+
+    def is_valid_token(self, token):
+        return onetimepass.valid_totp(token, self.otp_secret)

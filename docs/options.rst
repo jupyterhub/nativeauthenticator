@@ -67,7 +67,6 @@ Native Authenticator is based on username and password only. But if you need ext
 
     c.Authenticator.ask_email_on_signup = True
 
-
 Import users from FirstUse Authenticator
 ----------------------------------------
 
@@ -101,3 +100,22 @@ You can also remove FirstUse's database file after the importation to Native Aut
 
     c.Authenticator.delete_firstuse_db_after_import = True
 
+
+Add two factor authentication obligatory for users
+--------------------------------------------------
+
+You can increase security making two factor authentication obligatory for all users.
+To do so, add the following line on the config file:
+
+.. code-block:: python
+
+    c.Authenticator.add_two_factor_authentication = True
+
+Users will receive a message after signup with the two factor authentication code:  
+
+.. image:: _static/signup-two-factor-auth.png
+
+And login will now require the two factor authentication code as well:
+
+
+.. image:: _static/login-two-factor-auth.png
