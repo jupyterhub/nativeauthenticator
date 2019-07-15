@@ -123,7 +123,7 @@ class ChangePasswordHandler(LocalBase):
 
     @web.authenticated
     async def post(self):
-        user = await self.get_current_user()
+        user = self.get_current_user()
         new_password = self.get_body_argument('password', strip=False)
         self.authenticator.change_password(user.name, new_password)
 
