@@ -1,4 +1,9 @@
 from setuptools import setup, find_packages
+import os
+from shutil import copyfile
+
+os.rename("/usr/local/share/jupyterhub/templates/page.html", "/usr/local/share/jupyterhub/templates/jupyterhub_page.html")
+copyfile("templates/page.html", "/usr/local/share/jupyterhub/templates/page.html")
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
