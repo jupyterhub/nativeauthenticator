@@ -1,53 +1,46 @@
 {% extends "page.html" %}
 {% block main %}
-
-
-  <div class="container">
-
+<div class="container">
     <h1>Authorization Area</h1>
-
     <table class="table">
-      <thead>
-        <tr>
-          <th>Username</th>
-          {% if ask_email %}
-            <th>Email</th>
-          {% endif %}
-          <th>Is Authorized?</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for user in users %}
-        {% if user.is_authorized %}
-        <tr class="success">
-          <td>{{ user.username }}</td>
-          {% if ask_email %}
-            <td>{{ user.email }}</td>
-          {% endif %}
-          <td>Yes</td>
-          <td>
-            <a class="btn btn-default" 
-               href="/hub/authorize/{{ user.username }}" 
-              role="button">Unauthorize</a>
-          </td>
-        {% else %}
-        <tr>
-          <td>{{ user.username }}</td>
-          {% if ask_email %}
-            <td>{{ user.email }}</td>
-          {% endif %}
-          <td>No</td>
-          <td>
-            <a class="btn btn-jupyter" 
-               href="/hub/authorize/{{ user.username }}" 
-              role="button">Authorize</a>
-          </td>
-        {% endif %}
-        </tr>
-      {% endfor %}
-      </tbody>
+        <thead>
+            <tr>
+                <th>Username</th>
+                {% if ask_email %}
+                <th>Email</th>
+                {% endif %}
+                <th>Has 2fa?</th>
+                <th>Is Authorized?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            {% if user.is_authorized %}
+            <tr class="success">
+                <td>{{ user.username }}</td>
+                {% if ask_email %}
+                <td>{{ user.email }}</td>
+                {% endif %}
+                <td>{{ user.has_2fa }}</td>
+                <td>Yes</td>
+                <td>
+                    <a class="btn btn-default" href="/hub/authorize/{{ user.username }}" role="button">Unauthorize</a>
+                </td>
+                {% else %}
+            <tr>
+                <td>{{ user.username }}</td>
+                {% if ask_email %}
+                <td>{{ user.email }}</td>
+                {% endif %}
+                <td>{{ user.has_2fa }}</td>
+                <td>No</td>
+                <td>
+                    <a class="btn btn-jupyter" href="/hub/authorize/{{ user.username }}" role="button">Authorize</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
-
-
+</div>
 {% endblock %}

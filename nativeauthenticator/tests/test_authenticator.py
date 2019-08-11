@@ -1,3 +1,5 @@
+import dbm
+import os
 import pytest
 import time
 from jupyterhub.tests.mocking import MockHub
@@ -91,6 +93,7 @@ async def test_handlers(app):
     '''Test if all handlers are available on the Authenticator'''
     auth = NativeAuthenticator(db=app.db)
     handlers = auth.get_handlers(app)
+    assert handlers[0][0] == '/login'
     assert handlers[1][0] == '/signup'
     assert handlers[2][0] == '/authorize'
     assert handlers[4][0] == '/change-password'
@@ -165,3 +168,42 @@ async def test_delete_user(tmpcwd, app):
 
     user_info = UserInfo.find(app.db, 'johnsnow')
     assert not user_info
+
+
+async def test_import_from_firstuse_dont_delete_db_after(tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db['user1'] = 'password'
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.add_data_from_firstuse()
+
+    files = os.listdir()
+    assert UserInfo.find(app.db, 'user1')
+    assert ('passwords.dbm' in files) or ('passwords.dbm.db' in files)
+
+
+async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db['user1'] = 'password'
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.delete_firstuse_db_after_import = True
+
+    auth.add_data_from_firstuse()
+    files = os.listdir()
+    assert UserInfo.find(app.db, 'user1')
+    assert ('passwords.dbm' not in files) and ('passwords.dbm.db' not in files)
+
+
+@pytest.mark.parametrize("user,pwd", [
+    ('user1', 'password'),
+    ('user 1', 'somethingelsereallysecure'),
+])
+async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
+    with dbm.open('passwords.dbm', 'c', 0o600) as db:
+        db[user] = pwd
+
+    auth = NativeAuthenticator(db=app.db)
+    auth.check_common_password = True
+    with pytest.raises(ValueError):
+        auth.add_data_from_firstuse()

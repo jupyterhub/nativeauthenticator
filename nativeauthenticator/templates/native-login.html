@@ -1,0 +1,69 @@
+{% extends "page.html" %}
+{% block main %}
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    var button = document.getElementById('eye');
+    button.addEventListener("click", function(e) {
+        var pwd = document.getElementById("password_input");
+        if (pwd.getAttribute("type") == "password") {
+            pwd.setAttribute("type", "text");
+            button.textContent = "🔑";
+        } else {
+            pwd.setAttribute("type", "password");
+            button.textContent = "👁";
+        }
+    });
+});
+</script>
+{% block login %}
+<div id="login-main" class="container">
+    <form action="{{login_url}}?next={{next}}" method="post" role="form">
+        <div class="auth-form-header">
+            Sign In
+        </div>
+        <div class='auth-form-body'>
+            <p id='insecure-login-warning' class='hidden'>
+                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
+                We strongly recommend enabling HTTPS for JupyterHub.
+            </p>
+            {% if login_error %}
+            <p class="login_error">
+                {{login_error}}
+            </p>
+            {% endif %}
+            <label for="username_input">Username:</label>
+            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <p></p>
+            <label for='password_input'>Password:</label>
+            <div class="input-group">
+                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
+                <span class="input-group-addon">
+                    <button style="border:0;" type="button" id="eye">
+                        👁
+                    </button>
+                </span>
+            </div>
+            {% if two_factor_auth %}
+            <p></p>
+            <label for="2fa_input">Two Factor Authentication:</label>
+            <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2fa" tabindex="1" autofocus="autofocus" placeholder="If you don't have 2FA, leave empty" />
+            {% endif %}
+            <input type="submit" id="login_submit" class='btn btn-jupyter' value='Sign In' tabindex="3" />
+            <div style="padding-top: 25px;">
+                <p>Don't have an user? <a href="/signup">Signup!</a></p>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock login %}
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script>
+if (window.location.protocol === "http:") {
+    // unhide http warning
+    var warning = document.getElementById('insecure-login-warning');
+    warning.className = warning.className.replace(/\bhidden\b/, '');
+}
+</script>
+{% endblock %}
