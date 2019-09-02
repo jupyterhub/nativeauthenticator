@@ -225,7 +225,7 @@ class NativeAuthenticator(Authenticator):
         db_complete_path = str(db_path.absolute())
 
         # necessary for BSD implementation of dbm lib
-        if db_name + '.db' in os.listdir(db_dir):
+        if os.path.exists(os.path.join(db_dir, db_name + '.db')):
             os.remove(db_complete_path + '.db')
         else:
             os.remove(db_complete_path)
