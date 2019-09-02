@@ -156,7 +156,7 @@ class NativeAuthenticator(Authenticator):
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
-                self.COMMON_PASSWORDS = f.read().splitlines()
+                self.COMMON_PASSWORDS = set(f.read().splitlines())
         return password in self.COMMON_PASSWORDS
 
     def is_password_strong(self, password):
