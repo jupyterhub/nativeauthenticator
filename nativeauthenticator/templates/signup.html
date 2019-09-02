@@ -2,10 +2,10 @@
 {% block main %}
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
-    var button = document.getElementById('eye');
+    let button = document.getElementById('eye');
     button.addEventListener("click", function(e) {
-        var pwd = document.getElementById("pwd");
-        if (pwd.getAttribute("type") == "password") {
+        let pwd = document.getElementById("pwd");
+        if (pwd.getAttribute("type") === "password") {
             pwd.setAttribute("type", "text");
             button.textContent = "🔑";
         } else {
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
             Sign Up
         </div>
         <div class='auth-form-body'>
-            <label>Username:</label>
-            <input type="" class="form-control" name="username" id="username_input" tabindex="2" required />
+            <label for="username_input">Username:</label>
+            <input type="text" class="form-control" name="username" id="username_input" tabindex="2" required />
             {% if ask_email %}
-            <label>Email:</label>
-            <input type="" class="form-control" name="email" id="email_input" tabindex="2" required />
+            <label for="email_input">Email:</label>
+            <input type="email" class="form-control" name="email" id="email_input" tabindex="2" required />
             {% endif %}
-            <label for='password_input'>Password:</label>
+            <label for="pwd">Password:</label>
             <div class="input-group">
                 <input type="password" class="form-control" name="pw" id="pwd" tabindex="2" required />
                 <span class="input-group-addon">
@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <p></p>
             {% if two_factor_auth %}
-            <label>Add two factor authentication:</label>
-            <input type="checkbox" name="2fa" value="2fa">
+            <label for="2fa">Add two factor authentication:</label>
+            <input type="checkbox" name="2fa" value="2fa" id="2fa">
             {% endif %}
             <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
             <div style="padding-top: 25px;">
@@ -50,8 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">
                 {{result_message}}
                 {% if two_factor_auth_user %}
-                <p>
-                    <p />
                     <strong>Attention!</strong> You have configured two factor authentication.
                     <br />
                     Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep it safe :)
@@ -59,8 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             {% endif %}
         </div>
-</div>
-</form>
+    </form>
 </div>
 {% endblock login %}
 {% endblock %}
