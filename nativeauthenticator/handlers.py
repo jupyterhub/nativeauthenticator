@@ -48,6 +48,11 @@ class SignUpHandler(LocalBase):
             alert = 'alert-success'
             message = ('The signup was successful. You can now go to '
                        'home page and log in the system')
+        else:
+            alert = 'alert-danger'
+            message = ('Signup not allowed.'
+                       'ask an Cashstory Admin to get access')   
+            return alert, message
         if not user:
             alert = 'alert-danger'
             pw_len = self.authenticator.minimum_password_length
@@ -125,11 +130,15 @@ class ChangePasswordHandler(LocalBase):
     async def post(self):
         user = await self.get_current_user()
         new_password = self.get_body_argument('password', strip=False)
-        self.authenticator.change_password(user.name, new_password)
-
+        message = ''
+        if self.authenticator.open_change_password:
+            message = 'Your password has been changed successfully'
+            self.authenticator.change_password(user.name, new_password)
+        else:
+            message = 'You can\'t change your password, ask an Admin'
         html = self.render_template(
             'change-password.html',
-            result_message='Your password has been changed successfully',
+            result_message=message,
         )
         self.finish(html)
 
