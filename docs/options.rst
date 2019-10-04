@@ -54,7 +54,6 @@ open signup, where all users that do sign up can already log in the system. To d
 
 .. code-block:: python
 
-    c.Authenticator.open_signup = True
 
 
 Ask for extra information on SignUp

@@ -65,13 +65,13 @@ class SignUpHandler(LocalBase):
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'pw': self.get_body_argument('pw', strip=False),
+            'is_authorized': True,
             'email': self.get_body_argument('email', '', strip=False),
             'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
         alert, message = '', ''
         otp_secret, user_2fa = '', ''
-
-        if self.authenticator.open_signup or api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
+        if user_info['api_token'] == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
             user = self.authenticator.get_or_create_user(**user_info)
             alert, message = self.get_result_message(user)
             if user:

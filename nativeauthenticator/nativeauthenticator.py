@@ -41,12 +41,6 @@ class NativeAuthenticator(Authenticator):
         help=("Configures the number of seconds a user has to wait "
               "after being blocked. Default is 600.")
     )
-    open_signup = Bool(
-        config=True,
-        default_value=False,
-        help=("Allows every user that made sign up to automatically log in "
-              "the system without needing admin authorization")
-    )
     ask_email_on_signup = Bool(
         False,
         config=True,
@@ -179,8 +173,6 @@ class NativeAuthenticator(Authenticator):
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
         infos.update(kwargs)
-        if username in self.admin_users or self.open_signup:
-            infos.update({'is_authorized': True})
 
         try:
             user_info = UserInfo(**infos)
