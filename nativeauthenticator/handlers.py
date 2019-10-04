@@ -70,7 +70,7 @@ class SignUpHandler(LocalBase):
         }
         alert = ''
         message = ''
-        if self.authenticator.open_signup or api_token == self.settings['service_tokens']['secret-token']:
+        if self.authenticator.open_signup or api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
             user = self.authenticator.get_or_create_user(**user_info)
             alert, message = self.get_result_message(user)
         else:
