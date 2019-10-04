@@ -41,18 +41,9 @@ class SignUpHandler(LocalBase):
         self.finish(html)
 
     def get_result_message(self, user):
-        alert = 'alert-info'
-        message = 'Your information have been sent to the admin'
-
-        if self.authenticator.open_signup:
-            alert = 'alert-success'
-            message = ('The signup was successful. You can now go to '
-                       'home page and log in the system')
-        else:
-            alert = 'alert-danger'
-            message = ('Signup not allowed.'
-                       'ask an Cashstory Admin to get access')
-            return alert, message
+        alert = 'alert-success'
+        message = ('The signup was successful. You can now go to '
+                   'home page and log in the system')
         if not user:
             alert = 'alert-danger'
             pw_len = self.authenticator.minimum_password_length
@@ -70,15 +61,21 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
+        api_token = self.get_body_argument('api_token', '', strip=False)
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'pw': self.get_body_argument('pw', strip=False),
             'email': self.get_body_argument('email', '', strip=False),
             'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
-        user = self.authenticator.get_or_create_user(**user_info)
-
-        alert, message = self.get_result_message(user)
+        alert, message = ''
+        if self.authenticator.open_signup or api_token == self.settings['service_tokens']['secret-token']:
+            user = self.authenticator.get_or_create_user(**user_info)
+            alert, message = self.get_result_message(user)
+        else:
+            alert = 'alert-danger'
+            message = ('Signup not allowed.'
+                       ' Ask an Cashstory Admin to get access')
 
         otp_secret, user_2fa = '', ''
         if user:
