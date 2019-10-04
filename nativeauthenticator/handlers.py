@@ -82,6 +82,7 @@ class SignUpHandler(LocalBase):
             message = ('Signup not allowed.'
                        ' Ask an Cashstory Admin to get access')
 
+        self._register_template_path()
         html = self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
