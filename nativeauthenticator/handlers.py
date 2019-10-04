@@ -68,7 +68,8 @@ class SignUpHandler(LocalBase):
             'email': self.get_body_argument('email', '', strip=False),
             'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
-        alert, message = ''
+        alert = ''
+        message = ''
         if self.authenticator.open_signup or api_token == self.settings['service_tokens']['secret-token']:
             user = self.authenticator.get_or_create_user(**user_info)
             alert, message = self.get_result_message(user)
