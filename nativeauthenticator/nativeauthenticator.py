@@ -181,6 +181,8 @@ class NativeAuthenticator(Authenticator):
 
         self.db.add(user_info)
         self.db.commit()
+        if self.whitelist:
+            self.whitelist.add(username)
         return user_info
 
     def change_password(self, username, new_password):
