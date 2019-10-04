@@ -71,7 +71,7 @@ class SignUpHandler(LocalBase):
         }
         alert, message = '', ''
         otp_secret, user_2fa = '', ''
-        if user_info['api_token'] == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
+        if api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
             user = self.authenticator.get_or_create_user(**user_info)
             alert, message = self.get_result_message(user)
             if user:
