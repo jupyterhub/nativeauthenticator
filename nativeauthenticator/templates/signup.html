@@ -4,7 +4,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var button = document.getElementById('eye');
         button.addEventListener("click", function (e) {
-            var pwd = document.getElementById("password");
+            var pwd = document.getElementById("password_input");
             if (pwd.getAttribute("type") == "password") {
                 pwd.setAttribute("type", "text");
                 button.textContent = "🔑";
@@ -30,7 +30,7 @@
             {% endif %}
             <label for='password_input'>Password:</label>
             <div class="input-group">
-                <input type="password" class="form-control" name="password" id="password" tabindex="2" required />
+                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" required />
                 <span class="input-group-addon">
                     <button style="border:0;" type="button" id="eye">
                         👁
