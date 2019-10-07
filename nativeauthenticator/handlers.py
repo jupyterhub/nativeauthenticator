@@ -107,6 +107,13 @@ class ChangeAuthorizationHandler(LocalBase):
         self.redirect('/authorize')
 
 
+class DeleteHandler(LocalBase):
+    @admin_only
+    async def get(self, slug):
+        UserInfo.delete_user(self.db, slug)
+        self.redirect('/authorize')
+
+
 class ChangePasswordHandler(LocalBase):
     """Render the reset password page."""
 

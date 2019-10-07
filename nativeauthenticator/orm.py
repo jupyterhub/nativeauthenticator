@@ -39,6 +39,13 @@ class UserInfo(Base):
         db.commit()
         return user
 
+    @classmethod
+    def delete_user(cls, db, username):
+        user = db.query(cls).filter(cls.username == username).first()
+        db.delete(user)
+        db.commit()
+        return user
+
     @validates('email')
     def validate_email(self, key, address):
         if not address:

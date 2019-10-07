@@ -197,6 +197,7 @@ class NativeAuthenticator(Authenticator):
             (r'/login', LoginHandler),
             (r'/signup', SignUpHandler),
             (r'/authorize', AuthorizationHandler),
+            (r'/delete/([^/]*)', DeleteHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
             (r'/change-password', ChangePasswordHandler),
         ]
