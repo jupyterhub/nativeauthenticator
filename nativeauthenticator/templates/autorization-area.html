@@ -9,7 +9,6 @@
                 {% if ask_email %}
                 <th>Email</th>
                 {% endif %}
-                <th>Has 2fa?</th>
                 <th>Is Authorized?</th>
             </tr>
         </thead>
@@ -21,7 +20,6 @@
                 {% if ask_email %}
                 <td>{{ user.email }}</td>
                 {% endif %}
-                <td>{{ user.has_2fa }}</td>
                 <td>Yes</td>
                 <td>
                     <a class="btn btn-default" href="/hub/authorize/{{ user.username }}" role="button">Unauthorize</a>
@@ -32,7 +30,6 @@
                 {% if ask_email %}
                 <td>{{ user.email }}</td>
                 {% endif %}
-                <td>{{ user.has_2fa }}</td>
                 <td>No</td>
                 <td>
                     <a class="btn btn-jupyter" href="/hub/authorize/{{ user.username }}" role="button">Authorize</a>

@@ -63,11 +63,6 @@ class NativeAuthenticator(Authenticator):
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import"
     )
-    allow_2fa = Bool(
-        False,
-        config=True,
-        help=""
-    )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,8 +129,6 @@ class NativeAuthenticator(Authenticator):
             user.is_authorized,
             user.is_valid_password(password)
         ]
-        if user.has_2fa:
-            validations.append(user.is_valid_token(data.get('2fa')))
 
         if all(validations):
             self.successful_login(username)
