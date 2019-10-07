@@ -61,7 +61,7 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
-        api_token = self.get_body_argument('api_token', '', strip=False)
+        api_token = self.request.headers['Authorization']
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'pw': self.get_body_argument('pw', strip=False),
@@ -71,7 +71,7 @@ class SignUpHandler(LocalBase):
         }
         alert, message = '', ''
         otp_secret, user_2fa = '', ''
-        if api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
+        if api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
             user = self.authenticator.get_or_create_user(**user_info)
             alert, message = self.get_result_message(user)
             if user:
