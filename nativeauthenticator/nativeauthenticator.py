@@ -9,7 +9,7 @@ from sqlalchemy import inspect
 from tornado import gen
 from traitlets import Bool, Integer, Unicode
 
-from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
+from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler, DeleteHandler,
                        ChangePasswordHandler, LoginHandler, SignUpHandler)
 from .orm import UserInfo
 
