@@ -181,6 +181,8 @@ class NativeAuthenticator(Authenticator):
 
         self.db.add(user_info)
         self.db.commit()
+        if kwargs['admin'] and self.adminlist:
+            self.admin_users.add(username)
         if self.whitelist:
             self.whitelist.add(username)
         return user_info

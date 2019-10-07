@@ -67,6 +67,7 @@ class SignUpHandler(LocalBase):
             'pw': self.get_body_argument('pw', strip=False),
             'is_authorized': True,
             'email': self.get_body_argument('email', '', strip=False),
+            'admin': self.get_body_argument('admin', False, strip=False),
             'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
         alert, message = '', ''
