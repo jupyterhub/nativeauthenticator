@@ -172,6 +172,9 @@ class NativeAuthenticator(Authenticator):
 
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_password}
+        if kwargs['admin'] and kwargs['admin'] == 'true' and self.adminlist:
+            self.admin_users.add(username)
+            del kwargs['admin']
         infos.update(kwargs)
 
         try:
@@ -181,8 +184,6 @@ class NativeAuthenticator(Authenticator):
 
         self.db.add(user_info)
         self.db.commit()
-        if kwargs['admin'] and self.adminlist:
-            self.admin_users.add(username)
         if self.whitelist:
             self.whitelist.add(username)
         return user_info
