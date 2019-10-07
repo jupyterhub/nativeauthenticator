@@ -1,19 +1,19 @@
 {% extends "page.html" %}
 {% block main %}
 <script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    var button = document.getElementById('eye');
-    button.addEventListener("click", function(e) {
-        var pwd = document.getElementById("pwd");
-        if (pwd.getAttribute("type") == "password") {
-            pwd.setAttribute("type", "text");
-            button.textContent = "🔑";
-        } else {
-            pwd.setAttribute("type", "password");
-            button.textContent = "👁";
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        var button = document.getElementById('eye');
+        button.addEventListener("click", function (e) {
+            var pwd = document.getElementById("password");
+            if (pwd.getAttribute("type") == "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁";
+            }
+        });
     });
-});
 </script>
 {% block login %}
 <div id="login-main" class="container">
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endif %}
             <label for='password_input'>Password:</label>
             <div class="input-group">
-                <input type="password" class="form-control" name="pw" id="pwd" tabindex="2" required />
+                <input type="password" class="form-control" name="password" id="password" tabindex="2" required />
                 <span class="input-group-addon">
                     <button style="border:0;" type="button" id="eye">
                         👁
@@ -54,7 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p />
                     <strong>Attention!</strong> You have configured two factor authentication.
                     <br />
-                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep it safe :)
+                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep
+                    it safe :)
                     {% endif %}
             </div>
             {% endif %}

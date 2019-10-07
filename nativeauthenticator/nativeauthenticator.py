@@ -55,7 +55,7 @@ class NativeAuthenticator(Authenticator):
         'passwords.dbm',
         config=True,
         help="""
-        Path to store the db file of FirstUse with username / pwd hash in
+        Path to store the db file of FirstUse with username / password hash in
         """
     )
     delete_firstuse_db_after_import = Bool(
@@ -161,17 +161,17 @@ class NativeAuthenticator(Authenticator):
 
         return all(checks)
 
-    def get_or_create_user(self, username, pw, **kwargs):
+    def get_or_create_user(self, username, password, **kwargs):
         user = UserInfo.find(self.db, username)
         if user:
             return user
 
-        if not self.is_password_strong(pw) or \
+        if not self.is_password_strong(password) or \
            not self.validate_username(username):
             return
 
-        encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {'username': username, 'password': encoded_pw}
+        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        infos = {'username': username, 'password': encoded_password}
         infos.update(kwargs)
 
         try:

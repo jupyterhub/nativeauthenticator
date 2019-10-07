@@ -46,12 +46,12 @@ class SignUpHandler(LocalBase):
                    'home page and log in the system')
         if not user:
             alert = 'alert-danger'
-            pw_len = self.authenticator.minimum_password_length
+            password_len = self.authenticator.minimum_password_length
 
-            if pw_len:
+            if password_len:
                 message = ("Something went wrong. Be sure your password has "
                            "at least {} characters, doesn't have spaces or "
-                           "commas and is not too common.").format(pw_len)
+                           "commas and is not too common.").format(password_len)
 
             else:
                 message = ("Something went wrong. Be sure your password "
@@ -64,7 +64,7 @@ class SignUpHandler(LocalBase):
         api_token = self.request.headers['Authorization']
         user_info = {
             'username': self.get_body_argument('username', strip=False),
-            'pw': self.get_body_argument('pw', strip=False),
+            'password': self.get_body_argument('password', strip=False),
             'is_authorized': True,
             'email': self.get_body_argument('email', '', strip=False),
             'admin': self.get_body_argument('admin', False, strip=False),
