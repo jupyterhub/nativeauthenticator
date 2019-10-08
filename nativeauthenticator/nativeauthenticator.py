@@ -181,6 +181,9 @@ class NativeAuthenticator(Authenticator):
             self.whitelist.add(username)
         return user_info
 
+    def normalize_username(self, username):
+        return username.replace('@', '__').replace('.', '_').lower()
+
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
