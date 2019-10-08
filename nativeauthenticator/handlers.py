@@ -60,7 +60,7 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
-        api_token = self.request.headers['Authorization']
+        api_token = self.request.headers.get('Authorization', None)
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'password': self.get_body_argument('password', strip=False),
