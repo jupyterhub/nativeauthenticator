@@ -71,9 +71,6 @@ class NativeAuthenticator(Authenticator):
         if add_new_table:
             self.add_new_table()
 
-        if self.import_from_firstuse:
-            self.add_data_from_firstuse()
-
     def add_new_table(self):
         inspector = inspect(self.db.bind)
         if 'users_info' not in inspector.get_table_names():
@@ -181,8 +178,8 @@ class NativeAuthenticator(Authenticator):
             self.whitelist.add(username)
         return user_info
 
-    def normalize_username(self, username):
-        return username.replace('@', '--').replace('.', '-').lower()
+    # def normalize_username(self, username):
+    #     return username.replace('@', '--').replace('.', '-').lower()
 
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
@@ -223,17 +220,3 @@ class NativeAuthenticator(Authenticator):
             os.remove(db_complete_path + '.db')
         else:
             os.remove(db_complete_path)
-
-    def add_data_from_firstuse(self):
-        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
-            for user in db.keys():
-                password = db[user].decode()
-                new_user = self.get_or_create_user(user.decode(), password)
-                if not new_user:
-                    error = '''User {} was not created. Check password
-                               restrictions or username problems before trying
-                               again'''.format(user)
-                    raise ValueError(error)
-
-        if self.delete_firstuse_db_after_import:
-            self.delete_dbm_db()
