@@ -167,7 +167,7 @@ class NativeAuthenticator(Authenticator):
         infos = {'username': username, 'password': encoded_password}
         if kwargs['admin'] and kwargs['admin'] == 'true' and self.admin_users:
             self.admin_users.add(username)
-        del kwargs['admin']
+        kwargs.pop('admin', None)
         infos.update(kwargs)
 
         try:
