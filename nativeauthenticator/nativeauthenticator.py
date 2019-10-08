@@ -182,7 +182,7 @@ class NativeAuthenticator(Authenticator):
         return user_info
 
     def normalize_username(self, username):
-        return username.replace('@', '__').replace('.', '_').lower()
+        return username.replace('@', '--').replace('.', '-').lower()
 
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
