@@ -160,7 +160,7 @@ class NativeAuthenticator(Authenticator):
         return password in self.COMMON_PASSWORDS
 
     def is_password_strong(self, password):
-        checks = [len(password) > self.minimum_password_length]
+        checks = [len(password) >= self.minimum_password_length]
 
         if self.check_common_password:
             checks.append(not self.is_password_common(password))
