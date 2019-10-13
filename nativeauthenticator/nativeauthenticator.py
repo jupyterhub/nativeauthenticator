@@ -125,7 +125,7 @@ class NativeAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = data['username']
+        username = self.normalize_username(data['username'])
         password = data['password']
 
         user = UserInfo.find(self.db, username)
@@ -168,6 +168,7 @@ class NativeAuthenticator(Authenticator):
         return all(checks)
 
     def get_or_create_user(self, username, pw, **kwargs):
+        username = self.normalize_username(username)
         user = UserInfo.find(self.db, username)
         if user:
             return user
