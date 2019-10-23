@@ -2,6 +2,7 @@ import os
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
+from jupyterhub.orm import User
 from jupyterhub.utils import admin_only
 
 from tornado import web
@@ -80,16 +81,24 @@ class SignUpHandler(LocalBase):
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
 
-        html = self.render_template(
-            'signup.html',
-            ask_email=self.authenticator.ask_email_on_signup,
-            result_message=message,
-            alert=alert,
-            two_factor_auth=self.authenticator.allow_2fa,
-            two_factor_auth_user=user_2fa,
-            two_factor_auth_value=otp_secret,
-        )
-        self.finish(html)
+        user = self.authenticator.get_or_create_user(**user_info)
+
+        username = user_info['username']
+        pw = user_info['pw']
+        if self.authenticator.authenticate(self, username, pw):
+            user = User.find(self.db, username)
+            self.redirect(self.get_next_url(user=user), permanent=False)
+        else:
+            html = self.render_template(
+                'signup.html',
+                ask_email=self.authenticator.ask_email_on_signup,
+                result_message=message,
+                alert=alert,
+                two_factor_auth=self.authenticator.allow_2fa,
+                two_factor_auth_user=user_2fa,
+                two_factor_auth_value=otp_secret,
+            )
+            self.finish(html)
 
 
 class AuthorizationHandler(LocalBase):
