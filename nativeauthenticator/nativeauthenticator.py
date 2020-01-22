@@ -194,7 +194,6 @@ class NativeAuthenticator(Authenticator):
 
     def get_handlers(self, app):
         native_handlers = [
-            (r'/login', LoginHandler),
             (r'/signup', SignUpHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/delete/([^/]*)', DeleteHandler),
