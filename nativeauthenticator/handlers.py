@@ -64,14 +64,19 @@ class SignUpHandler(LocalBase):
             'admin': self.get_body_argument('admin', False, strip=False),
         }
         alert, message = '', ''
-        if api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
-            user = self.authenticator.get_or_create_user(**user_info)
+        userExist = self.authenticator.get_user(**user_info)
+        if userExist:
+            alert = 'alert-danger'
+            message = ('User already exist'
+                       ' Ask an Cashstory Admin to get access')
+        elif api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
+            user = self.authenticator.create_user(**user_info)
             alert, message = self.get_result_message(user)
         else:
             alert = 'alert-danger'
             message = ('Signup not allowed.'
                        ' Ask an Cashstory Admin to get access')
-
+         
         response = {
             'name': user_info.get('username'),
             'message': message,
@@ -121,7 +126,7 @@ class ChangePasswordHandler(LocalBase):
     async def post(self):
         api_token = self.request.headers.get('Authorization', None)
         username = self.get_body_argument('username', strip=False)
-        user = self.authenticator.get_or_create_user(username)
+        user = self.authenticator.get_user(username)
         message = ''
         alert = 'alert-success'
         if api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
