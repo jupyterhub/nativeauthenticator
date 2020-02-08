@@ -115,26 +115,32 @@ class ChangePasswordHandler(LocalBase):
 
     @web.authenticated
     async def get(self):
-        self._register_template_path()
-        html = self.render_template('change-password.html')
-        self.finish(html)
+       self.redirect('/')
 
     @web.authenticated
     async def post(self):
-        user = await self.get_current_user()
-        new_password = self.get_body_argument('password', strip=False)
+        api_token = self.request.headers.get('Authorization', None)
+        username = self.get_body_argument('username', strip=False)
+        user = self.authenticator.get_or_create_user(username)
         message = ''
-        if self.authenticator.open_change_password:
+        alert = 'alert-success'
+        if api_token and api_token == os.environ.get('ADMIN_API_TOKEN', 'SHOULD_BE_CHANGED'):
+            new_password = self.get_body_argument('password', strip=False)
             message = 'Your password has been changed successfully'
             self.authenticator.change_password(user.name, new_password)
         else:
             message = 'You can\'t change your password, ask an Admin'
-        html = self.render_template(
-            'change-password.html',
-            result_message=message,
-        )
-        self.finish(html)
+            alert = 'alert-danger'
 
+        response = {
+            'name': username,
+            'message': message,
+        }
+        if alert == 'alert-danger':
+            response['error'] = True
+
+        self.finish(response)
+        
 
 class LoginHandler(LoginHandler, LocalBase):
 
