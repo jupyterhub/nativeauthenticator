@@ -32,12 +32,7 @@ class LocalBase(BaseHandler):
 class SignUpHandler(LocalBase):
     """Render the sign in page."""
     async def get(self):
-        self._register_template_path()
-        html = self.render_template(
-            'signup.html',
-            ask_email=self.authenticator.ask_email_on_signup,
-        )
-        self.finish(html)
+        self.redirect('/')
 
     def get_result_message(self, user):
         alert = 'alert-success'
@@ -77,14 +72,15 @@ class SignUpHandler(LocalBase):
             message = ('Signup not allowed.'
                        ' Ask an Cashstory Admin to get access')
 
-        self._register_template_path()
-        html = self.render_template(
-            'signup.html',
-            ask_email=self.authenticator.ask_email_on_signup,
-            result_message=message,
-            alert=alert,
-        )
-        self.finish(html)
+        response = {
+            'name': user_info.get('username'),
+            'message': message,
+        }
+        if alert == 'alert-danger':
+            response['error'] = True
+
+        self.finish(response)
+
 
 
 class AuthorizationHandler(LocalBase):
