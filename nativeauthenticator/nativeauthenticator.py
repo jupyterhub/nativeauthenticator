@@ -150,11 +150,8 @@ class NativeAuthenticator(Authenticator):
             checks.append(not self.is_password_common(password))
 
         return all(checks)
-
-    def get_or_create_user(self, username, password, **kwargs):
-        user = UserInfo.find(self.db, username)
-        if user:
-            return user
+      
+    def create_user(self, username, password, **kwargs):
 
         if not self.is_password_strong(password) or \
            not self.validate_username(username):
@@ -177,9 +174,10 @@ class NativeAuthenticator(Authenticator):
         if self.whitelist:
             self.whitelist.add(username)
         return user_info
-
-    # def normalize_username(self, username):
-    #     return username.replace('@', '--').replace('.', '-').lower()
+      
+    def get_user(self, username, password, **kwargs):
+        user = UserInfo.find(self.db, username)
+        return user
 
     def change_password(self, username, new_password):
         user = UserInfo.find(self.db, username)
