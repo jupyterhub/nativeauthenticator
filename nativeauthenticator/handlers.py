@@ -37,6 +37,7 @@ class SignUpHandler(LocalBase):
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
+            base_url=self.base_url,
         )
         self.finish(html)
 
@@ -88,6 +89,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
+            base_url=self.base_url,
         )
         self.finish(html)
 
@@ -101,6 +103,7 @@ class AuthorizationHandler(LocalBase):
             'autorization-area.html',
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
+            base_url=self.base_url,
         )
         self.finish(html)
 
@@ -109,7 +112,7 @@ class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
-        self.redirect('/authorize')
+        self.redirect(self.base_url.rstrip('/') + '/authorize')
 
 
 class ChangePasswordHandler(LocalBase):
@@ -150,4 +153,5 @@ class LoginHandler(LoginHandler, LocalBase):
                 self.authenticator.login_url(self.hub.base_url),
                 {'next': self.get_argument('next', '')},
             ),
+            base_url=self.base_url,
         )
