@@ -112,7 +112,7 @@ class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
-        self.redirect(self.base_url.rstrip('/') + '/authorize')
+        self.redirect(self.base_url + '/authorize')
 
 
 class ChangePasswordHandler(LocalBase):
