@@ -5,10 +5,10 @@
 {% block main %}
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
-    var button = document.getElementById('eye');
+    let button = document.getElementById('eye');
     button.addEventListener("click", function(e) {
-        var pwd = document.getElementById("password_input");
-        if (pwd.getAttribute("type") == "password") {
+        let pwd = document.getElementById("password_input");
+        if (pwd.getAttribute("type") === "password") {
             pwd.setAttribute("type", "text");
             button.textContent = "🔑";
         } else {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 if (window.location.protocol === "http:") {
     // unhide http warning
-    var warning = document.getElementById('insecure-login-warning');
+    let warning = document.getElementById('insecure-login-warning');
     warning.className = warning.className.replace(/\bhidden\b/, '');
 }
 </script>

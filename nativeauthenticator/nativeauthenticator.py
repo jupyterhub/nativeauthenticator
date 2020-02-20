@@ -156,7 +156,7 @@ class NativeAuthenticator(Authenticator):
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
-                self.COMMON_PASSWORDS = f.read().splitlines()
+                self.COMMON_PASSWORDS = set(f.read().splitlines())
         return password in self.COMMON_PASSWORDS
 
     def is_password_strong(self, password):
@@ -226,7 +226,7 @@ class NativeAuthenticator(Authenticator):
         db_complete_path = str(db_path.absolute())
 
         # necessary for BSD implementation of dbm lib
-        if db_name + '.db' in os.listdir(db_dir):
+        if os.path.exists(os.path.join(db_dir, db_name + '.db')):
             os.remove(db_complete_path + '.db')
         else:
             os.remove(db_complete_path)
