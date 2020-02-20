@@ -28,7 +28,7 @@ Documentation is available [here](https://native-authenticator.readthedocs.io)
 
 To run the tests locally, you can install the development dependencies:
 
-`$ pip install dev-requirements.txt`
+`$ pip install -r dev-requirements.txt`
 
 Then run tests with pytest:
 

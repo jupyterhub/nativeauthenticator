@@ -90,7 +90,7 @@ class NativeAuthenticator(Authenticator):
             return True
 
         time_last_attempt = datetime.now() - login_attempts['time']
-        if time_last_attempt.seconds > self.seconds_before_next_try:
+        if time_last_attempt.total_seconds() > self.seconds_before_next_try:
             return True
 
         return False
@@ -111,7 +111,7 @@ class NativeAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = data['username']
+        username = self.normalize_username(data['username'])
         password = data['password']
 
         user = UserInfo.find(self.db, username)
@@ -140,17 +140,17 @@ class NativeAuthenticator(Authenticator):
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
-                self.COMMON_PASSWORDS = f.read().splitlines()
+                self.COMMON_PASSWORDS = set(f.read().splitlines())
         return password in self.COMMON_PASSWORDS
 
     def is_password_strong(self, password):
-        checks = [len(password) > self.minimum_password_length]
+        checks = [len(password) >= self.minimum_password_length]
 
         if self.check_common_password:
             checks.append(not self.is_password_common(password))
 
         return all(checks)
-      
+
     def create_user(self, username, password, **kwargs):
 
         if not self.is_password_strong(password) or \
@@ -174,7 +174,7 @@ class NativeAuthenticator(Authenticator):
         if self.whitelist:
             self.whitelist.add(username)
         return user_info
-      
+
     def get_user(self, username, password, **kwargs):
         user = UserInfo.find(self.db, username)
         return user
@@ -202,8 +202,9 @@ class NativeAuthenticator(Authenticator):
 
     def delete_user(self, user):
         user_info = UserInfo.find(self.db, user.name)
-        self.db.delete(user_info)
-        self.db.commit()
+        if user_info is not None:
+            self.db.delete(user_info)
+            self.db.commit()
         return super().delete_user(user)
 
     def delete_dbm_db(self):
@@ -213,7 +214,7 @@ class NativeAuthenticator(Authenticator):
         db_complete_path = str(db_path.absolute())
 
         # necessary for BSD implementation of dbm lib
-        if db_name + '.db' in os.listdir(db_dir):
+        if os.path.exists(os.path.join(db_dir, db_name + '.db')):
             os.remove(db_complete_path + '.db')
         else:
             os.remove(db_complete_path)
