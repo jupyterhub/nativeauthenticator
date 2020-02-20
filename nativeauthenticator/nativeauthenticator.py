@@ -215,8 +215,9 @@ class NativeAuthenticator(Authenticator):
 
     def delete_user(self, user):
         user_info = UserInfo.find(self.db, user.name)
-        self.db.delete(user_info)
-        self.db.commit()
+        if user_info is not None:
+            self.db.delete(user_info)
+            self.db.commit()
         return super().delete_user(user)
 
     def delete_dbm_db(self):
