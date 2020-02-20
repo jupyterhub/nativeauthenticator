@@ -24,7 +24,7 @@
                 <td>{{ user.has_2fa }}</td>
                 <td>Yes</td>
                 <td>
-                    <a class="btn btn-default" href="/hub/authorize/{{ user.username }}" role="button">Unauthorize</a>
+                    <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a>
                 </td>
                 {% else %}
             <tr>
@@ -35,7 +35,7 @@
                 <td>{{ user.has_2fa }}</td>
                 <td>No</td>
                 <td>
-                    <a class="btn btn-jupyter" href="/hub/authorize/{{ user.username }}" role="button">Authorize</a>
+                    <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a>
                 </td>
                 {% endif %}
             </tr>
