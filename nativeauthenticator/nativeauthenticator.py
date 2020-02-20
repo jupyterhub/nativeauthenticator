@@ -104,7 +104,7 @@ class NativeAuthenticator(Authenticator):
             return True
 
         time_last_attempt = datetime.now() - login_attempts['time']
-        if time_last_attempt.seconds > self.seconds_before_next_try:
+        if time_last_attempt.total_seconds() > self.seconds_before_next_try:
             return True
 
         return False
