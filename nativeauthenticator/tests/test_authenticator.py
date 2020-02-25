@@ -47,7 +47,7 @@ async def test_create_user(is_admin, open_signup, expected_authorization,
     assert user_info.is_authorized == expected_authorization
 
 
-async def test_create_user_bas_characters(tmpcwd, app):
+async def test_create_user_bad_characters(tmpcwd, app):
     '''Test method get_or_create_user with bad characters on username'''
     auth = NativeAuthenticator(db=app.db)
     assert not auth.get_or_create_user('john snow', 'password')
