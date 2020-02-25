@@ -54,6 +54,19 @@ async def test_create_user_bad_characters(tmpcwd, app):
     assert not auth.get_or_create_user('john,snow', 'password')
 
 
+async def test_create_user_twice(tmpcwd, app):
+	'''Test if creating users with an existing handle errors.'''
+	auth = NativeAuthenticator(db=app.db)
+	
+	# First creation should succeed.
+	assert auth.get_or_create_user('johnsnow', 'password')
+	
+	# Creating the same account again should fail.
+	assert not auth.get_or_create_user('johnsnow', 'password')
+	
+	# Creating a user with same handle but different pw should also fail.
+	assert not auth.get_or_create_user('johnsnow', 'adifferentpassword')
+
 @pytest.mark.parametrize("password,min_len,expected", [
     ("qwerty", 1, False),
     ("agameofthrones", 1, True),
