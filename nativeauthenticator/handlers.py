@@ -32,6 +32,9 @@ class LocalBase(BaseHandler):
 class SignUpHandler(LocalBase):
     """Render the sign in page."""
     async def get(self):
+        if not self.authenticator.enable_signup:
+            raise web.HTTPError(404)
+
         self._register_template_path()
         html = self.render_template(
             'signup.html',
@@ -65,6 +68,9 @@ class SignUpHandler(LocalBase):
         return alert, message
 
     async def post(self):
+        if not self.authenticator.enable_signup:
+            raise web.HTTPError(404)
+
         user_info = {
             'username': self.get_body_argument('username', strip=False),
             'pw': self.get_body_argument('pw', strip=False),
@@ -145,6 +151,7 @@ class LoginHandler(LoginHandler, LocalBase):
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings['login_url'],
+            enable_signup=self.authenticator.enable_signup,
             two_factor_auth=self.authenticator.allow_2fa,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
