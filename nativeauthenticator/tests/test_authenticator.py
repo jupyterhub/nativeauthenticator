@@ -57,13 +57,13 @@ async def test_create_user_bad_characters(tmpcwd, app):
 async def test_create_user_twice(tmpcwd, app):
     '''Test if creating users with an existing handle errors.'''
     auth = NativeAuthenticator(db=app.db)
-    
+
     # First creation should succeed.
     assert auth.create_user('johnsnow', 'password')
-    
+
     # Creating the same account again should fail.
     assert not auth.create_user('johnsnow', 'password')
-    
+
     # Creating a user with same handle but different pw should also fail.
     assert not auth.create_user('johnsnow', 'adifferentpassword')
 
@@ -171,6 +171,16 @@ async def test_change_password(tmpcwd, app):
     assert not user.is_valid_password('password')
     assert user.is_valid_password('newpassword')
 
+
+async def test_get_user(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.create_user('johnsnow', 'password')
+
+    # Getting existing user is successful.
+    assert auth.get_user('johnsnow') != None
+
+    # Getting non-existing user fails.
+    assert auth.get_user('samwelltarly') == None
 
 async def test_delete_user(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
