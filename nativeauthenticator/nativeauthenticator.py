@@ -168,15 +168,12 @@ class NativeAuthenticator(Authenticator):
         return all(checks)
         
     def get_user(self, username):
-        user = UserInfo.find(self.db, self.normalize_username(username))
-        if user:
-            return user
+        return UserInfo.find(self.db, self.normalize_username(username))
             
     def user_exists(self, username):
         return self.get_user(username) is not None
 
     def create_user(self, username, pw, **kwargs):
-        
         username = self.normalize_username(username)
         
         if self.user_exists(username):
