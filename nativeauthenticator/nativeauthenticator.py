@@ -171,19 +171,19 @@ class NativeAuthenticator(Authenticator):
             checks.append(not self.is_password_common(password))
 
         return all(checks)
-        
+
     def get_user(self, username):
         return UserInfo.find(self.db, self.normalize_username(username))
-            
+
     def user_exists(self, username):
         return self.get_user(username) is not None
 
     def create_user(self, username, pw, **kwargs):
         username = self.normalize_username(username)
-        
+
         if self.user_exists(username):
             return
-        
+
         if not self.is_password_strong(pw) or \
            not self.validate_username(username):
             return

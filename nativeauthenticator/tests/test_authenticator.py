@@ -67,6 +67,7 @@ async def test_create_user_twice(tmpcwd, app):
     # Creating a user with same handle but different pw should also fail.
     assert not auth.create_user('johnsnow', 'adifferentpassword')
 
+
 @pytest.mark.parametrize("password,min_len,expected", [
     ("qwerty", 1, False),
     ("agameofthrones", 1, True),
@@ -195,10 +196,11 @@ async def test_get_user(tmpcwd, app):
     auth.create_user('johnsnow', 'password')
 
     # Getting existing user is successful.
-    assert auth.get_user('johnsnow') != None
+    assert auth.get_user('johnsnow') is not None
 
     # Getting non-existing user fails.
-    assert auth.get_user('samwelltarly') == None
+    assert auth.get_user('samwelltarly') is None
+
 
 async def test_delete_user(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)

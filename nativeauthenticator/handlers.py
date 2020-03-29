@@ -54,13 +54,13 @@ class SignUpHandler(LocalBase):
         if not user:
             alert = 'alert-danger'
             pw_len = self.authenticator.minimum_password_length
-            taken  = self.authenticator.user_exists(username)
+            taken = self.authenticator.user_exists(username)
 
             if pw_len:
                 message = ("Something went wrong. Be sure your password has "
                            "at least {} characters, doesn't have spaces or "
                            "commas and is not too common.").format(pw_len)
-            
+
             elif taken:
                 message = ("Something went wrong. It appears that this "
                            "username is already in use. Please try again "
