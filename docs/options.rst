@@ -45,6 +45,16 @@ You can also define the number of seconds a user must wait before trying again. 
 
 .. image:: _static/block_user_failed_logins.png
 
+Disable SignUp
+--------------
+
+By default Native Authenticator allows everyone to register user accounts. But you can add a option to disable signup. To do so, just add the following line to the config file:
+
+.. code-block:: python
+
+    c.Authenticator.enable_signup = False
+
+
 Open SignUp
 -----------
 

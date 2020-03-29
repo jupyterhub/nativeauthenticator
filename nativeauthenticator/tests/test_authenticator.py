@@ -70,6 +70,24 @@ async def test_create_user_with_strong_passwords(password, min_len, expected,
     assert bool(user) == expected
 
 
+@pytest.mark.parametrize("enable_signup,expected_success", [
+    (True, True),
+    (False, False),
+])
+async def test_create_user_disable(enable_signup, expected_success,
+                                   tmpcwd, app):
+    '''Test method get_or_create_user not create user if signup is disabled'''
+    auth = NativeAuthenticator(db=app.db)
+    auth.enable_signup = enable_signup
+
+    user = auth.get_or_create_user('johnsnow', 'password')
+
+    if expected_success:
+        assert user.username == 'johnsnow'
+    else:
+        assert not user
+
+
 @pytest.mark.parametrize("username,password,authorized,expected", [
     ("name", '123', False, False),
     ("johnsnow", '123', True, False),

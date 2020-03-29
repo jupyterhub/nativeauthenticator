@@ -41,6 +41,11 @@ class NativeAuthenticator(Authenticator):
         help=("Configures the number of seconds a user has to wait "
               "after being blocked. Default is 600.")
     )
+    enable_signup = Bool(
+        config=True,
+        default_value=True,
+        help=("Allows every user to registry a new account")
+    )
     open_signup = Bool(
         config=True,
         default_value=False,
@@ -175,6 +180,9 @@ class NativeAuthenticator(Authenticator):
 
         if not self.is_password_strong(pw) or \
            not self.validate_username(username):
+            return
+
+        if not self.enable_signup:
             return
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
