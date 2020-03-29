@@ -94,7 +94,7 @@ async def test_create_user_disable(enable_signup, expected_success,
     auth = NativeAuthenticator(db=app.db)
     auth.enable_signup = enable_signup
 
-    user = auth.get_or_create_user('johnsnow', 'password')
+    user = auth.create_user('johnsnow', 'password')
 
     if expected_success:
         assert user.username == 'johnsnow'
