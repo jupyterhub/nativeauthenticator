@@ -54,7 +54,7 @@ class SignUpHandler(LocalBase):
                         "username is already in use. Please try again "
                         "with a different username.")
         else:
-			# Error if user creation was not successful.
+            # Error if user creation was not successful.
             if not user:
                 alert = 'alert-danger'
                 pw_len = self.authenticator.minimum_password_length
@@ -66,8 +66,8 @@ class SignUpHandler(LocalBase):
                     message = ("Something went wrong. Be sure your password "
                                " doesn't have spaces or commas and is not too "
                                "common.")
-            
-            # If user creation went through and open-signup is enabled, success.                 
+
+            # If user creation went through and open-signup is enabled, success.
             elif self.authenticator.open_signup:
                 alert = 'alert-success'
                 message = ('The signup was successful. You can now go to '
