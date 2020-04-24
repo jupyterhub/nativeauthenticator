@@ -44,7 +44,7 @@ class SignUpHandler(LocalBase):
         self.finish(html)
 
     def get_result_message(self, user, taken):
-        alert   = 'alert-info'
+        alert = 'alert-info'
         message = 'Your information has been sent to the admin'
 
         # Always error if username is taken.
