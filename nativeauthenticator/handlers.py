@@ -44,34 +44,35 @@ class SignUpHandler(LocalBase):
         self.finish(html)
 
     def get_result_message(self, user, taken):
-        alert = 'alert-info'
+        alert   = 'alert-info'
         message = 'Your information has been sent to the admin'
 
         # Always error if username is taken.
         if taken:
             alert = 'alert-danger'
             message = ("Something went wrong. It appears that this "
-                        "username is already in use. Please try again "
-                        "with a different username.")
+                       "username is already in use. Please try again "
+                       "with a different username.")
         else:
             # Error if user creation was not successful.
             if not user:
                 alert = 'alert-danger'
                 pw_len = self.authenticator.minimum_password_length
                 if pw_len:
-                    message = ("Something went wrong. Be sure your password has "
-                               "at least {} characters, doesn't have spaces or "
-                               "commas and is not too common.").format(pw_len)
+                    message = ("Something went wrong. Be sure your "
+                               "password has at least {} characters, doesn't "
+                               "have spaces or commas and is not too "
+                               "common.").format(pw_len)
                 else:
                     message = ("Something went wrong. Be sure your password "
-                               " doesn't have spaces or commas and is not too "
+                               "doesn't have spaces or commas and is not too "
                                "common.")
 
-            # If user creation went through and open-signup is enabled, success.
+            # If user creation went through & open-signup is enabled, success.
             elif self.authenticator.open_signup:
                 alert = 'alert-success'
                 message = ('The signup was successful. You can now go to '
-                            'home page and log in the system')
+                           'home page and log in the system')
 
         return alert, message
 
