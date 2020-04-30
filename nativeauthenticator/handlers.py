@@ -85,7 +85,7 @@ class SignUpHandler(LocalBase):
             response['error'] = True
 
         self.finish(response)
-
+        return response
 
 
 class AuthorizationHandler(LocalBase):
@@ -145,7 +145,7 @@ class ChangePasswordHandler(LocalBase):
             response['error'] = True
 
         self.finish(response)
-        
+        return response
 
 class LoginHandler(LoginHandler, LocalBase):
 
