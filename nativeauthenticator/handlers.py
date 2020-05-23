@@ -43,33 +43,36 @@ class SignUpHandler(LocalBase):
         )
         self.finish(html)
 
-    def get_result_message(self, user, username):
+    def get_result_message(self, user, taken):
         alert = 'alert-info'
-        message = 'Your information have been sent to the admin'
+        message = 'Your information has been sent to the admin'
 
-        if self.authenticator.open_signup:
-            alert = 'alert-success'
-            message = ('The signup was successful. You can now go to '
-                       'home page and log in the system')
-        if not user:
+        # Always error if username is taken.
+        if taken:
             alert = 'alert-danger'
-            pw_len = self.authenticator.minimum_password_length
-            taken = self.authenticator.user_exists(username)
+            message = ("Something went wrong. It appears that this "
+                       "username is already in use. Please try again "
+                       "with a different username.")
+        else:
+            # Error if user creation was not successful.
+            if not user:
+                alert = 'alert-danger'
+                pw_len = self.authenticator.minimum_password_length
+                if pw_len:
+                    message = ("Something went wrong. Be sure your "
+                               "password has at least {} characters, doesn't "
+                               "have spaces or commas and is not too "
+                               "common.").format(pw_len)
+                else:
+                    message = ("Something went wrong. Be sure your password "
+                               "doesn't have spaces or commas and is not too "
+                               "common.")
 
-            if pw_len:
-                message = ("Something went wrong. Be sure your password has "
-                           "at least {} characters, doesn't have spaces or "
-                           "commas and is not too common.").format(pw_len)
-
-            elif taken:
-                message = ("Something went wrong. It appears that this "
-                           "username is already in use. Please try again "
-                           "with a different username.")
-
-            else:
-                message = ("Something went wrong. Be sure your password "
-                           " doesn't have spaces or commas and is not too "
-                           "common.")
+            # If user creation went through & open-signup is enabled, success.
+            elif self.authenticator.open_signup:
+                alert = 'alert-success'
+                message = ('The signup was successful. You can now go to '
+                           'home page and log in the system')
 
         return alert, message
 
@@ -83,10 +86,10 @@ class SignUpHandler(LocalBase):
             'email': self.get_body_argument('email', '', strip=False),
             'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
         }
+        taken = self.authenticator.user_exists(user_info['username'])
         user = self.authenticator.create_user(**user_info)
-        name = self.authenticator.user_exists(user_info['username'])
 
-        alert, message = self.get_result_message(user, name)
+        alert, message = self.get_result_message(user, taken)
 
         otp_secret, user_2fa = '', ''
         if user:
