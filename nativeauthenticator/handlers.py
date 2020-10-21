@@ -137,7 +137,7 @@ class ChangePasswordHandler(LocalBase):
         self._register_template_path()
         html = self.render_template(
             'change-password.html',
-             user_name=user.name,
+            user_name=user.name,
         )
         self.finish(html)
 
@@ -181,6 +181,7 @@ class ChangePasswordAdminHandler(LocalBase):
             result_message=message_template.format(user_name),
         )
         self.finish(html)
+
 
 class LoginHandler(LoginHandler, LocalBase):
 
