@@ -9,8 +9,10 @@ from sqlalchemy import inspect
 from tornado import gen
 from traitlets import Bool, Integer, Unicode
 
-from .handlers import (AuthorizationHandler, ChangeAuthorizationHandler,
-                       ChangePasswordHandler, LoginHandler, SignUpHandler)
+from .handlers import (
+    AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
+    ChangePasswordAdminHandler, LoginHandler, SignUpHandler,
+)
 from .orm import UserInfo
 
 
@@ -224,6 +226,7 @@ class NativeAuthenticator(Authenticator):
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
             (r'/change-password', ChangePasswordHandler),
+            (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]
         return native_handlers
 

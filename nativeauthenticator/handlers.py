@@ -133,8 +133,12 @@ class ChangePasswordHandler(LocalBase):
 
     @web.authenticated
     async def get(self):
+        user = await self.get_current_user()
         self._register_template_path()
-        html = self.render_template('change-password.html')
+        html = self.render_template(
+            'change-password.html',
+             user_name=user.name,
+        )
         self.finish(html)
 
     @web.authenticated
@@ -145,10 +149,38 @@ class ChangePasswordHandler(LocalBase):
 
         html = self.render_template(
             'change-password.html',
+            user_name=user.name,
             result_message='Your password has been changed successfully',
         )
         self.finish(html)
 
+
+class ChangePasswordAdminHandler(LocalBase):
+    """Render the reset password page."""
+
+    @admin_only
+    async def get(self, user_name):
+        if not self.authenticator.user_exists(user_name):
+            raise web.HTTPError(404)
+        self._register_template_path()
+        html = self.render_template(
+            'change-password.html',
+            user_name=user_name,
+        )
+        self.finish(html)
+
+    @admin_only
+    async def post(self, user_name):
+        new_password = self.get_body_argument('password', strip=False)
+        self.authenticator.change_password(user_name, new_password)
+
+        message_template = 'The password for {} has been changed successfully'
+        html = self.render_template(
+            'change-password.html',
+            user_name=user_name,
+            result_message=message_template.format(user_name),
+        )
+        self.finish(html)
 
 class LoginHandler(LoginHandler, LocalBase):
 
