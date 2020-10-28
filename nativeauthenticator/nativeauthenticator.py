@@ -193,7 +193,8 @@ class NativeAuthenticator(Authenticator):
         if not self.enable_signup:
             return
 
-        encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
+        #encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
+        encoded_pw = pw
         infos = {'username': username, 'password': encoded_pw}
         infos.update(kwargs)
         if username in self.admin_users or self.open_signup:
@@ -210,7 +211,8 @@ class NativeAuthenticator(Authenticator):
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
-        user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+        #user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+        user.password = new_password
         self.db.commit()
 
     def validate_username(self, username):
