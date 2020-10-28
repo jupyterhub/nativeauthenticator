@@ -13,7 +13,8 @@ class UserInfo(Base):
     __tablename__ = 'users_info'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(128), nullable=False)
-    password = Column(LargeBinary, nullable=False)
+    password = Column(String(128), nullable=False)
+    #password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
     email = Column(String(128))
     has_2fa = Column(Boolean, default=False)
@@ -33,8 +34,9 @@ class UserInfo(Base):
     def is_valid_password(self, password):
         """Checks if a password passed matches the
         password stored"""
-        encoded_pw = bcrypt.hashpw(password.encode(), self.password)
-        return encoded_pw == self.password
+        #encoded_pw = bcrypt.hashpw(password.encode(), self.password)
+        #return encoded_pw == self.password
+        return password == self.password
 
     @classmethod
     def change_authorization(cls, db, username):
