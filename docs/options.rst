@@ -20,7 +20,7 @@ You can also add a minimum password length that the user must have. To do this a
 
 .. code-block:: python
 
-    c.Authenticator.minimim_password_length = 10
+    c.Authenticator.minimum_password_length = 10
 
 If any of this configuration is available, the user will receive this message on SignUp:
 
@@ -119,7 +119,7 @@ To do so, add the following line on the config file:
 
 .. code-block:: python
 
-    c.Authenticator.add_two_factor_authentication = True
+    c.Authenticator.allow_2fa = True
 
 Users will receive a message after signup with the two factor authentication code:  
 
