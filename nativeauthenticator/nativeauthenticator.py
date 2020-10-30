@@ -196,7 +196,21 @@ class NativeAuthenticator(Authenticator):
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
         infos.update(kwargs)
-        if username in self.admin_users or self.open_signup:
+        admins = self.admin_users
+
+        try:
+            allowed = self.allowed_users
+        except AttributeError:
+            try:
+                # Deprecated for jupyterhub >= 1.2
+                allowed = self.whitelist
+            except AttributeError:
+                # Not present at all in jupyterhub < 0.9
+                allowed = {}
+
+        authed = admins.union(allowed)
+
+        if self.open_signup or username in authed:
             infos.update({'is_authorized': True})
 
         try:
