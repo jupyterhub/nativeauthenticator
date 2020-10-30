@@ -196,10 +196,8 @@ class NativeAuthenticator(Authenticator):
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
         infos.update(kwargs)
-        
         admins = self.admin_users
-        
-        # EAFP
+
         try:
             allowed = self.allowed_users
         except AttributeError:
