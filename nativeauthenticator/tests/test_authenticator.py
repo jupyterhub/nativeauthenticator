@@ -127,8 +127,11 @@ async def test_handlers(app):
     handlers = auth.get_handlers(app)
     assert handlers[0][0] == '/login'
     assert handlers[1][0] == '/signup'
-    assert handlers[2][0] == '/authorize'
-    assert handlers[4][0] == '/change-password'
+    assert handlers[2][0] == '/discard/([^/]*)'
+    assert handlers[3][0] == '/authorize'
+    assert handlers[4][0] == '/authorize/([^/]*)'
+    assert handlers[5][0] == '/change-password'
+    assert handlers[6][0] == '/change-password/([^/]+)'
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):
