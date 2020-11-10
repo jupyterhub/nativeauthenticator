@@ -11,7 +11,7 @@ from traitlets import Bool, Integer, Unicode
 
 from .handlers import (
     AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
-    ChangePasswordAdminHandler, LoginHandler, SignUpHandler,
+    ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
 )
 from .orm import UserInfo
 
@@ -237,6 +237,7 @@ class NativeAuthenticator(Authenticator):
         native_handlers = [
             (r'/login', LoginHandler),
             (r'/signup', SignUpHandler),
+            (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
             (r'/change-password', ChangePasswordHandler),
