@@ -33,7 +33,7 @@ class SignUpHandler(LocalBase):
         if not self.authenticator.enable_signup:
             raise web.HTTPError(404)
 
-        html = self.render_template(
+        html = await self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
@@ -93,7 +93,7 @@ class SignUpHandler(LocalBase):
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
 
-        html = self.render_template(
+        html = await self.render_template(
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
@@ -109,7 +109,7 @@ class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
     @admin_only
     async def get(self):
-        html = self.render_template(
+        html = await self.render_template(
             'autorization-area.html',
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
@@ -130,7 +130,7 @@ class ChangePasswordHandler(LocalBase):
     @web.authenticated
     async def get(self):
         user = await self.get_current_user()
-        html = self.render_template(
+        html = await self.render_template(
             'change-password.html',
             user_name=user.name,
         )
@@ -142,7 +142,7 @@ class ChangePasswordHandler(LocalBase):
         new_password = self.get_body_argument('password', strip=False)
         self.authenticator.change_password(user.name, new_password)
 
-        html = self.render_template(
+        html = await self.render_template(
             'change-password.html',
             user_name=user.name,
             result_message='Your password has been changed successfully',
@@ -157,7 +157,7 @@ class ChangePasswordAdminHandler(LocalBase):
     async def get(self, user_name):
         if not self.authenticator.user_exists(user_name):
             raise web.HTTPError(404)
-        html = self.render_template(
+        html = await self.render_template(
             'change-password.html',
             user_name=user_name,
         )
@@ -169,7 +169,7 @@ class ChangePasswordAdminHandler(LocalBase):
         self.authenticator.change_password(user_name, new_password)
 
         message_template = 'The password for {} has been changed successfully'
-        html = self.render_template(
+        html = await self.render_template(
             'change-password.html',
             user_name=user_name,
             result_message=message_template.format(user_name),
