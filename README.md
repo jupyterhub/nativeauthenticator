@@ -1,12 +1,9 @@
 # Native Authenticator
 
-
-[![Circle Ci Badge](https://img.shields.io/circleci/project/github/jupyterhub/nativeauthenticator.svg)](https://circleci.com/gh/jupyterhub/nativeauthenticator)
-
-![Code Cov](https://img.shields.io/codecov/c/github/jupyterhub/nativeauthenticator.svg)
-
-[![Documentation build status](https://img.shields.io/readthedocs/native-authenticator?logo=read-the-docs&logoColor=white)](https://native-authenticator.readthedocs.org/en/latest/)
 [![Latest PyPI version](https://img.shields.io/pypi/v/jupyterhub-nativeauthenticator?logo=pypi&logoColor=white)](https://pypi.python.org/pypi/jupyterhub-nativeauthenticator)
+[![Documentation build status](https://img.shields.io/readthedocs/native-authenticator?logo=read-the-docs&logoColor=white)](https://native-authenticator.readthedocs.org/en/latest/)
+[![GitHub Workflow Status - Test](https://img.shields.io/github/workflow/status/jupyterhub/nativeauthenticator/Test?logo=github&label=tests)](https://github.com/jupyterhub/nativeauthenticator/actions)
+[![Code coverage](https://img.shields.io/codecov/c/github/jupyterhub/nativeauthenticator.svg)](https://codecov.io/github/jupyterhub/nativeauthenticator)
 <br>
 [![GitHub](https://img.shields.io/badge/issue_tracking-github-blue?logo=github)](https://github.com/jupyterhub/nativeauthenticator/issues)
 [![Discourse](https://img.shields.io/badge/help_forum-discourse-blue?logo=discourse)](https://discourse.jupyter.org/c/jupyterhub)
