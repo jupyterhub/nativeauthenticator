@@ -10,6 +10,7 @@ from tornado import gen
 from traitlets import Bool, Integer, Unicode
 
 from .handlers import (
+        AuthorizeHandler,
     AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
     ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
 )
@@ -240,6 +241,7 @@ class NativeAuthenticator(Authenticator):
             (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
+            (r'/merda/([^/]*)', AuthorizeHandler),
             (r'/change-password', ChangePasswordHandler),
             (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]

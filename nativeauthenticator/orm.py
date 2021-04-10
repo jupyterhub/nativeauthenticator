@@ -37,6 +37,11 @@ class UserInfo(Base):
         return encoded_pw == self.password
 
     @classmethod
+    def is_authorized(cls, db, username):
+        user = db.query(cls).filter(cls.username == username).first()
+        return user.is_authorized
+
+    @classmethod
     def change_authorization(cls, db, username):
         user = db.query(cls).filter(cls.username == username).first()
         user.is_authorized = not user.is_authorized

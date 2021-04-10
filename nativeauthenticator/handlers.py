@@ -123,6 +123,19 @@ class ChangeAuthorizationHandler(LocalBase):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + 'authorize')
 
+class AuthorizeHandler(LocalBase):
+    async def get(self, slug):
+        msg = "not changed"
+        if not UserInfo.is_authorized(self.db, slug):
+            UserInfo.change_authorization(self.db, slug)
+            msg = "changed"
+        html = await self.render_template(
+            'my_message.html',
+            message=msg,
+        )
+        self.finish(html)
+
+
 
 class ChangePasswordHandler(LocalBase):
     """Render the reset password page."""
