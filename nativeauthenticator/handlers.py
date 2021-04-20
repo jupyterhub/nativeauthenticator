@@ -127,7 +127,7 @@ class AuthorizeHandler(LocalBase):
     async def get(self, slug):
         msg = "not changed"
         usr = UserInfo.find(self.db, slug)
-        if not usr.is_authorized
+        if not usr.is_authorized:
             usr.change_authorization(self.db, slug)
             msg = "changed"
         html = await self.render_template(
