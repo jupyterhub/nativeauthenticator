@@ -241,7 +241,7 @@ class NativeAuthenticator(Authenticator):
             (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
-            (r'/merda/([^/]*)', AuthorizeHandler),
+            (r'/confirm/([^/]*)', AuthorizeHandler),
             (r'/change-password', ChangePasswordHandler),
             (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]
