@@ -126,12 +126,14 @@ class NativeAuthenticator(Authenticator):
 
     def setup_self_approval(self):
         if self.allow_self_approval_for:
+            if self.open_signup:
+                self.log.error("self_approval and open_signup are conflicting options!")
             from django.conf import settings
             if not settings.configured:
                 settings.configure()
             self.ask_email_on_signup = True
             if len(self.secret_key) < 8:
-                raise ValueError("secret_key must be a random string with len > 8 when using self_approval")
+                raise ValueError("Secret_key must be a random string with len > 8 when using self_approval")
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
