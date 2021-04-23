@@ -126,6 +126,9 @@ class NativeAuthenticator(Authenticator):
 
     def setup_self_approval(self):
         if self.allow_self_approval_for:
+            from django.conf import settings
+            if not settings.configured:
+                settings.configure()
             self.ask_email_on_signup = True
             if len(self.secret_key) < 8:
                 raise ValueError("secret_key must be a random string with len > 8 when using self_approval")
@@ -259,11 +262,20 @@ class NativeAuthenticator(Authenticator):
         if self.allow_self_approval_for:
             match = self.allow_self_approval_for.match(user_info.email)
             if match:
-                self.send_approval_email(user_info.email,"xx")
+                url = self.generate_approval_url(username)
+                self.send_approval_email(user_info.email, url )
 
         self.db.add(user_info)
         self.db.commit()
         return user_info
+
+    def generate_approval_url(self, username):
+        from django.core.signing import Signer
+        s=Signer(self.secret_key)
+        u = s.sign_object({"username": username, 
+            })
+        return "/confirm/" + u
+
 
     def send_approval_email(self, dest, url):
         msg = EmailMessage()
@@ -293,7 +305,7 @@ class NativeAuthenticator(Authenticator):
             (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
-            (r'/confirm/([^/]*)', AuthorizeHandler),
+            (r'/confirm/([^/]*)', AuthorizeHandler),                    # must be the same as in generate_approval_url()
             (r'/change-password', ChangePasswordHandler),
             (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]

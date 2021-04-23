@@ -136,9 +136,16 @@ class AuthorizeHandler(LocalBase):
         )
         self.finish(html)
 
+    # static method so it can be easily tested without initializate the class
     @staticmethod
-    def validate_url(slug):
-        pass
+    def validate_slug(slug, key):
+        from django.core.signing import Signer, BadSignature
+        s=Signer(key)
+        try:
+            obj = s.unsign_object(slug)
+        except BadSignature as e:
+            raise ValueError(e)
+        return obj
 
 
 class ChangePasswordHandler(LocalBase):

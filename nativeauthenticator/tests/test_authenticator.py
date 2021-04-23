@@ -278,7 +278,8 @@ async def test_approval_url(app):
     auth.setup_self_approval()
 
     with pytest.raises(ValueError):
-        AuthorizeHandler.validate_url("foo", auth.secret_key)
+        AuthorizeHandler.validate_slug("foo", auth.secret_key)
 
     url = auth.generate_approval_url("somebody")
-    AuthorizeHandler.validate_url(url, auth.secret_key)
+    slug = url.split("/")[-1]
+    AuthorizeHandler.validate_slug(slug, auth.secret_key)
