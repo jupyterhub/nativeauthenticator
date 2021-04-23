@@ -249,18 +249,21 @@ class NativeAuthenticator(Authenticator):
         if self.allow_self_approval_for:
             match = self.allow_self_approval_for.match(user_info.email)
             if match:
-                msg = EmailMessage()
-                msg['From'] = self.self_approval_email[0]
-                msg['Subject'] = self.self_approval_email[1]
-                msg.set_content(self.self_approval_email[2].format(approval_url="xx"))
-                msg['To'] = user_info.email
-                s = smtplib.SMTP('localhost')
-                s.send_message(msg)
-                s.quit()
+                self.send_approval_email(user_info.email,"xx")
 
         self.db.add(user_info)
         self.db.commit()
         return user_info
+
+    def send_approval_email(self, dest, url):
+        msg = EmailMessage()
+        msg['From'] = self.self_approval_email[0]
+        msg['Subject'] = self.self_approval_email[1]
+        msg.set_content(self.self_approval_email[2].format(approval_url=url))
+        msg['To'] = dest
+        s = smtplib.SMTP('localhost')
+        s.send_message(msg)
+        s.quit()
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
