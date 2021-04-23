@@ -136,6 +136,9 @@ class AuthorizeHandler(LocalBase):
         )
         self.finish(html)
 
+    @staticmethod
+    def validate_url(slug):
+        pass
 
 
 class ChangePasswordHandler(LocalBase):

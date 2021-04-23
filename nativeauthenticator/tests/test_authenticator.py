@@ -7,6 +7,7 @@ from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
 from ..orm import UserInfo
+from ..handlers import AuthorizeHandler
 
 
 @pytest.fixture
@@ -270,3 +271,14 @@ async def test_secret_key(app):
     auth.setup_self_approval()
     assert auth.ask_email_on_signup == True
 
+async def test_approval_url(app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.allow_self_approval_for = re.compile('.*@some-domain.com$')
+    auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
+    auth.setup_self_approval()
+
+    with pytest.raises(ValueError):
+        AuthorizeHandler.validate_url("foo")
+
+    url = auth.generate_approval_url("somebody")
+    AuthorizeHandler.validate_url(url)
