@@ -23,6 +23,11 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
+    secret_key = Unicode(
+        config = True,
+        default = "",
+        help = "Secret key to cryptographically sign the self-approved URL (if allow_self_approval is utilized)"
+    )
     allow_self_approval_for = Instance(
         klass=re.Pattern,
         allow_none=True,
@@ -117,8 +122,13 @@ class NativeAuthenticator(Authenticator):
         if self.import_from_firstuse:
             self.add_data_from_firstuse()
 
+        self.setup_self_approval()
+
+    def setup_self_approval(self):
         if self.allow_self_approval_for:
             self.ask_email_on_signup = True
+            if len(self.secret_key) < 8:
+                raise ValueError("secret_key must be a random string with len > 8 when using self_approval")
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
