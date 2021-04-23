@@ -263,7 +263,7 @@ class NativeAuthenticator(Authenticator):
             match = self.allow_self_approval_for.match(user_info.email)
             if match:
                 url = self.generate_approval_url(username)
-                self.send_approval_email(user_info.email, url )
+                self.send_approval_email(user_info.email, url)
 
         self.db.add(user_info)
         self.db.commit()
