@@ -126,11 +126,25 @@ class ChangeAuthorizationHandler(LocalBase):
 
 class AuthorizeHandler(LocalBase):
     async def get(self, slug):
-        msg = "not changed"
-        usr = UserInfo.find(self.db, slug)
-        if not usr.is_authorized:
-            usr.change_authorization(self.db, slug)
-            msg = "changed"
+        must_stop = True
+        msg = "Invalid URL"
+        if self.authenticator.allow_self_approval_for:
+            try:
+                data = AuthorizeHandler.validate_slug(slug, self.authenticator.secret_key)
+                must_stop = False
+            except ValueError:
+                pass
+
+        if not must_stop:
+            username = data["username"]
+            msg = "{} was already authorized".format(username)
+            usr = UserInfo.find(self.db, username)
+            if not usr.is_authorized:
+                usr.change_authorization(self.db, slug)
+                msg = "{} has been authorized".format(username)
+
+            # add POSIX user!!
+
         html = await self.render_template(
             'my_message.html',
             message=msg,
