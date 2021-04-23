@@ -1,6 +1,7 @@
 import dbm
 import os
 import pytest
+import datetime
 import time
 import re
 from jupyterhub.tests.mocking import MockHub
@@ -280,6 +281,10 @@ async def test_approval_url(app):
     with pytest.raises(ValueError):
         AuthorizeHandler.validate_slug("foo", auth.secret_key)
 
-    url = auth.generate_approval_url("somebody")
+    expiration = datetime.datetime.now()
+    url = auth.generate_approval_url("somebody", when=expiration)
     slug = url.split("/")[-1]
-    AuthorizeHandler.validate_slug(slug, auth.secret_key)
+    out = AuthorizeHandler.validate_slug(slug, auth.secret_key)
+    print (out)
+    assert out["username"] == "somebody"
+    assert out["expire"] == expiration

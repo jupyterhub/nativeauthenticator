@@ -4,7 +4,7 @@ import os
 import re
 import smtplib
 from email.message import EmailMessage
-from datetime import datetime
+from datetime import datetime, timedelta
 from jupyterhub.auth import Authenticator
 from pathlib import Path
 
@@ -269,10 +269,11 @@ class NativeAuthenticator(Authenticator):
         self.db.commit()
         return user_info
 
-    def generate_approval_url(self, username):
+    def generate_approval_url(self, username, when = datetime.now() + timedelta(minutes = 15)):
         from django.core.signing import Signer
         s=Signer(self.secret_key)
         u = s.sign_object({"username": username, 
+                           "expire": when.isoformat()
             })
         return "/confirm/" + u
 

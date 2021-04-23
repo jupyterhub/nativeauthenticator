@@ -1,4 +1,5 @@
 import os
+from datetime import date, datetime
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
@@ -145,6 +146,16 @@ class AuthorizeHandler(LocalBase):
             obj = s.unsign_object(slug)
         except BadSignature as e:
             raise ValueError(e)
+        datetimestr = obj["expire"].split("T") # format = "%Y-%m-%dT%H:%M:%S.%f"
+
+        # the following should just be fromisoformat, but sadly it does not support 
+        # the time part of the format, only the date:
+        # https://docs.python.org/3/library/datetime.html#datetime.date.fromisoformat
+
+        dateobj = date.fromisoformat(datetimestr[0]) # before the T
+        timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time() # after the T
+        obj["expire"] = datetime.combine(dateobj, timeobj)
+
         return obj
 
 
