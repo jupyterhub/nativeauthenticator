@@ -77,6 +77,24 @@ Native Authenticator is based on username and password only. But if you need ext
 
     c.Authenticator.ask_email_on_signup = True
 
+
+Allow self-serve approval
+-------------------------
+
+By default all users that make sign up on Native Authenticator need an admin approval so 
+they can actually log in the system. Or you can allow anybody without approval as described
+above with `open_signup`. Alternatively, you can allow only users who have access to a 
+given email to self approve. New users will still need approval, but that can be
+achieved by the users themselves navigating to a URL which will be e-mailed if the
+provided email address matches the specified pattern. This setting automatically enables
+`ask_email_on_signup`. For example, to allow any users who have an mit.edu email address,
+you may do the following:
+
+.. code-block:: python
+
+    import re
+    c.Authenticator.allow_self_approval_for = re.compile('@mit\.edu$')
+
 Import users from FirstUse Authenticator
 ----------------------------------------
 

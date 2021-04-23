@@ -1,13 +1,14 @@
 import bcrypt
 import dbm
 import os
+import re
 from datetime import datetime
 from jupyterhub.auth import Authenticator
 from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer, Unicode
+from traitlets import Bool, Integer, Unicode, Instance
 
 from .handlers import (
         AuthorizeHandler,
@@ -20,6 +21,16 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
+    allow_self_approval_for = Instance(
+        klass=re.Pattern,
+        allow_none=True,
+        config=True,
+        default=None,
+        help=("Use self-service authentication (rather than "
+              "admin-based authentication) for users whose "
+              "email match this patter. Note that this forces "
+              "ask_email_on_signup to be True.")
+    )
     check_common_password = Bool(
         config=True,
         default=False,
@@ -92,6 +103,9 @@ class NativeAuthenticator(Authenticator):
 
         if self.import_from_firstuse:
             self.add_data_from_firstuse()
+
+        if self.allow_self_approval_for:
+            self.ask_email_on_signup = True
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
