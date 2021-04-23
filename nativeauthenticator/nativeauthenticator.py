@@ -2,13 +2,15 @@ import bcrypt
 import dbm
 import os
 import re
+import smtplib
+from email.message import EmailMessage
 from datetime import datetime
 from jupyterhub.auth import Authenticator
 from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer, Unicode, Instance
+from traitlets import Bool, Integer, Unicode, Instance, Tuple
 
 from .handlers import (
         AuthorizeHandler,
@@ -30,6 +32,17 @@ class NativeAuthenticator(Authenticator):
               "admin-based authentication) for users whose "
               "email match this patter. Note that this forces "
               "ask_email_on_signup to be True.")
+    )
+    self_approval_email = Tuple(
+        Unicode(), Unicode(), Unicode(),
+        config=True,
+        default_value=("do-not-reply@my-domain.com",
+                 "Welcome to JupyterHub on my-domain",
+                 ("Your JupyterHub account on my-domain has been created, but it's inactive.\n"
+                  "If you did not create the account yourself, IGNORE this message:\n"
+                  "somebody is trying to use your email to get an unathorized account!\n"
+                  "If you did create the account yourself, navigate to {approval_url} to activate it.\n"))
+
     )
     check_common_password = Bool(
         config=True,
@@ -232,6 +245,18 @@ class NativeAuthenticator(Authenticator):
             user_info = UserInfo(**infos)
         except AssertionError:
             return
+
+        if self.allow_self_approval_for:
+            match = self.allow_self_approval_for.match(user_info.email)
+            if match:
+                msg = EmailMessage()
+                msg['From'] = self.self_approval_email[0]
+                msg['Subject'] = self.self_approval_email[1]
+                msg.set_content(self.self_approval_email[2].format(approval_url="xx"))
+                msg['To'] = user_info.email
+                s = smtplib.SMTP('localhost')
+                s.send_message(msg)
+                s.quit()
 
         self.db.add(user_info)
         self.db.commit()

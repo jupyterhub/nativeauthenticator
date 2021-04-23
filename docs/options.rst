@@ -93,7 +93,13 @@ you may do the following:
 .. code-block:: python
 
     import re
-    c.Authenticator.allow_self_approval_for = re.compile('@mit\.edu$')
+    c.Authenticator.allow_self_approval_for = re.compile('.*@mit\.edu$')
+
+You should customize the email sent to users with
+
+.. code-block:: python
+
+    c.Authenticator.self_approval_email = ("from", "subject", "email body, including {approval_url}")
 
 Import users from FirstUse Authenticator
 ----------------------------------------
