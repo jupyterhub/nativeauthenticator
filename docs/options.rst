@@ -97,6 +97,14 @@ you may do the following:
     c.Authenticator.allow_self_approval_for = re.compile('[^@]+@mit\.edu$')
 
 Note that this setting automatically enables `ask_email_on_signup`.
+
+To use the code, you must also provide a secret key to cryptographically sign the URL.
+To prevents attacks, it is mandatory that this key stays secret.
+
+.. code-block:: python
+
+c.Authenticator.secret_key = "your-key"
+
 You should customize the email sent to users with
 
 .. code-block:: python
