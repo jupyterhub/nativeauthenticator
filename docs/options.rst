@@ -81,13 +81,13 @@ Native Authenticator is based on username and password only. But if you need ext
 Allow self-serve approval
 -------------------------
 
-By default all users that sign up on Native Authenticator need an admin approval so 
+By default all users who sign up on Native Authenticator need an admin approval so 
 they can actually log in the system. Or you can allow anybody without approval as described
-above with `open_signup`. Alternatively, you can allow only users who have access to a 
-given email to self approve, for example users in your own organization.
+above with `open_signup`. Alternatively, you may want something like `open_signup` but
+only for users in your own organization. This is what this option permits.
 New users are still created in non-authorized mode, but they can self-authorize by
 navigating to a (cryptographic) URL which will be e-mailed to them *only* if the
-provided email address matches the specified pattern. 
+provided email address matches the specified pattern.
 For example, to allow any users who have an mit.edu email address,
 you may do the following:
 
