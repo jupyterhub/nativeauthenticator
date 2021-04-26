@@ -103,9 +103,9 @@ To prevents attacks, it is mandatory that this key stays secret.
 
 .. code-block:: python
 
-c.Authenticator.secret_key = "your-key"
+    c.Authenticator.secret_key = "your-key"
 
-You should customize the email sent to users with
+You should customize the email sent to users with something like
 
 .. code-block:: python
 
