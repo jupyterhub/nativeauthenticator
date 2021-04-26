@@ -93,7 +93,7 @@ you may do the following:
 .. code-block:: python
 
     import re
-    c.Authenticator.allow_self_approval_for = re.compile('.*@mit\.edu$')
+    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@mit\.edu$')
 
 You should customize the email sent to users with
 
