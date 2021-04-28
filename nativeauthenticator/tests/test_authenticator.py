@@ -258,6 +258,7 @@ async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
     with pytest.raises(ValueError):
         auth.add_data_from_firstuse()
 
+
 async def test_secret_key(app):
     auth = NativeAuthenticator(db=app.db)
     auth.ask_email_on_signup = False
@@ -270,7 +271,8 @@ async def test_secret_key(app):
     auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
 
     auth.setup_self_approval()
-    assert auth.ask_email_on_signup == True
+    assert auth.ask_email_on_signup is True
+
 
 async def test_approval_url(app):
     auth = NativeAuthenticator(db=app.db)

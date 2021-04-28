@@ -13,7 +13,7 @@ from tornado import gen
 from traitlets import Bool, Integer, Unicode, Instance, Tuple
 
 from .handlers import (
-        AuthorizeHandler,
+    AuthorizeHandler,
     AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
     ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
 )
@@ -24,9 +24,10 @@ class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
     secret_key = Unicode(
-        config = True,
-        default = "",
-        help = "Secret key to cryptographically sign the self-approved URL (if allow_self_approval is utilized)"
+        config=True,
+        default="",
+        help=("Secret key to cryptographically sign the "
+              "self-approved URL (if allow_self_approval is utilized)")
     )
     allow_self_approval_for = Instance(
         klass=re.Pattern,
@@ -42,11 +43,15 @@ class NativeAuthenticator(Authenticator):
         Unicode(), Unicode(), Unicode(),
         config=True,
         default_value=("do-not-reply@my-domain.com",
-                 "Welcome to JupyterHub on my-domain",
-                 ("Your JupyterHub account on my-domain has been created, but it's inactive.\n"
-                  "If you did not create the account yourself, IGNORE this message:\n"
-                  "somebody is trying to use your email to get an unathorized account!\n"
-                  "If you did create the account yourself, navigate to {approval_url} to activate it.\n"))
+                       "Welcome to JupyterHub on my-domain",
+                       ("Your JupyterHub account on my-domain has been "
+                        "created, but it's inactive.\n"
+                        "If you did not create the account yourself, "
+                        "IGNORE this message:\n"
+                        "somebody is trying to use your email to get an "
+                        "unathorized account!\n"
+                        "If you did create the account yourself, navigate "
+                        "to {approval_url} to activate it.\n"))
 
     )
     check_common_password = Bool(
@@ -127,13 +132,14 @@ class NativeAuthenticator(Authenticator):
     def setup_self_approval(self):
         if self.allow_self_approval_for:
             if self.open_signup:
-                self.log.error("self_approval and open_signup are conflicting options!")
+                self.log.error("self_approval and open_signup are conflicts!")
             from django.conf import settings
             if not settings.configured:
                 settings.configure()
             self.ask_email_on_signup = True
             if len(self.secret_key) < 8:
-                raise ValueError("Secret_key must be a random string with len > 8 when using self_approval")
+                raise ValueError("Secret_key must be a random string of "
+                                 "len > 8 when using self_approval")
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
@@ -271,18 +277,14 @@ class NativeAuthenticator(Authenticator):
         self.db.commit()
         return user_info
 
-    def generate_approval_url(self, username, when = None):
-        # default arguments are evaluated at import time, hence
-        # whereas `when` must be evaluated at call time
-        if when == None:
-            when = datetime.now() + timedelta(minutes = 15)
+    def generate_approval_url(self, username, when=None):
+        if when is None:
+            when = datetime.now() + timedelta(minutes=15)
         from django.core.signing import Signer
-        s=Signer(self.secret_key)
-        u = s.sign_object({"username": username, 
-                           "expire": when.isoformat()
-            })
+        s = Signer(self.secret_key)
+        u = s.sign_object({"username": username,
+                           "expire": when.isoformat()})
         return "/confirm/" + u
-
 
     def send_approval_email(self, dest, url):
         msg = EmailMessage()
@@ -312,7 +314,8 @@ class NativeAuthenticator(Authenticator):
             (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
-            (r'/confirm/([^/]*)', AuthorizeHandler),                    # must be the same as in generate_approval_url()
+            # the following /confirm/ must be like in generate_approval_url()
+            (r'/confirm/([^/]*)', AuthorizeHandler),
             (r'/change-password', ChangePasswordHandler),
             (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]

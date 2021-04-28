@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import datetime
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
@@ -124,13 +124,15 @@ class ChangeAuthorizationHandler(LocalBase):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + 'authorize')
 
+
 class AuthorizeHandler(LocalBase):
     async def get(self, slug):
         must_stop = True
         msg = "Invalid URL"
         if self.authenticator.allow_self_approval_for:
             try:
-                data = AuthorizeHandler.validate_slug(slug, self.authenticator.secret_key)
+                data = AuthorizeHandler.validate_slug(slug,
+                                                      self.authenticator.secret_key)
                 must_stop = False
             except ValueError:
                 pass
@@ -155,7 +157,7 @@ class AuthorizeHandler(LocalBase):
     @staticmethod
     def validate_slug(slug, key):
         from django.core.signing import Signer, BadSignature
-        s=Signer(key)
+        s = Signer(key)
         try:
             obj = s.unsign_object(slug)
         except BadSignature as e:
