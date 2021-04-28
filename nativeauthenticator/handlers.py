@@ -169,6 +169,8 @@ class AuthorizeHandler(LocalBase):
         dateobj = date.fromisoformat(datetimestr[0]) # before the T
         timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time() # after the T
         obj["expire"] = datetime.combine(dateobj, timeobj)
+        if now > obj["expire"]:
+            raise ValueError("The URL has expired")
 
         return obj
 
