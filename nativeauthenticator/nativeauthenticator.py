@@ -271,7 +271,11 @@ class NativeAuthenticator(Authenticator):
         self.db.commit()
         return user_info
 
-    def generate_approval_url(self, username, when = datetime.now() + timedelta(minutes = 15)):
+    def generate_approval_url(self, username, when = None):
+        # default arguments are evaluated at import time, hence
+        # whereas `when` must be evaluated at call time
+        if when == None:
+            when = datetime.now() + timedelta(minutes = 15)
         from django.core.signing import Signer
         s=Signer(self.secret_key)
         u = s.sign_object({"username": username, 
