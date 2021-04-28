@@ -131,8 +131,8 @@ class AuthorizeHandler(LocalBase):
         msg = "Invalid URL"
         if self.authenticator.allow_self_approval_for:
             try:
-                data = AuthorizeHandler.validate_slug(slug,
-                                                      self.authenticator.secret_key)
+                data = AuthorizeHandler.validate_slug(
+                        slug, self.authenticator.secret_key)
                 must_stop = False
             except ValueError:
                 pass
