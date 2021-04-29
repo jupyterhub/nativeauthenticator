@@ -2,6 +2,7 @@ import dbm
 import os
 import pytest
 import datetime
+from datetime import timezone as tz
 import time
 import re
 from jupyterhub.tests.mocking import MockHub
@@ -285,14 +286,14 @@ async def test_approval_url(app):
         AuthorizeHandler.validate_slug("foo", auth.secret_key)
 
     # confirm that an expired URL cannot be used
-    expiration = datetime.datetime.now() - datetime.timedelta(days=2)
+    expiration = datetime.datetime.now(tz.utc) - datetime.timedelta(days=2)
     url = auth.generate_approval_url("somebody", when=expiration)
     slug = url.split("/")[-1]
     with pytest.raises(ValueError):
         AuthorizeHandler.validate_slug(slug, auth.secret_key)
 
     # confirm that a non-expired, correctly signed URL can be used
-    expiration = datetime.datetime.now() + datetime.timedelta(days=2)
+    expiration = datetime.datetime.now(tz.utc) + datetime.timedelta(days=2)
     url = auth.generate_approval_url("somebody", when=expiration)
     slug = url.split("/")[-1]
     out = AuthorizeHandler.validate_slug(slug, auth.secret_key)

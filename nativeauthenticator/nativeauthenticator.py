@@ -5,6 +5,7 @@ import re
 import smtplib
 from email.message import EmailMessage
 from datetime import datetime, timedelta
+from datetime import timezone as tz
 from jupyterhub.auth import Authenticator
 from pathlib import Path
 
@@ -279,7 +280,7 @@ class NativeAuthenticator(Authenticator):
 
     def generate_approval_url(self, username, when=None):
         if when is None:
-            when = datetime.now() + timedelta(minutes=15)
+            when = datetime.now(tz.utc) + timedelta(minutes=15)
         from django.core.signing import Signer
         s = Signer(self.secret_key)
         u = s.sign_object({"username": username,

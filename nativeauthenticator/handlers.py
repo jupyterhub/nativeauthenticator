@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from datetime import timezone as tz
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
@@ -164,7 +165,7 @@ class AuthorizeHandler(LocalBase):
             raise ValueError(e)
 
         obj["expire"] = datetime.fromisoformat(obj["expire"])
-        if datetime.now() > obj["expire"]:
+        if datetime.now(tz.utc) > obj["expire"]:
             raise ValueError("The URL has expired")
 
         return obj
