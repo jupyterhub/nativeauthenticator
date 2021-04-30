@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+{% if recaptcha %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
 {% block login %}
 <div id="login-main" class="container">
     <form action="{{post_url}}" method="post" role="form">
