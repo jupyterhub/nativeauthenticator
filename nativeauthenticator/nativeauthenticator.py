@@ -25,6 +25,12 @@ class NativeAuthenticator(Authenticator):
         help=("Your key to enable reCAPTCHA as described at "
               "https://developers.google.com/recaptcha/intro")
     )
+    recaptcha_secret = Unicode(
+        config=True,
+        default=None,
+        help=("Your secret to enable reCAPTCHA as described at "
+              "https://developers.google.com/recaptcha/intro")
+    )
     check_common_password = Bool(
         config=True,
         default=False,

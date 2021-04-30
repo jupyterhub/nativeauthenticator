@@ -8,6 +8,8 @@ from tornado import web
 from tornado.escape import url_escape
 from tornado.httputil import url_concat
 
+import requests
+
 from .orm import UserInfo
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
@@ -42,7 +44,7 @@ class SignUpHandler(LocalBase):
         )
         self.finish(html)
 
-    def get_result_message(self, user, taken):
+    def get_result_message(self, user, taken, human=True):
         alert = 'alert-info'
         message = 'Your information has been sent to the admin'
 
@@ -73,22 +75,48 @@ class SignUpHandler(LocalBase):
                 message = ('The signup was successful. You can now go to '
                            'home page and log in the system')
 
+        if not human:
+            alert = 'alert-danger'
+            message = ("You failed the reCAPTCHA. Please try again")
+
         return alert, message
 
     async def post(self):
         if not self.authenticator.enable_signup:
             raise web.HTTPError(404)
 
-        user_info = {
-            'username': self.get_body_argument('username', strip=False),
-            'pw': self.get_body_argument('pw', strip=False),
-            'email': self.get_body_argument('email', '', strip=False),
-            'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
-        }
-        taken = self.authenticator.user_exists(user_info['username'])
-        user = self.authenticator.create_user(**user_info)
+        assume_human = True
+        url = "https://www.google.com/recaptcha/api/siteverify"
 
-        alert, message = self.get_result_message(user, taken)
+        if self.authenticator.recaptcha_key is not None:
+            recaptcha_response = \
+                self.get_body_argument('g-recaptcha-response', strip=True)
+            if recaptcha_response == "":
+                assume_human = False
+            else:
+                data = {
+                    'secret': self.authenticator.recaptcha_secret,
+                    'response': recaptcha_response
+                }
+                validation_status = requests.post(url, data=data)
+                print(validation_status.text)
+                assume_human = validation_status.json().get("success")
+                print(assume_human)
+
+        if assume_human:
+            user_info = {
+                'username': self.get_body_argument('username', strip=False),
+                'pw': self.get_body_argument('pw', strip=False),
+                'email': self.get_body_argument('email', '', strip=False),
+                'has_2fa': bool(self.get_body_argument('2fa', '', strip=False))
+            }
+            taken = self.authenticator.user_exists(user_info['username'])
+            user = self.authenticator.create_user(**user_info)
+        else:
+            user = False
+            taken = False
+
+        alert, message = self.get_result_message(user, taken, assume_human)
 
         otp_secret, user_2fa = '', ''
         if user:
