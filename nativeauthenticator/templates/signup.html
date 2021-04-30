@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="checkbox" name="2fa" value="2fa" id="2fa">
             {% endif %}
 	    {% if recaptcha %}
-	    <div class="g-recaptcha" data-sitekey="{% recaptcha_key %}"></div>
+	    <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
             {% endif %}
             <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
             <div style="padding-top: 25px;">
