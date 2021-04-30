@@ -19,6 +19,12 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
+    recaptcha_key = Unicode(
+        config=True,
+        default=None,
+        help=("Your key to enable reCAPTCHA as described at "
+              "https://developers.google.com/recaptcha/intro")
+    )
     check_common_password = Bool(
         config=True,
         default=False,
