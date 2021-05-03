@@ -99,9 +99,11 @@ class SignUpHandler(LocalBase):
                     'response': recaptcha_response
                 }
                 validation_status = requests.post(url, data=data)
-                print(validation_status.text)
                 assume_human = validation_status.json().get("success")
-                print(assume_human)
+                if assume_human:
+                    self.authenticator.log.info("Passed reCaptcha")
+                else:
+                    self.authenticator.log.error("Failed reCaptcha")
 
         if assume_human:
             user_info = {
