@@ -16,7 +16,7 @@
         <tbody>
             {% for user in users %}
             {% if user.is_authorized %}
-            <tr class="success">
+            <tr class="success" id={{ user.username }}>
                 <td>{{ user.username }}</td>
                 {% if ask_email %}
                 <td>{{ user.email }}</td>
@@ -28,7 +28,7 @@
                 </td>
                 <td></td>
                 {% else %}
-            <tr>
+            <tr id={{ user.username }}>
                 <td>{{ user.username }}</td>
                 {% if ask_email %}
                 <td>{{ user.email }}</td>
