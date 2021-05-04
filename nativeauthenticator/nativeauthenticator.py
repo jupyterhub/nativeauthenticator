@@ -11,7 +11,7 @@ from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer, Unicode, Instance, Tuple
+from traitlets import Bool, Integer, Unicode, Instance, Tuple, Dict
 
 from .handlers import (
     AuthorizeHandler,
@@ -24,6 +24,14 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
+    self_approval_server = Dict(
+        config=True,
+        default=None,
+        help=("SMTP server information as a dictionary of 'url', 'usr'"
+              "and 'pwd' to use for sending email, e.g."
+              "self_approval_server={'url': 'smtp.gmail.com', 'usr': 'myself'"
+              "'pwd': 'mypassword'}")
+    )
     secret_key = Unicode(
         config=True,
         default="",
@@ -293,7 +301,12 @@ class NativeAuthenticator(Authenticator):
         msg['Subject'] = self.self_approval_email[1]
         msg.set_content(self.self_approval_email[2].format(approval_url=url))
         msg['To'] = dest
-        s = smtplib.SMTP('localhost')
+        if self.self_approval_server:
+            s = smtplib.SMTP_SSL(self.self_approval_server['url'])
+            s = smtplib.login(self.self_approval_server['usr'],
+                              self.self_approval_server['pwd'])
+        else:
+            s = smtplib.SMTP('localhost')
         s.send_message(msg)
         s.quit()
 
