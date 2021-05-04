@@ -7,7 +7,7 @@ Installation
 
 Native Authenticator is a plugin Authenticator for the `JupyterHub <https://github.com/jupyterhub/>`_. 
 
-It is available on `Pypi <https://pypi.org/project/jupyterhub-nativeauthenticator/`_. The easiest way to install it is via pip:
+It is available on `Pypi <https://pypi.org/project/jupyterhub-nativeauthenticator/>`_. The easiest way to install it is via pip:
 
 .. code-block:: bash
 
