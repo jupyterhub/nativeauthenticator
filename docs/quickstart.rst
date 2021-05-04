@@ -19,6 +19,7 @@ Alternatively, you can install this authenticator throught the project's reposit
 .. code-block:: bash
 
    $ git clone https://github.com/jupyterhub/nativeauthenticator.git
+   $ cd nativeauthenticator
    $ pip install -e .
 
 
