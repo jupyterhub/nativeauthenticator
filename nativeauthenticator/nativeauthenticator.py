@@ -19,6 +19,12 @@ from .orm import UserInfo
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
+    tos = Unicode(
+        config=True,
+        default=None,
+        help=("The HTML to present next to the Term of Service "
+              "checkbox")
+    )
     check_common_password = Bool(
         config=True,
         default=False,
