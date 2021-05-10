@@ -321,8 +321,8 @@ class NativeAuthenticator(Authenticator):
         msg['To'] = dest
         if self.self_approval_server:
             s = smtplib.SMTP_SSL(self.self_approval_server['url'])
-            s = smtplib.login(self.self_approval_server['usr'],
-                              self.self_approval_server['pwd'])
+            s.login(self.self_approval_server['usr'],
+                    self.self_approval_server['pwd'])
         else:
             s = smtplib.SMTP('localhost')
         s.send_message(msg)
