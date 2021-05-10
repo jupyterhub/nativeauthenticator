@@ -136,6 +136,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
             recaptcha_key=self.authenticator.recaptcha_key,
+            tos=self.authenticator.tos,
         )
         self.finish(html)
 
