@@ -101,6 +101,40 @@ You may force users to click a checkbox agreeing to TOS before they can Sign Up.
     c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
 
 
+Allow self-serve approval
+-------------------------
+
+By default all users who sign up on Native Authenticator need an admin approval so 
+they can actually log in the system. Or you can allow anybody without approval as described
+above with `open_signup`. Alternatively, you may want something like `open_signup` but
+only for users in your own organization. This is what this option permits.
+New users are still created in non-authorized mode, but they can self-authorize by
+navigating to a (cryptographic) URL which will be e-mailed to them *only* if the
+provided email address matches the specified pattern.
+For example, to allow any users who have an mit.edu email address,
+you may do the following:
+
+.. code-block:: python
+
+    import re
+    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@mit\.edu$')
+
+Note that this setting automatically enables `ask_email_on_signup`.
+
+To use the code, you must also provide a secret key to cryptographically sign the URL.
+To prevents attacks, it is mandatory that this key stays secret.
+
+.. code-block:: python
+
+    c.Authenticator.secret_key = "your-key"
+
+You should customize the email sent to users with something like
+
+.. code-block:: python
+
+    c.Authenticator.self_approval_email = ("from", "subject", "email body, including {approval_url}")
+
+
 Import users from FirstUse Authenticator
 ----------------------------------------
 

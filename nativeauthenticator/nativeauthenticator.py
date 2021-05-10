@@ -1,15 +1,20 @@
 import bcrypt
 import dbm
 import os
-from datetime import datetime
+import re
+import smtplib
+from email.message import EmailMessage
+from datetime import datetime, timedelta
+from datetime import timezone as tz
 from jupyterhub.auth import Authenticator
 from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer, Unicode
+from traitlets import Bool, Integer, Unicode, Instance, Tuple, Dict
 
 from .handlers import (
+    AuthorizeHandler,
     AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
     ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
 )
@@ -36,6 +41,45 @@ class NativeAuthenticator(Authenticator):
         default=None,
         help=("The HTML to present next to the Term of Service "
               "checkbox")
+    )
+    self_approval_server = Dict(
+        config=True,
+        default=None,
+        help=("SMTP server information as a dictionary of 'url', 'usr'"
+              "and 'pwd' to use for sending email, e.g."
+              "self_approval_server={'url': 'smtp.gmail.com', 'usr': 'myself'"
+              "'pwd': 'mypassword'}")
+    )
+    secret_key = Unicode(
+        config=True,
+        default="",
+        help=("Secret key to cryptographically sign the "
+              "self-approved URL (if allow_self_approval is utilized)")
+    )
+    allow_self_approval_for = Instance(
+        klass=re.Pattern,
+        allow_none=True,
+        config=True,
+        default=None,
+        help=("Use self-service authentication (rather than "
+              "admin-based authentication) for users whose "
+              "email match this patter. Note that this forces "
+              "ask_email_on_signup to be True.")
+    )
+    self_approval_email = Tuple(
+        Unicode(), Unicode(), Unicode(),
+        config=True,
+        default_value=("do-not-reply@my-domain.com",
+                       "Welcome to JupyterHub on my-domain",
+                       ("Your JupyterHub account on my-domain has been "
+                        "created, but it's inactive.\n"
+                        "If you did not create the account yourself, "
+                        "IGNORE this message:\n"
+                        "somebody is trying to use your email to get an "
+                        "unathorized account!\n"
+                        "If you did create the account yourself, navigate "
+                        "to {approval_url} to activate it.\n"))
+
     )
     check_common_password = Bool(
         config=True,
@@ -109,6 +153,20 @@ class NativeAuthenticator(Authenticator):
 
         if self.import_from_firstuse:
             self.add_data_from_firstuse()
+
+        self.setup_self_approval()
+
+    def setup_self_approval(self):
+        if self.allow_self_approval_for:
+            if self.open_signup:
+                self.log.error("self_approval and open_signup are conflicts!")
+            from django.conf import settings
+            if not settings.configured:
+                settings.configure()
+            self.ask_email_on_signup = True
+            if len(self.secret_key) < 8:
+                raise ValueError("Secret_key must be a random string of "
+                                 "len > 8 when using self_approval")
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
@@ -236,9 +294,39 @@ class NativeAuthenticator(Authenticator):
         except AssertionError:
             return
 
+        if self.allow_self_approval_for:
+            match = self.allow_self_approval_for.match(user_info.email)
+            if match:
+                url = self.generate_approval_url(username)
+                self.send_approval_email(user_info.email, url)
+
         self.db.add(user_info)
         self.db.commit()
         return user_info
+
+    def generate_approval_url(self, username, when=None):
+        if when is None:
+            when = datetime.now(tz.utc) + timedelta(minutes=15)
+        from django.core.signing import Signer
+        s = Signer(self.secret_key)
+        u = s.sign_object({"username": username,
+                           "expire": when.isoformat()})
+        return "/confirm/" + u
+
+    def send_approval_email(self, dest, url):
+        msg = EmailMessage()
+        msg['From'] = self.self_approval_email[0]
+        msg['Subject'] = self.self_approval_email[1]
+        msg.set_content(self.self_approval_email[2].format(approval_url=url))
+        msg['To'] = dest
+        if self.self_approval_server:
+            s = smtplib.SMTP_SSL(self.self_approval_server['url'])
+            s = smtplib.login(self.self_approval_server['usr'],
+                              self.self_approval_server['pwd'])
+        else:
+            s = smtplib.SMTP('localhost')
+        s.send_message(msg)
+        s.quit()
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
@@ -258,6 +346,8 @@ class NativeAuthenticator(Authenticator):
             (r'/discard/([^/]*)', DiscardHandler),
             (r'/authorize', AuthorizationHandler),
             (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
+            # the following /confirm/ must be like in generate_approval_url()
+            (r'/confirm/([^/]*)', AuthorizeHandler),
             (r'/change-password', ChangePasswordHandler),
             (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
         ]

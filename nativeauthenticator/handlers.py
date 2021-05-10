@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from datetime import timezone as tz
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
@@ -155,6 +157,51 @@ class ChangeAuthorizationHandler(LocalBase):
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + 'authorize')
+
+
+class AuthorizeHandler(LocalBase):
+    async def get(self, slug):
+        must_stop = True
+        msg = "Invalid URL"
+        if self.authenticator.allow_self_approval_for:
+            try:
+                data = AuthorizeHandler.validate_slug(
+                        slug, self.authenticator.secret_key)
+                must_stop = False
+            except ValueError:
+                pass
+
+        if not must_stop:
+            username = data["username"]
+            msg = "{} was already authorized".format(username)
+            usr = UserInfo.find(self.db, username)
+            if not usr.is_authorized:
+                UserInfo.change_authorization(self.db, username)
+                msg = "{} has been authorized".format(username)
+
+            # add POSIX user!!
+
+        html = await self.render_template(
+            'my_message.html',
+            message=msg,
+        )
+        self.finish(html)
+
+    # static method so it can be easily tested without initializate the class
+    @staticmethod
+    def validate_slug(slug, key):
+        from django.core.signing import Signer, BadSignature
+        s = Signer(key)
+        try:
+            obj = s.unsign_object(slug)
+        except BadSignature as e:
+            raise ValueError(e)
+
+        obj["expire"] = datetime.fromisoformat(obj["expire"])
+        if datetime.now(tz.utc) > obj["expire"]:
+            raise ValueError("The URL has expired")
+
+        return obj
 
 
 class ChangePasswordHandler(LocalBase):

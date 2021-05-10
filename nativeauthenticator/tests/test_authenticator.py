@@ -1,11 +1,15 @@
 import dbm
 import os
 import pytest
+import datetime
+from datetime import timezone as tz
 import time
+import re
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
 from ..orm import UserInfo
+from ..handlers import AuthorizeHandler
 
 
 @pytest.fixture
@@ -130,8 +134,9 @@ async def test_handlers(app):
     assert handlers[2][0] == '/discard/([^/]*)'
     assert handlers[3][0] == '/authorize'
     assert handlers[4][0] == '/authorize/([^/]*)'
-    assert handlers[5][0] == '/change-password'
-    assert handlers[6][0] == '/change-password/([^/]+)'
+    assert handlers[5][0] == '/confirm/([^/]*)'
+    assert handlers[6][0] == '/change-password'
+    assert handlers[7][0] == '/change-password/([^/]+)'
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):
@@ -253,3 +258,44 @@ async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
     auth.check_common_password = True
     with pytest.raises(ValueError):
         auth.add_data_from_firstuse()
+
+
+async def test_secret_key(app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.ask_email_on_signup = False
+    auth.allow_self_approval_for = re.compile('.*@some-domain.com$')
+    auth.secret_key = "short"
+
+    with pytest.raises(ValueError):
+        auth.setup_self_approval()
+
+    auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
+
+    auth.setup_self_approval()
+    assert auth.ask_email_on_signup is True
+
+
+async def test_approval_url(app):
+    auth = NativeAuthenticator(db=app.db)
+    auth.allow_self_approval_for = re.compile('.*@some-domain.com$')
+    auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
+    auth.setup_self_approval()
+
+    # confirm that a forged slug cannot be used
+    with pytest.raises(ValueError):
+        AuthorizeHandler.validate_slug("foo", auth.secret_key)
+
+    # confirm that an expired URL cannot be used
+    expiration = datetime.datetime.now(tz.utc) - datetime.timedelta(days=2)
+    url = auth.generate_approval_url("somebody", when=expiration)
+    slug = url.split("/")[-1]
+    with pytest.raises(ValueError):
+        AuthorizeHandler.validate_slug(slug, auth.secret_key)
+
+    # confirm that a non-expired, correctly signed URL can be used
+    expiration = datetime.datetime.now(tz.utc) + datetime.timedelta(days=2)
+    url = auth.generate_approval_url("somebody", when=expiration)
+    slug = url.split("/")[-1]
+    out = AuthorizeHandler.validate_slug(slug, auth.secret_key)
+    assert out["username"] == "somebody"
+    assert out["expire"] == expiration
