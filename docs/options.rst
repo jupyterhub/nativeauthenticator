@@ -77,6 +77,19 @@ Native Authenticator is based on username and password only. But if you need ext
 
     c.Authenticator.ask_email_on_signup = True
 
+
+Use reCaptcha to prevent scripted SignUp attacks
+------------------------------------------------
+
+Since anybody can sign up, you may want to use the lightweight single-click reCaptcha to reduce your risks from scripting attacks. You will need to register with reCaptcha as described at https://developers.google.com/recaptcha/intro
+
+
+.. code-block:: python
+
+    c.Authenticator.recaptcha_key = "your key"
+    c.Authenticator.recaptcha_secret = "your secret"
+
+
 Import users from FirstUse Authenticator
 ----------------------------------------
 
