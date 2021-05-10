@@ -90,7 +90,7 @@ class SignUpHandler(LocalBase):
         assume_human = True
         url = "https://www.google.com/recaptcha/api/siteverify"
 
-        if self.authenticator.recaptcha_key
+        if self.authenticator.recaptcha_key:
             recaptcha_response = \
                 self.get_body_argument('g-recaptcha-response', strip=True)
             if recaptcha_response == "":
