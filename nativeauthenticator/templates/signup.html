@@ -42,6 +42,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <label for="2fa">Add two factor authentication:</label>
             <input type="checkbox" name="2fa" value="2fa" id="2fa">
             {% endif %}
+	    {% if tos %}
+	    <span class="input-tos-check">
+		<input type="checkbox">
+                   {{tos|safe}}
+		</input>
+	    </span>
+	    {% endif %}
             <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
             <div style="padding-top: 25px;">
                 Already have an account? <a href="{{ base_url }}login">Login!</a>
