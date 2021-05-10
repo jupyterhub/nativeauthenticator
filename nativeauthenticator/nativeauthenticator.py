@@ -31,6 +31,12 @@ class NativeAuthenticator(Authenticator):
         help=("Your secret to enable reCAPTCHA as described at "
               "https://developers.google.com/recaptcha/intro")
     )
+    tos = Unicode(
+        config=True,
+        default=None,
+        help=("The HTML to present next to the Term of Service "
+              "checkbox")
+    )
     check_common_password = Bool(
         config=True,
         default=False,

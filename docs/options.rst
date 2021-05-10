@@ -90,6 +90,17 @@ Since anybody can sign up, you may want to use the lightweight single-click reCa
     c.Authenticator.recaptcha_secret = "your secret"
 
 
+Force acceptance of Terms of Service before SignUp
+--------------------------------------------------
+
+You may force users to click a checkbox agreeing to TOS before they can Sign Up. This might be legally binding is some jurisditions.
+
+
+.. code-block:: python
+
+    c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
+
+
 Import users from FirstUse Authenticator
 ----------------------------------------
 
