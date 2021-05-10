@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-{% if recaptcha %}
+{% if recaptcha_key %}
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endif %}
 {% block login %}
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <label for="2fa">Add two factor authentication:</label>
             <input type="checkbox" name="2fa" value="2fa" id="2fa">
             {% endif %}
-            {% if recaptcha %}
+            {% if recaptcha_key %}
             <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
             {% endif %}
             <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />

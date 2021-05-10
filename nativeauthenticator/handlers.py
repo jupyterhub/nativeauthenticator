@@ -39,7 +39,6 @@ class SignUpHandler(LocalBase):
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
-            recaptcha=self.authenticator.recaptcha_key is not None,
             recaptcha_key=self.authenticator.recaptcha_key,
         )
         self.finish(html)
@@ -88,7 +87,7 @@ class SignUpHandler(LocalBase):
         assume_human = True
         url = "https://www.google.com/recaptcha/api/siteverify"
 
-        if self.authenticator.recaptcha_key is not None:
+        if self.authenticator.recaptcha_key
             recaptcha_response = \
                 self.get_body_argument('g-recaptcha-response', strip=True)
             if recaptcha_response == "":
@@ -133,7 +132,6 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
-            recaptcha=self.authenticator.recaptcha_key is not None,
             recaptcha_key=self.authenticator.recaptcha_key,
         )
         self.finish(html)
