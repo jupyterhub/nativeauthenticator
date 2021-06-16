@@ -56,8 +56,7 @@ class NativeAuthenticator(Authenticator):
         help=("Secret key to cryptographically sign the "
               "self-approved URL (if allow_self_approval is utilized)")
     )
-    allow_self_approval_for = Instance(
-        klass=re.Pattern,
+    allow_self_approval_for = Unicode(
         allow_none=True,
         config=True,
         default=None,
@@ -295,7 +294,7 @@ class NativeAuthenticator(Authenticator):
             return
 
         if self.allow_self_approval_for:
-            match = self.allow_self_approval_for.match(user_info.email)
+            match = re.match(self.allow_self_approval_for, user_info.email)
             if match:
                 url = self.generate_approval_url(username)
                 self.send_approval_email(user_info.email, url)
