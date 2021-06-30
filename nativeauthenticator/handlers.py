@@ -198,7 +198,14 @@ class AuthorizeHandler(LocalBase):
         except BadSignature as e:
             raise ValueError(e)
 
-        obj["expire"] = datetime.fromisoformat(obj["expire"])
+        # the following it is not supported in earlier versions of python
+        # obj["expire"] = datetime.fromisoformat(obj["expire"])
+
+        datetimestr = obj["expire"].split("T") # format = "%Y-%m-%dT%H:%M:%S.%f"
+        dateobj = date.fromisoformat(datetimestr[0]) # before the T
+        timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time() # after the T
+        obj["expire"] = datetime.combine(dateobj, timeobj)
+
         if datetime.now(tz.utc) > obj["expire"]:
             raise ValueError("The URL has expired")
 
