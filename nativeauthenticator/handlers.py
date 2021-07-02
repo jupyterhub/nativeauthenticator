@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, date
 from datetime import timezone as tz
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
@@ -201,9 +201,13 @@ class AuthorizeHandler(LocalBase):
         # the following it is not supported in earlier versions of python
         # obj["expire"] = datetime.fromisoformat(obj["expire"])
 
-        datetimestr = obj["expire"].split("T") # format = "%Y-%m-%dT%H:%M:%S.%f"
-        dateobj = date.fromisoformat(datetimestr[0]) # before the T
-        timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time() # after the T
+        datetimestr = obj["expire"].split("T")  # format="%Y-%m-%dT%H:%M:%S.%f"
+
+        # before the T
+        dateobj = date.fromisoformat(datetimestr[0])
+
+        # after the T
+        timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time()
         obj["expire"] = datetime.combine(dateobj, timeobj)
 
         if datetime.now(tz.utc) > obj["expire"]:
