@@ -11,7 +11,7 @@ from pathlib import Path
 
 from sqlalchemy import inspect
 from tornado import gen
-from traitlets import Bool, Integer, Unicode, Instance, Tuple, Dict
+from traitlets import Bool, Integer, Unicode, Tuple, Dict
 
 from .handlers import (
     AuthorizeHandler,
