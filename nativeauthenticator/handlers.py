@@ -37,6 +37,7 @@ class SignUpHandler(LocalBase):
             'signup.html',
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
+            tos=self.authenticator.tos,
         )
         self.finish(html)
 
@@ -101,6 +102,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
+            tos=self.authenticator.tos,
         )
         self.finish(html)
 

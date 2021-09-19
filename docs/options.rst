@@ -77,6 +77,18 @@ Native Authenticator is based on username and password only. But if you need ext
 
     c.Authenticator.ask_email_on_signup = True
 
+
+Force acceptance of Terms of Service before SignUp
+--------------------------------------------------
+
+You may force users to click a checkbox agreeing to TOS before they can Sign Up. This might be legally binding is some jurisditions.
+
+
+.. code-block:: python
+
+    c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
+
+
 Import users from FirstUse Authenticator
 ----------------------------------------
 

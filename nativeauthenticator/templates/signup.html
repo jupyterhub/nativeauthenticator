@@ -14,6 +14,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+{% if tos %}
+document.addEventListener('DOMContentLoaded', function() {
+    let checkbox = document.getElementById('tos_check');
+    checkbox.addEventListener("click", function(e) {
+        let submit_button = document.getElementById("signup_submit");
+	submit_button.disabled = ! checkbox.checked;
+    });
+});
+{% endif %}
 </script>
 {% block login %}
 <div id="login-main" class="container">
@@ -42,7 +51,18 @@ document.addEventListener('DOMContentLoaded', function() {
             <label for="2fa">Add two factor authentication:</label>
             <input type="checkbox" name="2fa" value="2fa" id="2fa">
             {% endif %}
-            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
+	    {% if tos %}
+	    <span class="input-tos-check">
+		<input type="checkbox" id="tos_check">
+                   {{tos|safe}}
+		</input>
+	    </span>
+	    {% endif %}
+            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3"
+	    {% if tos %}
+	    disabled
+	    {% endif %}
+	    />
             <div style="padding-top: 25px;">
                 Already have an account? <a href="{{ base_url }}login">Login!</a>
             </div>
