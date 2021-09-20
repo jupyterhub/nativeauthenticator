@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Native Authenticator'
-copyright = u'2018, Leticia Portella'
+copyright = u'2021, Leticia Portella'
 author = u'Leticia Portella'
 
 # The short X.Y version

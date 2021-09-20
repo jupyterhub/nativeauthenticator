@@ -40,6 +40,7 @@ class SignUpHandler(LocalBase):
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
             recaptcha_key=self.authenticator.recaptcha_key,
+            tos=self.authenticator.tos,
         )
         self.finish(html)
 
@@ -133,6 +134,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
             recaptcha_key=self.authenticator.recaptcha_key,
+            tos=self.authenticator.tos,
         )
         self.finish(html)
 
@@ -153,7 +155,7 @@ class ChangeAuthorizationHandler(LocalBase):
     @admin_only
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
-        self.redirect(self.hub.base_url + 'authorize')
+        self.redirect(self.hub.base_url + 'authorize#' + slug)
 
 
 class ChangePasswordHandler(LocalBase):

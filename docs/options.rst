@@ -83,11 +83,20 @@ Use reCaptcha to prevent scripted SignUp attacks
 
 Since anybody can sign up, you may want to use the lightweight single-click "I am not a robot" checkbox provided by reCAPTCHA v2 to reduce your risks from scripting attacks. You will need to register with reCaptcha at https://www.google.com/recaptcha/admin/create (you will need a Google account to do so). You can learn more about reCAPTCHA at https://developers.google.com/recaptcha/intro and if you would like to simply test this functionality without creating an account, you can do so as explained at https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do (do **NOT** do this in production).
 
+    c.Authenticator.recaptcha_key = "your key"
+    c.Authenticator.recaptcha_secret = "your secret"
+
+
+Force acceptance of Terms of Service before SignUp
+--------------------------------------------------
+
+You may force users to click a checkbox agreeing to TOS before they can Sign Up. This might be legally binding is some jurisditions.
+>>>>>>> 010da1be5d8b39b195df36f05a49b11dd9edcb7d
+
 
 .. code-block:: python
 
-    c.Authenticator.recaptcha_key = "your key"
-    c.Authenticator.recaptcha_secret = "your secret"
+    c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
 
 
 Import users from FirstUse Authenticator
