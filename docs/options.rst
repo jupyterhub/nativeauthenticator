@@ -91,7 +91,6 @@ Force acceptance of Terms of Service before SignUp
 --------------------------------------------------
 
 You may force users to click a checkbox agreeing to TOS before they can Sign Up. This might be legally binding is some jurisditions.
->>>>>>> 010da1be5d8b39b195df36f05a49b11dd9edcb7d
 
 
 .. code-block:: python
