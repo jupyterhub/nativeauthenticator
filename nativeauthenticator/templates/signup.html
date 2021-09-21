@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
             {% if recaptcha_key %}
             <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
             {% endif %}
-            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3" />
 	    {% if tos %}
 	    <span class="input-tos-check">
 		<input type="checkbox" id="tos_check">
