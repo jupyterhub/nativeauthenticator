@@ -201,7 +201,8 @@ class AuthorizeHandler(LocalBase):
         # the following it is not supported in earlier versions of python
         # obj["expire"] = datetime.fromisoformat(obj["expire"])
 
-        datestr, timestr = obj["expire"].split("T")  # format="%Y-%m-%dT%H:%M:%S.%f"
+        # format="%Y-%m-%dT%H:%M:%S.%f"
+        datestr, timestr = obj["expire"].split("T")
 
         # before the T
         year_month_day = datestr.split("-")
@@ -210,7 +211,8 @@ class AuthorizeHandler(LocalBase):
                        int(year_month_day[2]))
 
         # after the T
-        # Python does not correctly parses iso-8601 times with a colon in the timezone
+        # manually parsing iso-8601 times with a colon in the timezone
+        # since the strptime does not support it
         if timestr[-3] == ":":
             timestr = timestr[:-3] + timestr[-2:]
         timeobj = datetime.strptime(timestr, "%H:%M:%S.%f%z").timetz()
