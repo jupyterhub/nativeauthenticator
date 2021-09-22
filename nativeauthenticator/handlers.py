@@ -201,16 +201,20 @@ class AuthorizeHandler(LocalBase):
         # the following it is not supported in earlier versions of python
         # obj["expire"] = datetime.fromisoformat(obj["expire"])
 
-        datetimestr = obj["expire"].split("T")  # format="%Y-%m-%dT%H:%M:%S.%f"
+        datestr, timestr = obj["expire"].split("T")  # format="%Y-%m-%dT%H:%M:%S.%f"
 
         # before the T
-        year_month_day = datetimestr[0].split("-")
+        year_month_day = datestr.split("-")
         dateobj = date(int(year_month_day[0]),
                        int(year_month_day[1]),
                        int(year_month_day[2]))
 
         # after the T
-        timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time()
+        # Python does not correctly parses iso-8601 times with a colon in the timezone
+        if timestr[-3] == ":":
+            timestr = timestr[:-3] + timestr[-2:]
+        timeobj = datetime.strptime(timestr[1], "%H:%M:%S.%f+%z").time()
+
         obj["expire"] = datetime.combine(dateobj, timeobj)
 
         if datetime.now(tz.utc) > obj["expire"]:
