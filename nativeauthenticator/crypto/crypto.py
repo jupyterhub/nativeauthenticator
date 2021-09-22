@@ -5,7 +5,7 @@ import hashlib
 import hmac
 import secrets
 
-from django.utils.encoding import force_bytes
+from .encoding import force_bytes
 
 
 class InvalidAlgorithm(ValueError):
