@@ -40,7 +40,6 @@ import json
 import time
 import zlib
 
-from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
@@ -117,7 +116,7 @@ def dumps(obj,
           compress=False):
     """
     Return URL-safe, hmac signed base64 compressed JSON string. If key is
-    None, use settings.SECRET_KEY instead. The hmac algorithm is the default
+    None, raises Exception. The hmac algorithm is the default
     Signer algorithm.
 
     If compress is True (not the default), check if compressing using zlib can
@@ -153,7 +152,9 @@ def loads(s,
 
 class Signer:
     def __init__(self, key=None, sep=':', salt=None, algorithm=None):
-        self.key = key or settings.SECRET_KEY
+        if key is None:
+            raise ValueError('Must specify the key')
+        self.key = key
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
