@@ -78,6 +78,15 @@ Native Authenticator is based on username and password only. But if you need ext
     c.Authenticator.ask_email_on_signup = True
 
 
+Use reCaptcha to prevent scripted SignUp attacks
+------------------------------------------------
+
+Since anybody can sign up, you may want to use the lightweight single-click "I am not a robot" checkbox provided by reCAPTCHA v2 to reduce your risks from scripting attacks. You will need to register with reCaptcha at https://www.google.com/recaptcha/admin/create (you will need a Google account to do so). You can learn more about reCAPTCHA at https://developers.google.com/recaptcha/intro and if you would like to simply test this functionality without creating an account, you can do so as explained at https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do (do **NOT** do this in production).
+
+    c.Authenticator.recaptcha_key = "your key"
+    c.Authenticator.recaptcha_secret = "your secret"
+
+
 Force acceptance of Terms of Service before SignUp
 --------------------------------------------------
 
