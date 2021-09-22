@@ -4,8 +4,6 @@ import locale
 from decimal import Decimal
 from urllib.parse import quote
 
-from django.utils.functional import Promise
-
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -13,24 +11,18 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
-
-
-def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
-    """
-    Return a string representing 's'. Treat bytestrings using the 'encoding'
-    codec.
-
-    If strings_only is True, don't convert (some) non-string-like objects.
-    """
-    if isinstance(s, Promise):
-        # The input is the result of a gettext_lazy() call.
-        return s
-    return force_str(s, encoding, strings_only, errors)
+        return '%s. You passed in %r (%s)' % (
+                super().__str__(),
+                self.obj,
+                type(self.obj))
 
 
 _PROTECTED_TYPES = (
-    type(None), int, float, Decimal, datetime.datetime, datetime.date, datetime.time,
+    type(None),
+    int, float, Decimal,
+    datetime.datetime,
+    datetime.date,
+    datetime.time,
 )
 
 
@@ -65,18 +57,6 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     return s
 
 
-def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
-    """
-    Return a bytestring version of 's', encoded as specified in 'encoding'.
-
-    If strings_only is True, don't convert (some) non-string-like objects.
-    """
-    if isinstance(s, Promise):
-        # The input is the result of a gettext_lazy() call.
-        return s
-    return force_bytes(s, encoding, strings_only, errors)
-
-
 def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Similar to smart_bytes, except that lazy instances are resolved to
@@ -95,38 +75,6 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     if isinstance(s, memoryview):
         return bytes(s)
     return str(s).encode(encoding, errors)
-
-
-def iri_to_uri(iri):
-    """
-    Convert an Internationalized Resource Identifier (IRI) portion to a URI
-    portion that is suitable for inclusion in a URL.
-
-    This is the algorithm from section 3.1 of RFC 3987, slightly simplified
-    since the input is assumed to be a string rather than an arbitrary byte
-    stream.
-
-    Take an IRI (string or UTF-8 bytes, e.g. '/I ♥ Django/' or
-    b'/I \xe2\x99\xa5 Django/') and return a string containing the encoded
-    result with ASCII chars only (e.g. '/I%20%E2%99%A5%20Django/').
-    """
-    # The list of safe characters here is constructed from the "reserved" and
-    # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
-    #     reserved    = gen-delims / sub-delims
-    #     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-    #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
-    #                   / "*" / "+" / "," / ";" / "="
-    #     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-    # Of the unreserved characters, urllib.parse.quote() already considers all
-    # but the ~ safe.
-    # The % character is also added to the list of safe characters here, as the
-    # end of section 3.1 of RFC 3987 specifically mentions that % must not be
-    # converted.
-    if iri is None:
-        return iri
-    elif isinstance(iri, Promise):
-        iri = str(iri)
-    return quote(iri, safe="/#%[]=:;$&()+,!?*@'~")
 
 
 # List of byte values that uri_to_iri() decodes from percent encoding.
@@ -217,7 +165,8 @@ def repercent_broken_unicode(path):
         except UnicodeDecodeError as e:
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
-            repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+            repercent = quote(path[e.start:e.end],
+                              safe=b"/#%[]=:;$&()+,!?*@'~")
             path = path[:e.start] + repercent.encode() + path[e.end:]
         else:
             return path
