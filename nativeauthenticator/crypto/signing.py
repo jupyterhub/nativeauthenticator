@@ -35,17 +35,15 @@ These functions make use of all of them.
 
 import base64
 import datetime
+import re
 import json
 import time
 import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.encoding import force_bytes
-from django.utils.module_loading import import_string
-from django.utils.regex_helper import _lazy_re_compile
 
-_SEP_UNSAFE = _lazy_re_compile(r'^[A-z0-9-_=]*$')
+_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
 
@@ -96,11 +94,6 @@ def b64_decode(s):
 def base64_hmac(salt, value, key, algorithm='sha1'):
     return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
 
-
-def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
-    Signer = import_string(settings.SIGNING_BACKEND)
-    key = force_bytes(settings.SECRET_KEY)  # SECRET_KEY may be str or bytes.
-    return Signer(b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer:
