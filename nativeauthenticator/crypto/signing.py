@@ -15,9 +15,9 @@ If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
 'hello'
->>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422n-modified")
 ...
-BadSignature: Signature failed: ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified
+BadSignature: Signature failed: ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422n-modified
 
 You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually
@@ -44,7 +44,8 @@ from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
-BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+BASE62_ALPHABET = \
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
 
 class BadSignature(Exception):
@@ -92,8 +93,9 @@ def b64_decode(s):
 
 
 def base64_hmac(salt, value, key, algorithm='sha1'):
-    return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
-
+    return b64_encode(
+            salted_hmac(salt, value, key, algorithm=algorithm).digest()
+            ).decode()
 
 
 class JSONSerializer:
@@ -108,7 +110,11 @@ class JSONSerializer:
         return json.loads(data.decode('latin-1'))
 
 
-def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
+def dumps(obj,
+          key=None,
+          salt='django.core.signing',
+          serializer=JSONSerializer,
+          compress=False):
     """
     Return URL-safe, hmac signed base64 compressed JSON string. If key is
     None, use settings.SECRET_KEY instead. The hmac algorithm is the default
@@ -125,16 +131,24 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(obj, serializer=serializer, compress=compress)
+    return TimestampSigner(key, salt=salt).sign_object(obj,
+                                                       serializer=serializer,
+                                                       compress=compress)
 
 
-def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
+def loads(s,
+          key=None,
+          salt='django.core.signing',
+          serializer=JSONSerializer,
+          max_age=None):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt).unsign_object(s, serializer=serializer, max_age=max_age)
+    return TimestampSigner(key, salt=salt).unsign_object(s,
+                                                         serializer=serializer,
+                                                         max_age=max_age)
 
 
 class Signer:
@@ -146,11 +160,15 @@ class Signer:
                 'Unsafe Signer separator: %r (cannot be empty or consist of '
                 'only A-z0-9-_=)' % sep,
             )
-        self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        self.salt = salt or '%s.%s' % (
+                self.__class__.__module__, self.__class__.__name__
+                )
         self.algorithm = algorithm or 'sha256'
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=self.algorithm)
+        return base64_hmac(self.salt + 'signer',
+                           value, self.key,
+                           algorithm=self.algorithm)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
