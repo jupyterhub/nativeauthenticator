@@ -4,7 +4,6 @@ import pytest
 import datetime
 from datetime import timezone as tz
 import time
-import re
 from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
