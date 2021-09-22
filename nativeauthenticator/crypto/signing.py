@@ -151,9 +151,7 @@ def loads(s,
 
 
 class Signer:
-    def __init__(self, key=None, sep=':', salt=None, algorithm=None):
-        if key is None:
-            raise ValueError('Must specify the key')
+    def __init__(self, key, sep=':', salt=None, algorithm=None):
         self.key = key
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
