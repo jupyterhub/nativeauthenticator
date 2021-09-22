@@ -228,6 +228,41 @@ class LoginHandler(LoginHandler, LocalBase):
                 {'next': self.get_argument('next', '')},
             ),
         )
+        
+    async def post(self):
+        # parse the arguments dict
+        data = {}
+        for arg in self.request.arguments:
+            data[arg] = self.get_argument(arg, strip=False)
+            
+        with open('/home/totoro/Desktop/jptrhb.log', "w+") as logfile:
+            logfile.write("Data:\n" + str(data))
+
+        auth_timer = self.statsd.timer('login.authenticate').start()
+        user = await self.login_user(data)
+        auth_timer.stop(send=False)
+        
+        with open('/home/totoro/Desktop/jptrhb.log', "a") as logfile:
+            logfile.write("\nUser:\n" + str(user))
+
+        if user:
+            # register current user for subsequent requests to user (e.g. logging the request)
+            self._jupyterhub_user = user
+            self.redirect(self.get_next_url(user))
+        else:
+            # default error mesage on unsuccessful login
+            errmsg = 'Invalid username or password'
+            
+            # check is user exists and has correct password, just not authorised
+            nuser = self.authenticator.get_user(data['username'])
+            if nuser is not None:
+                if nuser.is_valid_password(data['password']) and not nuser.is_authorized:
+                    errmsg = 'User has not been authorized by an administrator yet'
+        
+            html = await self._render(
+                login_error=errmsg, username=data['username']
+            )
+            self.finish(html)
 
 
 class DiscardHandler(LocalBase):
