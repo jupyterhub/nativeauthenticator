@@ -13,7 +13,7 @@ To verify if the password is not common (such as 'qwerty' or '1234'), you can ad
 
     c.Authenticator.check_common_password = True
 
-The Authenticator will verify if the password is a common password and the user won't be able to sign up if it is. The list of the common passwords that are in our verification is available `on this link <https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-10000.txt>`_ >._  
+The Authenticator will verify if the password is a common password and the user won't be able to sign up if it is. The list of the common passwords that are in our verification is available `on this link <https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-10000.txt>`_.
 
 
 You can also add a minimum password length that the user must have. To do this add the following line on the config file with an integer as a value:
@@ -70,8 +70,8 @@ open signup, where all users that do sign up can already log in the system. To d
 Ask for extra information on SignUp
 -----------------------------------
 
-Native Authenticator is based on username and password only. But if you need extra information about the users, you can add them on the sign up. For now, the only extra information you can ask is email. To do so, you can add the following line on the config file:
-
+Native Authenticator is based on username and password only. But if you need extra information about the users, you can add them on the sign up.
+For now, the only extra information you can ask is email. To do so, you can add the following line to the config file:
 
 .. code-block:: python
 
@@ -81,24 +81,19 @@ Native Authenticator is based on username and password only. But if you need ext
 Use reCaptcha to prevent scripted SignUp attacks
 ------------------------------------------------
 
-Since anybody can sign up, you may want to use the lightweight single-click reCaptcha to reduce your risks from scripting attacks. You will need to register with reCaptcha as described at https://developers.google.com/recaptcha/intro
+Since anybody can sign up, you may want to use the lightweight single-click "I am not a robot" checkbox provided by reCAPTCHA v2 to reduce your risks from scripting attacks.
+To use this feature, you will need to `register with reCaptcha <https://www.google.com/recaptcha/admin/create>`_ (you will need a Google account to do so).
 
+You can learn more about reCAPTCHA `here <https://developers.google.com/recaptcha/intro>`_. If you would like to simply test this functionality without creating an account,
+you can do so as explained `here <https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do>`_. Note that this test 
+in itself does not provide actual security so please do **NOT** use these test credentials for your actual production system.
+
+To enable reCAPTCHA on signup, add the following two lines to the configuration file and substitute your own credentials.
 
 .. code-block:: python
 
     c.Authenticator.recaptcha_key = "your key"
     c.Authenticator.recaptcha_secret = "your secret"
-
-
-Force acceptance of Terms of Service before SignUp
---------------------------------------------------
-
-You may force users to click a checkbox agreeing to TOS before they can Sign Up. This might be legally binding is some jurisditions.
-
-
-.. code-block:: python
-
-    c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
 
 
 Allow self-serve approval
@@ -133,6 +128,17 @@ You should customize the email sent to users with something like
 .. code-block:: python
 
     c.Authenticator.self_approval_email = ("from", "subject", "email body, including {approval_url}")
+
+
+Mandatory acceptance of Terms of Service before SignUp
+------------------------------------------------------
+
+You may require that users to click a checkbox agreeing to your TOS before they can sign up. This might be legally binding in some jurisditions.
+To do so, you only need to add the following line to your config file and provide a link the where users can find your TOS.
+
+.. code-block:: python
+
+    c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
 
 
 Import users from FirstUse Authenticator
