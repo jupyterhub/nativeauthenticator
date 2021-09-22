@@ -213,7 +213,7 @@ class AuthorizeHandler(LocalBase):
         # Python does not correctly parses iso-8601 times with a colon in the timezone
         if timestr[-3] == ":":
             timestr = timestr[:-3] + timestr[-2:]
-        timeobj = datetime.strptime(timestr, "%H:%M:%S.%f%z").time()
+        timeobj = datetime.strptime(timestr, "%H:%M:%S.%f%z").timetz()
 
         obj["expire"] = datetime.combine(dateobj, timeobj)
 
