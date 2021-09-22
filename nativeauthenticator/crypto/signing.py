@@ -40,7 +40,7 @@ import json
 import time
 import zlib
 
-from django.utils.crypto import constant_time_compare, salted_hmac
+from .crypto import constant_time_compare, salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 BASE62_ALPHABET = \
