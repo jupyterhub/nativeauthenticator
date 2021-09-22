@@ -191,7 +191,7 @@ class AuthorizeHandler(LocalBase):
     # static method so it can be easily tested without initializate the class
     @staticmethod
     def validate_slug(slug, key):
-        from django.core.signing import Signer, BadSignature
+        from .crypto.signing import Signer, BadSignature
         s = Signer(key)
         try:
             obj = s.unsign_object(slug)

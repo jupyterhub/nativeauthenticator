@@ -159,9 +159,6 @@ class NativeAuthenticator(Authenticator):
         if self.allow_self_approval_for:
             if self.open_signup:
                 self.log.error("self_approval and open_signup are conflicts!")
-            from django.conf import settings
-            if not settings.configured:
-                settings.configure()
             self.ask_email_on_signup = True
             if len(self.secret_key) < 8:
                 raise ValueError("Secret_key must be a random string of "
@@ -306,7 +303,7 @@ class NativeAuthenticator(Authenticator):
     def generate_approval_url(self, username, when=None):
         if when is None:
             when = datetime.now(tz.utc) + timedelta(minutes=15)
-        from django.core.signing import Signer
+        from .crypto.signing import Signer
         s = Signer(self.secret_key)
         u = s.sign_object({"username": username,
                            "expire": when.isoformat()})
