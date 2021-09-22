@@ -129,6 +129,16 @@ You should customize the email sent to users with something like
 
     c.Authenticator.self_approval_email = ("from", "subject", "email body, including {approval_url}")
 
+Also, you may specify the SMTP server to use for sending the email. If you use gmail as in the following
+example, you must also allow "less secure apps" for this to work, as described at
+https://support.google.com/accounts/answer/6010255 (and if you have 2FA enabled you should disable it for
+this app, as described at https://support.google.com/accounts/answer/185833)
+
+.. code-block:: python
+
+    c.Authenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself', 'pwd': 'mypassword'}
+
+If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
 
 Mandatory acceptance of Terms of Service before SignUp
 ------------------------------------------------------
