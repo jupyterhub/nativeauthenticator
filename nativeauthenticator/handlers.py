@@ -204,7 +204,10 @@ class AuthorizeHandler(LocalBase):
         datetimestr = obj["expire"].split("T")  # format="%Y-%m-%dT%H:%M:%S.%f"
 
         # before the T
-        dateobj = date.fromisoformat(datetimestr[0])
+        year_month_day = datetimestr[0].split("-")
+        dateobj = date(int(year_month_day[0]),
+                       int(year_month_day[1]),
+                       int(year_month_day[2]))
 
         # after the T
         timeobj = datetime.strptime(datetimestr[1], "%H:%M:%S.%f").time()
