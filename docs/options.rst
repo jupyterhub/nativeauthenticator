@@ -127,18 +127,46 @@ You should customize the email sent to users with something like
 
 .. code-block:: python
 
-    c.Authenticator.self_approval_email = ("from", "subject", "email body, including {approval_url}")
+    c.Authenticator.self_approval_email = ("from", "subject", "email body, including https://example.com{approval_url}")
 
-Also, you may specify the SMTP server to use for sending the email. If you use gmail as in the following
-example, you must also allow "less secure apps" for this to work, as described at
-https://support.google.com/accounts/answer/6010255 (and if you have 2FA enabled you should disable it for
-this app, as described at https://support.google.com/accounts/answer/185833)
+Note that you need to specify the domain where JupyterHub is running (example.com in the example above) and
+the port too, if you are using a non-standard one (e.g. 8000). Also the protocol must be the correct one
+you are serving your connections from (https in the example).
+
+Moreover, you may specify the SMTP server to use for sending the email. You can do that with
 
 .. code-block:: python
 
     c.Authenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself', 'pwd': 'mypassword'}
 
 If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
+
+If you wish to use gmail as your SMTP server as in the example above, you must also allow
+"less secure apps" for this to work, as described at
+https://support.google.com/accounts/answer/6010255 and if you have 2FA enabled you should disable it for
+JupyterHub to be able to send emails, as described at https://support.google.com/accounts/answer/185833
+See https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp for additional
+gmail-specific SMTP details.
+
+Finally, all of this will correctly create and enable JupyterHub users. However the people wishing to
+login as this users, will need to have **also** accounts on the system. If the system where JupyterHub
+is running is one of the most common Linux distributions, adding the following to the config file
+will automatically create their Linux account the first time they log in JupyterHub. If the system
+where JupyterHub is running is another OS, such as BSD or Windows, the corresponding user
+creation command must be invoked instead of useradd with the appropriate arguments.
+
+.. code-block:: python
+
+def pre_spawn_hook(spawner):
+    username = spawner.user.name
+    try:
+        import pwd
+        pwd.getpwnam(username)
+    except KeyError:
+        import subprocess
+        subprocess.check_call(['useradd', '-ms', '/bin/bash', username])
+c.Spawner.pre_spawn_hook = pre_spawn_hook
+
 
 Mandatory acceptance of Terms of Service before SignUp
 ------------------------------------------------------
