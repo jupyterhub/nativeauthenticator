@@ -15,6 +15,7 @@ class UserInfo(Base):
     username = Column(String(128), nullable=False)
     password = Column(LargeBinary, nullable=False)
     is_authorized = Column(Boolean, default=False)
+    login_email_sent = Column(Boolean, default=False)
     email = Column(String(128))
     has_2fa = Column(Boolean, default=False)
     otp_secret = Column(String(16))

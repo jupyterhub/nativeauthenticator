@@ -295,6 +295,7 @@ class NativeAuthenticator(Authenticator):
             if match:
                 url = self.generate_approval_url(username)
                 self.send_approval_email(user_info.email, url)
+                user_info.login_email_sent = True
 
         self.db.add(user_info)
         self.db.commit()

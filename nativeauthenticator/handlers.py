@@ -49,6 +49,8 @@ class SignUpHandler(LocalBase):
     def get_result_message(self, user, taken, human=True):
         alert = 'alert-info'
         message = 'Your information has been sent to the admin'
+        if user and user.login_email_sent:
+            message = 'Check your email to authorize your access'
 
         # Always error if username is taken.
         if taken:
