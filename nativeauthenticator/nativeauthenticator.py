@@ -10,7 +10,7 @@ from jupyterhub.auth import Authenticator
 from pathlib import Path
 
 from sqlalchemy import inspect
-from tornado import gen
+from tornado import gen, web
 from traitlets import Bool, Integer, Unicode, Tuple, Dict
 
 from .handlers import (
@@ -316,14 +316,18 @@ class NativeAuthenticator(Authenticator):
         msg['Subject'] = self.self_approval_email[1]
         msg.set_content(self.self_approval_email[2].format(approval_url=url))
         msg['To'] = dest
-        if self.self_approval_server:
-            s = smtplib.SMTP_SSL(self.self_approval_server['url'])
-            s.login(self.self_approval_server['usr'],
-                    self.self_approval_server['pwd'])
-        else:
-            s = smtplib.SMTP('localhost')
-        s.send_message(msg)
-        s.quit()
+        try:
+            if self.self_approval_server:
+                s = smtplib.SMTP_SSL(self.self_approval_server['url'])
+                s.login(self.self_approval_server['usr'],
+                        self.self_approval_server['pwd'])
+            else:
+                s = smtplib.SMTP('localhost')
+            s.send_message(msg)
+            s.quit()
+        except Exception as e:
+            self.log.error(e)
+            raise web.HTTPError(503, reason="Self-authorization email could not be sent. Please contact the jupyterhub admin about this.")
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
