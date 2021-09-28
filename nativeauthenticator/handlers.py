@@ -298,6 +298,38 @@ class LoginHandler(LoginHandler, LocalBase):
             ),
         )
 
+    async def post(self):
+        # parse the arguments dict
+        data = {}
+        for arg in self.request.arguments:
+            data[arg] = self.get_argument(arg, strip=False)
+
+        auth_timer = self.statsd.timer('login.authenticate').start()
+        user = await self.login_user(data)
+        auth_timer.stop(send=False)
+
+        if user:
+            # register current user for subsequent requests to user
+            # (e.g. logging the request)
+            self._jupyterhub_user = user
+            self.redirect(self.get_next_url(user))
+        else:
+            # default error mesage on unsuccessful login
+            error = 'Invalid username or password'
+
+            # check is user exists and has correct password,
+            # and is just not authorised
+            nuser = self.authenticator.get_user(data['username'])
+            if nuser is not None:
+                if (nuser.is_valid_password(data['password'])
+                        and not nuser.is_authorized):
+                    error = 'User has not been authorized by administrator yet'
+
+            html = await self._render(
+                login_error=error, username=data['username']
+            )
+            self.finish(html)
+
 
 class DiscardHandler(LocalBase):
     """Discard a user from database"""

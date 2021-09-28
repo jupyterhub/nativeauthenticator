@@ -31,6 +31,11 @@ class UserInfo(Base):
         Returns None if not found"""
         return db.query(cls).filter(cls.username == username).first()
 
+    @classmethod
+    def all_users(cls, db):
+        """Returns all available user records."""
+        return db.query(cls).all()
+
     def is_valid_password(self, password):
         """Checks if a password passed matches the
         password stored"""

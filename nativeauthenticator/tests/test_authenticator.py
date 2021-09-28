@@ -33,6 +33,7 @@ pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
     (False, False, False),
     (True, False, True),
     (False, True, True),
+    (True, True, True)
 ])
 async def test_create_user(is_admin, open_signup, expected_authorization,
                            tmpcwd, app):
@@ -69,6 +70,50 @@ async def test_create_user_twice(tmpcwd, app):
 
     # Creating a user with same handle but different pw should also fail.
     assert not auth.create_user('johnsnow', 'adifferentpassword')
+
+
+async def test_get_authed_users(tmpcwd, app):
+    '''Test if get_authed_users returns the proper set of users.'''
+    auth = NativeAuthenticator(db=app.db)
+
+    auth.admin_users = set()
+    assert auth.get_authed_users() == set()
+
+    auth.create_user('johnsnow', 'password')
+    assert auth.get_authed_users() == set()
+
+    UserInfo.change_authorization(app.db, 'johnsnow')
+    assert auth.get_authed_users() == set({'johnsnow'})
+
+    auth.create_user('daenerystargaryen', 'anotherpassword')
+    assert auth.get_authed_users() == set({'johnsnow'})
+
+    auth.admin_users = set({'daenerystargaryen'})
+    assert 'johnsnow' in auth.get_authed_users()
+    assert 'daenerystargaryen' in auth.get_authed_users()
+
+
+async def test_get_unauthed_amount(tmpcwd, app):
+    '''Test if get_unauthed_amount returns the proper amount.'''
+    auth = NativeAuthenticator(db=app.db)
+
+    auth.admin_users = set()
+    assert auth.get_unauthed_amount() == 0
+
+    auth.create_user('johnsnow', 'password')
+    assert auth.get_unauthed_amount() == 1
+
+    UserInfo.change_authorization(app.db, 'johnsnow')
+    assert auth.get_unauthed_amount() == 0
+
+    auth.create_user('daenerystargaryen', 'anotherpassword')
+    assert auth.get_unauthed_amount() == 1
+
+    auth.create_user('tyrionlannister', 'yetanotherpassword')
+    assert auth.get_unauthed_amount() == 2
+
+    auth.admin_users = set({'daenerystargaryen'})
+    assert auth.get_unauthed_amount() == 1
 
 
 @pytest.mark.parametrize("password,min_len,expected", [

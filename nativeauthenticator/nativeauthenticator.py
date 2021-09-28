@@ -26,45 +26,45 @@ class NativeAuthenticator(Authenticator):
     COMMON_PASSWORDS = None
     recaptcha_key = Unicode(
         config=True,
-        default=None,
         help=("Your key to enable reCAPTCHA as described at "
               "https://developers.google.com/recaptcha/intro")
-    )
+    ).tag(default=None)
+
     recaptcha_secret = Unicode(
         config=True,
-        default=None,
         help=("Your secret to enable reCAPTCHA as described at "
               "https://developers.google.com/recaptcha/intro")
-    )
+    ).tag(default=None)
+
     tos = Unicode(
         config=True,
-        default=None,
         help=("The HTML to present next to the Term of Service "
               "checkbox")
-    )
+    ).tag(default=None)
+
     self_approval_server = Dict(
         config=True,
-        default=None,
         help=("SMTP server information as a dictionary of 'url', 'usr'"
               "and 'pwd' to use for sending email, e.g."
               "self_approval_server={'url': 'smtp.gmail.com', 'usr': 'myself'"
               "'pwd': 'mypassword'}")
-    )
+    ).tag(default=None)
+
     secret_key = Unicode(
         config=True,
-        default="",
         help=("Secret key to cryptographically sign the "
               "self-approved URL (if allow_self_approval is utilized)")
-    )
+    ).tag(default="")
+
     allow_self_approval_for = Unicode(
         allow_none=True,
         config=True,
-        default=None,
         help=("Use self-service authentication (rather than "
               "admin-based authentication) for users whose "
               "email match this patter. Note that this forces "
               "ask_email_on_signup to be True.")
-    )
+    ).tag(default=None)
+
     self_approval_email = Tuple(
         Unicode(), Unicode(), Unicode(),
         config=True,
@@ -80,51 +80,56 @@ class NativeAuthenticator(Authenticator):
                         "to {approval_url} to activate it.\n"))
 
     )
+
     check_common_password = Bool(
         config=True,
-        default=False,
         help=("Creates a verification of password strength "
               "when a new user makes signup")
-    )
+    ).tag(default=False)
+
     minimum_password_length = Integer(
         config=True,
-        default=1,
         help=("Check if the length of the password is at least this size on "
               "signup")
-    )
+    ).tag(default=1)
+
     allowed_failed_logins = Integer(
         config=True,
-        default=0,
         help=("Configures the number of failed attempts a user can have "
               "before being blocked.")
-    )
+    ).tag(default=0)
+
     seconds_before_next_try = Integer(
         config=True,
-        default=600,
         help=("Configures the number of seconds a user has to wait "
               "after being blocked. Default is 600.")
-    )
+    ).tag(default=600)
+
     enable_signup = Bool(
         config=True,
         default_value=True,
         help=("Allows every user to registry a new account")
     )
+
     open_signup = Bool(
         config=True,
         default_value=False,
         help=("Allows every user that made sign up to automatically log in "
               "the system without needing admin authorization")
     )
+
     ask_email_on_signup = Bool(
         False,
         config=True,
         help="Asks for email on signup"
     )
+
     import_from_firstuse = Bool(
         False,
         config=True,
         help="Import users from FirstUse Authenticator database"
     )
+
     firstuse_db_path = Unicode(
         'passwords.dbm',
         config=True,
@@ -132,11 +137,13 @@ class NativeAuthenticator(Authenticator):
         Path to store the db file of FirstUse with username / pwd hash in
         """
     )
+
     delete_firstuse_db_after_import = Bool(
         config=True,
         default_value=False,
         help="Deletes FirstUse Authenticator database after the import"
     )
+
     allow_2fa = Bool(
         False,
         config=True,
@@ -249,6 +256,26 @@ class NativeAuthenticator(Authenticator):
     def get_user(self, username):
         return UserInfo.find(self.db, self.normalize_username(username))
 
+    def get_authed_users(self):
+        try:
+            allowed = self.allowed_users
+        except AttributeError:
+            try:
+                # Deprecated for jupyterhub >= 1.2
+                allowed = self.whitelist
+            except AttributeError:
+                # Not present at all in jupyterhub < 0.9
+                allowed = {}
+
+        authed = set()
+        for info in UserInfo.all_users(self.db):
+            user = self.get_user(info.username)
+            if user is not None:
+                if user.is_authorized:
+                    authed.update(set({info.username}))
+
+        return authed.union(allowed.union(self.admin_users))
+
     def user_exists(self, username):
         return self.get_user(username) is not None
 
@@ -268,21 +295,8 @@ class NativeAuthenticator(Authenticator):
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
         infos = {'username': username, 'password': encoded_pw}
         infos.update(kwargs)
-        admins = self.admin_users
 
-        try:
-            allowed = self.allowed_users
-        except AttributeError:
-            try:
-                # Deprecated for jupyterhub >= 1.2
-                allowed = self.whitelist
-            except AttributeError:
-                # Not present at all in jupyterhub < 0.9
-                allowed = {}
-
-        authed = admins.union(allowed)
-
-        if self.open_signup or username in authed:
+        if self.open_signup or username in self.get_authed_users():
             infos.update({'is_authorized': True})
 
         try:
@@ -331,6 +345,16 @@ class NativeAuthenticator(Authenticator):
                                 reason="Self-authorization email could not " +
                                 "be sent. Please contact the jupyterhub " +
                                 "admin about this.")
+
+    def get_unauthed_amount(self):
+        unauthed = 0
+        for info in UserInfo.all_users(self.db):
+            user = self.get_user(info.username)
+            if user is not None:
+                if info.username not in self.get_authed_users():
+                    unauthed += 1
+
+        return unauthed
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
