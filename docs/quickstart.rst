@@ -69,7 +69,7 @@ The admin must access the authorization panel and authorize the user so they be 
 Adding new users
 ----------------
 
-To create a new user one must fo to `/hub/signup` and sign up with a username and a password. The information on the signup can change depending on admin configuration and are all obligatory. By default, when a new user is created on the system it will need an administrator authorization to access the system. 
+To create a new user one must go to `/hub/signup` and sign up with a username and a password. The information asked for on signup can change depending on admin configuration, but all fields are obligatory. By default, when a new user is created on the system they will need an administrator authorization to access the system. 
 
 It is important to note that **admin accounts must also be created through signup**. However, usernames listed in the config file as admins (see below) will automatically have authorization to enter the system. 
 
