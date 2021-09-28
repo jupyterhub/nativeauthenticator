@@ -327,7 +327,10 @@ class NativeAuthenticator(Authenticator):
             s.quit()
         except Exception as e:
             self.log.error(e)
-            raise web.HTTPError(503, reason="Self-authorization email could not be sent. Please contact the jupyterhub admin about this.")
+            raise web.HTTPError(503,
+                                reason="Self-authorization email could not " +
+                                "be sent. Please contact the jupyterhub " +
+                                "admin about this.")
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
