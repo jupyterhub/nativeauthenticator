@@ -29,8 +29,8 @@ class UserInfo(Base):
         """Find a user info record by name.
         Returns None if not found"""
         return db.query(cls).filter(cls.username == username).first()
-    
-    @classmethod 
+
+    @classmethod
     def all_users(cls, db):
         """Returns all available user records."""
         return db.query(cls).all()

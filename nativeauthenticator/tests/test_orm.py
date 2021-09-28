@@ -31,14 +31,14 @@ def test_validate_method_correct_email(tmpdir, app):
 
 
 def test_all_users(tmpdir, app):
-        assert len(UserInfo.all_users(app.db)) == 1
-        user = UserInfo(username='daenerystargaryen',
-                password=b'yesispeakvalyrian',
-	        email='khaleesi@valyria.com')
-        app.db.add(user)
-        app.db.commit()
-        
-        assert len(UserInfo.all_users(app.db)) == 2
+    assert len(UserInfo.all_users(app.db)) == 1
+    user = UserInfo(username='daenerystargaryen',
+                    password=b'yesispeakvalyrian',
+                    email='khaleesi@valyria.com')
+    app.db.add(user)
+    app.db.commit()
+
+    assert len(UserInfo.all_users(app.db)) == 2
 
 
 def test_wrong_pwd_type(tmpdir, app):

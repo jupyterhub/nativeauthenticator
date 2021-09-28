@@ -60,7 +60,7 @@ class NativeAuthenticator(Authenticator):
         help=("Configures the number of seconds a user has to wait "
               "after being blocked. Default is 600.")
     ).tag(default=600)
-    
+
     enable_signup = Bool(
         config=True,
         default_value=True,
@@ -200,7 +200,7 @@ class NativeAuthenticator(Authenticator):
 
     def get_user(self, username):
         return UserInfo.find(self.db, self.normalize_username(username))
-        
+
     def get_authed_users(self):
         try:
             allowed = self.allowed_users
@@ -211,7 +211,7 @@ class NativeAuthenticator(Authenticator):
             except AttributeError:
                 # Not present at all in jupyterhub < 0.9
                 allowed = {}
- 
+
         authed = set()
         for info in UserInfo.all_users(self.db):
             user = self.get_user(info.username)
@@ -252,7 +252,7 @@ class NativeAuthenticator(Authenticator):
         self.db.add(user_info)
         self.db.commit()
         return user_info
-        
+
     def get_unauthed_amount(self):
         unauthed = 0
         for info in UserInfo.all_users(self.db):
@@ -260,7 +260,7 @@ class NativeAuthenticator(Authenticator):
             if user is not None:
                 if info.username not in self.get_authed_users():
                     unauthed += 1
-        
+
         return unauthed
 
     def change_password(self, username, new_password):
