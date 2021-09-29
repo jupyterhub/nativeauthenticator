@@ -1,4 +1,6 @@
 import os
+from datetime import datetime, date
+from datetime import timezone as tz
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
@@ -47,6 +49,8 @@ class SignUpHandler(LocalBase):
     def get_result_message(self, user, taken, human=True):
         alert = 'alert-info'
         message = 'Your information has been sent to the admin'
+        if user and user.login_email_sent:
+            message = 'Check your email to authorize your access'
 
         # Always error if username is taken.
         if taken:
@@ -156,6 +160,71 @@ class ChangeAuthorizationHandler(LocalBase):
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + 'authorize#' + slug)
+
+
+class AuthorizeHandler(LocalBase):
+    async def get(self, slug):
+        must_stop = True
+        msg = "Invalid URL"
+        if self.authenticator.allow_self_approval_for:
+            try:
+                data = AuthorizeHandler.validate_slug(
+                        slug, self.authenticator.secret_key)
+                must_stop = False
+            except ValueError:
+                pass
+
+        if not must_stop:
+            username = data["username"]
+            msg = "{} was already authorized".format(username)
+            usr = UserInfo.find(self.db, username)
+            if not usr.is_authorized:
+                UserInfo.change_authorization(self.db, username)
+                msg = "{} has been authorized".format(username)
+
+            # add POSIX user!!
+
+        html = await self.render_template(
+            'my_message.html',
+            message=msg,
+        )
+        self.finish(html)
+
+    # static method so it can be easily tested without initializate the class
+    @staticmethod
+    def validate_slug(slug, key):
+        from .crypto.signing import Signer, BadSignature
+        s = Signer(key)
+        try:
+            obj = s.unsign_object(slug)
+        except BadSignature as e:
+            raise ValueError(e)
+
+        # the following it is not supported in earlier versions of python
+        # obj["expire"] = datetime.fromisoformat(obj["expire"])
+
+        # format="%Y-%m-%dT%H:%M:%S.%f"
+        datestr, timestr = obj["expire"].split("T")
+
+        # before the T
+        year_month_day = datestr.split("-")
+        dateobj = date(int(year_month_day[0]),
+                       int(year_month_day[1]),
+                       int(year_month_day[2]))
+
+        # after the T
+        # manually parsing iso-8601 times with a colon in the timezone
+        # since the strptime does not support it
+        if timestr[-3] == ":":
+            timestr = timestr[:-3] + timestr[-2:]
+        timeobj = datetime.strptime(timestr, "%H:%M:%S.%f%z").timetz()
+
+        obj["expire"] = datetime.combine(dateobj, timeobj)
+
+        if datetime.now(tz.utc) > obj["expire"]:
+            raise ValueError("The URL has expired")
+
+        return obj
 
 
 class ChangePasswordHandler(LocalBase):

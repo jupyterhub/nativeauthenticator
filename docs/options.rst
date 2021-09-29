@@ -96,6 +96,78 @@ To enable reCAPTCHA on signup, add the following two lines to the configuration 
     c.Authenticator.recaptcha_secret = "your secret"
 
 
+Allow self-serve approval
+-------------------------
+
+By default all users who sign up on Native Authenticator need an admin approval so 
+they can actually log in the system. Or you can allow anybody without approval as described
+above with `open_signup`. Alternatively, you may want something like `open_signup` but
+only for users in your own organization. This is what this option permits.
+New users are still created in non-authorized mode, but they can self-authorize by
+navigating to a (cryptographic) URL which will be e-mailed to them *only* if the
+provided email address matches the specified pattern.
+For example, to allow any users who have an mit.edu email address,
+you may do the following:
+
+.. code-block:: python
+
+    import re
+    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@mit\.edu$')
+
+Note that this setting automatically enables `ask_email_on_signup`.
+
+To use the code, you must also provide a secret key to cryptographically sign the URL.
+To prevents attacks, it is mandatory that this key stays secret.
+
+.. code-block:: python
+
+    c.Authenticator.secret_key = "your-key"
+
+You should customize the email sent to users with something like
+
+.. code-block:: python
+
+    c.Authenticator.self_approval_email = ("from", "subject", "email body, including https://example.com{approval_url}")
+
+Note that you need to specify the domain where JupyterHub is running (example.com in the example above) and
+the port too, if you are using a non-standard one (e.g. 8000). Also the protocol must be the correct one
+you are serving your connections from (https in the example).
+
+Moreover, you may specify the SMTP server to use for sending the email. You can do that with
+
+.. code-block:: python
+
+    c.Authenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself', 'pwd': 'mypassword'}
+
+If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
+
+If you wish to use gmail as your SMTP server as in the example above, you must also allow
+"less secure apps" for this to work, as described at
+https://support.google.com/accounts/answer/6010255 and if you have 2FA enabled you should disable it for
+JupyterHub to be able to send emails, as described at https://support.google.com/accounts/answer/185833
+See https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp for additional
+gmail-specific SMTP details.
+
+Finally, all of this will correctly create and enable JupyterHub users. However the people wishing to
+login as this users, will need to have **also** accounts on the system. If the system where JupyterHub
+is running is one of the most common Linux distributions, adding the following to the config file
+will automatically create their Linux account the first time they log in JupyterHub. If the system
+where JupyterHub is running is another OS, such as BSD or Windows, the corresponding user
+creation command must be invoked instead of useradd with the appropriate arguments.
+
+.. code-block:: python
+
+def pre_spawn_hook(spawner):
+    username = spawner.user.name
+    try:
+        import pwd
+        pwd.getpwnam(username)
+    except KeyError:
+        import subprocess
+        subprocess.check_call(['useradd', '-ms', '/bin/bash', username])
+c.Spawner.pre_spawn_hook = pre_spawn_hook
+
+
 Mandatory acceptance of Terms of Service before SignUp
 ------------------------------------------------------
 
