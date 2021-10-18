@@ -81,14 +81,19 @@ For now, the only extra information you can ask is email. To do so, you can add 
 Use reCaptcha to prevent scripted SignUp attacks
 ------------------------------------------------
 
-Since anybody can sign up, you may want to use the lightweight single-click "I am not a robot" checkbox provided by reCAPTCHA v2 to reduce your risks from scripting attacks.
+Since by default, anybody can sign up to the system, you may want to use the lightweight
+single-click "I am not a robot" checkbox provided by Google's reCAPTCHA v2 to reduce your
+risk from scripting attacks.
 To use this feature, you will need to `register with reCaptcha <https://www.google.com/recaptcha/admin/create>`_ (you will need a Google account to do so).
 
-You can learn more about reCAPTCHA `here <https://developers.google.com/recaptcha/intro>`_. If you would like to simply test this functionality without creating an account,
-you can do so as explained `here <https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do>`_. Note that this test 
-in itself does not provide actual security so please do **NOT** use these test credentials for your actual production system.
+You can learn more about reCAPTCHA `here <https://developers.google.com/recaptcha/intro>`_.
+If you would like to simply test this functionality without creating an account, you can do
+so as explained `here <https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do>`_.
+Note that this test in itself does not provide actual security so please do **NOT** use
+these test credentials for your actual production system.
 
-To enable reCAPTCHA on signup, add the following two lines to the configuration file and substitute your own credentials.
+To enable reCAPTCHA on signup, add the following two lines to the configuration file and
+substitute your own credentials.
 
 .. code-block:: python
 
@@ -99,41 +104,36 @@ To enable reCAPTCHA on signup, add the following two lines to the configuration 
 Allow self-serve approval
 -------------------------
 
-By default all users who sign up on Native Authenticator need an admin approval so 
-they can actually log in the system. Or you can allow anybody without approval as described
-above with `open_signup`. Alternatively, you may want something like `open_signup` but
-only for users in your own organization. This is what this option permits.
-New users are still created in non-authorized mode, but they can self-authorize by
-navigating to a (cryptographic) URL which will be e-mailed to them *only* if the
-provided email address matches the specified pattern.
-For example, to allow any users who have an mit.edu email address,
-you may do the following:
+By default, all users who sign up on NativeAuthenticator need a manual admin approval so they can actually log in the system. Or you can allow anybody without approval as described above with `open_signup`.
+Alternatively, depending on your situation, you may want something *like* `open_signup` but only for users in your own organization. This is what this option permits.
+
+New users are still created as non-authorized, but they can self-authorize by navigating to a (cryptographically verified) URL which will be e-mailed to them *only* if the provided email address matches the specified regular expression.
+
+For example, to allow any users who have an `example.com` email address to self-approve, you add the following to your configuration file:
 
 .. code-block:: python
 
     import re
-    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@mit\.edu$')
+    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@example\.com$')
 
-Note that this setting automatically enables `ask_email_on_signup`.
+Please note that activating this setting automatically also enables `ask_email_on_signup`.
 
-To use the code, you must also provide a secret key to cryptographically sign the URL.
-To prevents attacks, it is mandatory that this key stays secret.
+To use the code, you must also provide a secret key (i.e. an arbitrary string, not too short) to cryptographically sign the URL. To prevents attacks, it is crucial that this key stays secret.
 
 .. code-block:: python
 
-    c.Authenticator.secret_key = "your-key"
+    c.Authenticator.secret_key = "your-arbitrary-key"
 
-You should customize the email sent to users with something like
+You should also customize the email sent to users with something as follows:
 
 .. code-block:: python
 
     c.Authenticator.self_approval_email = ("from", "subject", "email body, including https://example.com{approval_url}")
 
-Note that you need to specify the domain where JupyterHub is running (example.com in the example above) and
-the port too, if you are using a non-standard one (e.g. 8000). Also the protocol must be the correct one
-you are serving your connections from (https in the example).
+Note that you need to specify the domain where JupyterHub is running (`example.com` in the code block above) as well as the port, if you are using a non-standard one (e.g. `8000`).
+Also the protocol must be the correct one you are serving your connections from (`https` in the example).
 
-Moreover, you may specify the SMTP server to use for sending the email. You can do that with
+Furthermore, you may specify the SMTP server to use for sending the email. You can do that with
 
 .. code-block:: python
 
@@ -141,31 +141,26 @@ Moreover, you may specify the SMTP server to use for sending the email. You can 
 
 If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
 
-If you wish to use gmail as your SMTP server as in the example above, you must also allow
-"less secure apps" for this to work, as described at
-https://support.google.com/accounts/answer/6010255 and if you have 2FA enabled you should disable it for
-JupyterHub to be able to send emails, as described at https://support.google.com/accounts/answer/185833
-See https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp for additional
-gmail-specific SMTP details.
+Using GMail (as in the example above) is entirely optional, any other SMTP server accepting password authentication also works. However, if you *do* wish to use GMail as your SMTP server, you must also allow "less secure apps" for this to work, as described at `this link <https://support.google.com/accounts/answer/6010255>`_. 
+If you have 2FA enabled (with GMail, not NativeAuthenticator) you should disable it for JupyterHub to be able to send emails, as described `over here <https://support.google.com/accounts/answer/185833`_.
+Also see `this helpful StackExchange post <https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp>`_ for additional GMail-specific SMTP details.
 
-Finally, all of this will correctly create and enable JupyterHub users. However the people wishing to
-login as this users, will need to have **also** accounts on the system. If the system where JupyterHub
-is running is one of the most common Linux distributions, adding the following to the config file
-will automatically create their Linux account the first time they log in JupyterHub. If the system
-where JupyterHub is running is another OS, such as BSD or Windows, the corresponding user
-creation command must be invoked instead of useradd with the appropriate arguments.
+Finally, the entire procedure so far will only correctly create and enable JupyterHub users.
+However, the people wishing to login as this users, will need to have **also** accounts on the system that is running Jupyterhub. If the system is one of the more common Linux distributions, adding the following to the configuration file will automatically create their Linux account the first time they log in JupyterHub.
+If the system where JupyterHub is running is another OS, such as BSD or Windows, the corresponding user creation command must be invoked instead of useradd with the appropriate arguments.
 
 .. code-block:: python
 
-def pre_spawn_hook(spawner):
-    username = spawner.user.name
-    try:
-        import pwd
-        pwd.getpwnam(username)
-    except KeyError:
-        import subprocess
-        subprocess.check_call(['useradd', '-ms', '/bin/bash', username])
-c.Spawner.pre_spawn_hook = pre_spawn_hook
+    def pre_spawn_hook(spawner):
+        username = spawner.user.name
+        try:
+            import pwd
+            pwd.getpwnam(username)
+        except KeyError:
+            import subprocess
+            subprocess.check_call(['useradd', '-ms', '/bin/bash', username])
+    
+    c.Spawner.pre_spawn_hook = pre_spawn_hook
 
 
 Mandatory acceptance of Terms of Service before SignUp
@@ -182,7 +177,7 @@ To do so, you only need to add the following line to your config file and provid
 Import users from FirstUse Authenticator
 ----------------------------------------
 
-If you are using `FirstUse Authenticator <https://github.com/jupyterhub/firstuseauthenticator>` and wish to change to Native Authenticator, you can import users from that authenticator to Native authenticator with minimum work!
+If you are using `FirstUse Authenticator <https://github.com/jupyterhub/firstuseauthenticator>`_ and wish to change to Native Authenticator, you can import users from that authenticator to Native authenticator with minimum work!
 
 To do so, you have to add the following line on the configuration file:
 
@@ -228,6 +223,5 @@ Users will receive a message after signup with the two factor authentication cod
 .. image:: _static/signup-two-factor-auth.png
 
 And login will now require the two factor authentication code as well:
-
 
 .. image:: _static/login-two-factor-auth.png
