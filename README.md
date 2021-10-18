@@ -10,26 +10,27 @@
 [![Gitter](https://img.shields.io/badge/social_chat-gitter-blue?logo=gitter)](https://gitter.im/jupyterhub/jupyterhub)
 [![Contribute](https://img.shields.io/badge/I_want_to_contribute!-grey?logo=jupyter)](https://github.com/jupyterhub/nativeauthenticator/blob/master/CONTRIBUTING.md)
 
-A simple authenticator for small-medium size [JupyterHub](http://github.com/jupyter/jupyterhub/) applications.
+This is a relatively simple authenticator for small or medium-sized [JupyterHub](http://github.com/jupyter/jupyterhub/) applications. Signup and authentication are implemented as native to JupyterHub without relying on external services.
 
-Native Authenticator provides the following features:
+NativeAuthenticator provides the following features:
 
 * New users can signup on the system;
-* New users can be blocked of accessing the system and need an admin authorization;
-* Option of increase password security by avoiding common passwords or minimum password length;
-* Option to block users after a number attempts of login;
-* Option of open signup and no need for initial authorization;
-* Option of adding more information about users on signup.
-
+* New users can be blocked from accessing the system awaiting admin authorization;
+* Option of enforcing password security by disallowing common passwords and/or requiring a minimum password length;
+* Option to block users after a set number of failed login attempts;
+* Option of open signup without need for initial authorization;
+* Option of asking more information about users on signup (e-mail).
+* Option of requiring users to agree with given Terms of Service;
+* Option of protection against scripting attacks via reCAPTCHA;
+* Option for users with a org e-mail address to self-approve via secure link;
 
 ## Documentation
 
-Documentation is available [here](https://native-authenticator.readthedocs.io)
-
+The latest documentation is available [here](https://native-authenticator.readthedocs.io).
 
 ## Running tests
 
-To run the tests locally, you can install the development dependencies:
+To run the tests locally, you can install the development dependencies like so:
 
 `$ pip install -r dev-requirements.txt`
 
