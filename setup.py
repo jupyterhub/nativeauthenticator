@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='jupyterhub-nativeauthenticator',
-    version='0.0.7',
+    version='1.0.0',
     description='JupyterHub Native Authenticator',
     long_description=long_description,
     long_description_content_type="text/markdown",
