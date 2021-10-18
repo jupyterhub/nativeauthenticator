@@ -142,7 +142,7 @@ Furthermore, you may specify the SMTP server to use for sending the email. You c
 If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
 
 Using GMail (as in the example above) is entirely optional, any other SMTP server accepting password authentication also works. However, if you *do* wish to use GMail as your SMTP server, you must also allow "less secure apps" for this to work, as described at `this link <https://support.google.com/accounts/answer/6010255>`_. 
-If you have 2FA enabled (with GMail, not NativeAuthenticator) you should disable it for JupyterHub to be able to send emails, as described `over here <https://support.google.com/accounts/answer/185833`_.
+If you have 2FA enabled (with GMail, not NativeAuthenticator) you should disable it for JupyterHub to be able to send emails, as described `over here <https://support.google.com/accounts/answer/185833>`_.
 Also see `this helpful StackExchange post <https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp>`_ for additional GMail-specific SMTP details.
 
 Finally, the entire procedure so far will only correctly create and enable JupyterHub users.
