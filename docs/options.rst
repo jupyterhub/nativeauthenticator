@@ -146,7 +146,7 @@ If you have 2FA enabled (with GMail, not NativeAuthenticator) you should disable
 Also see `this helpful StackExchange post <https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp>`_ for additional GMail-specific SMTP details.
 
 Finally, the entire procedure so far will only correctly create and enable JupyterHub users.
-However, the people wishing to login as this users, will need to have **also** accounts on the system that is running Jupyterhub. If the system is one of the more common Linux distributions, adding the following to the configuration file will automatically create their Linux account the first time they log in JupyterHub.
+However, the people wishing to login as this users, will **also** need to have accounts on the system that is running Jupyterhub. If the system is one of the more common Linux distributions, adding the following to the configuration file will automatically create their Linux account the first time they log in JupyterHub.
 If the system where JupyterHub is running is another OS, such as BSD or Windows, the corresponding user creation command must be invoked instead of useradd with the appropriate arguments.
 
 .. code-block:: python
