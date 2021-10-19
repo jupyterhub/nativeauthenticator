@@ -6,16 +6,19 @@
 Welcome to Native Authenticator's documentation!
 ================================================
 
-A simple authenticator for small-medium size `JupyterHub <https://github.com/jupyterhub/>`_ applications.
+This is a relatively simple authenticator for small or medium-sized `JupyterHub <https://github.com/jupyterhub/>`_ applications. Signup and authentication are implemented as native to JupyterHub without relying on external services.
 
-Native Authenticator provides the following features:
+NativeAuthenticator provides the following features:
 
 * New users can signup on the system;
-* New users can be blocked of accessing the system and need an admin authorization;
-* Option of increase password security by avoiding common passwords or minimum password length;
-* Option to block users after a number attempts of login;
-* Option of open signup and no need for initial authorization;
-* Option of adding more information about users on signup.
+* New users can be blocked from accessing the system awaiting admin authorization;
+* Option of enforcing password security by disallowing common passwords and/or requiring a minimum password length;
+* Option to block users after a set number of failed login attempts;
+* Option of open signup without need for initial authorization;
+* Option of asking more information about users on signup (e-mail).
+* Option of requiring users to agree with given Terms of Service;
+* Option of protection against scripting attacks via reCAPTCHA;
+* Option for users with a org e-mail address to self-approve via secure link;
 
 
 Indices and tables
