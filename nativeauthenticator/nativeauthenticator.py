@@ -19,7 +19,7 @@ from .handlers import (
     ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
 )
 from .orm import UserInfo
-
+from .crypto.signing import Signer
 
 class NativeAuthenticator(Authenticator):
 
@@ -318,7 +318,6 @@ class NativeAuthenticator(Authenticator):
     def generate_approval_url(self, username, when=None):
         if when is None:
             when = datetime.now(tz.utc) + timedelta(minutes=15)
-        from nativeauthenticator.crypto.signing import Signer
         s = Signer(self.secret_key)
         u = s.sign_object({"username": username,
                            "expire": when.isoformat()})
