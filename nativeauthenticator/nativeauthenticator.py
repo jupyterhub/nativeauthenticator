@@ -21,6 +21,7 @@ from .handlers import (
 from .orm import UserInfo
 from .crypto.signing import Signer
 
+
 class NativeAuthenticator(Authenticator):
 
     COMMON_PASSWORDS = None
