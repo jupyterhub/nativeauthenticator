@@ -4,7 +4,7 @@ from datetime import timezone as tz
 from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
-from jupyterhub.utils import admin_only
+from jupyterhub.scopes import needs_scope
 
 from tornado import web
 from tornado.escape import url_escape
@@ -145,7 +145,7 @@ class SignUpHandler(LocalBase):
 
 class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
-    @admin_only
+    @needs_scope('admin:users')
     async def get(self):
         html = await self.render_template(
             'autorization-area.html',
@@ -156,7 +156,7 @@ class AuthorizationHandler(LocalBase):
 
 
 class ChangeAuthorizationHandler(LocalBase):
-    @admin_only
+    @needs_scope('admin:users')
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
         self.redirect(self.hub.base_url + 'authorize#' + slug)
@@ -256,7 +256,7 @@ class ChangePasswordHandler(LocalBase):
 class ChangePasswordAdminHandler(LocalBase):
     """Render the reset password page."""
 
-    @admin_only
+    @needs_scope('admin:users')
     async def get(self, user_name):
         if not self.authenticator.user_exists(user_name):
             raise web.HTTPError(404)
@@ -266,7 +266,7 @@ class ChangePasswordAdminHandler(LocalBase):
         )
         self.finish(html)
 
-    @admin_only
+    @needs_scope('admin:users')
     async def post(self, user_name):
         new_password = self.get_body_argument('password', strip=False)
         self.authenticator.change_password(user_name, new_password)
@@ -334,7 +334,7 @@ class LoginHandler(LoginHandler, LocalBase):
 class DiscardHandler(LocalBase):
     """Discard a user from database"""
 
-    @admin_only
+    @needs_scope('admin:users')
     async def get(self, user_name):
         user = self.authenticator.get_user(user_name)
         if user is not None:
