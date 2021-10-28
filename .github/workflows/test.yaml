@@ -1,5 +1,5 @@
 # This is a GitHub workflow defining a set of jobs with a set of steps.
-# ref: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
+# ref: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 #
 name: Test
 
@@ -35,20 +35,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - python-version: 3.6
-          - python-version: 3.7
-          - python-version: 3.8
-          - python-version: 3.9
+          - python-version: "3.6"
+            jupyterhub-version: "1.3.*"
+          - python-version: "3.7"
+            jupyterhub-version: "1.4.*"
+          - python-version: "3.8"
+            jupyterhub-version: "1.*"
+          - python-version: "3.9"
+            jupyterhub-version: "2.*"
+          - python-version: "3.10"
+            jupyterhub-version: "2.*"
 
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: "${{ matrix.python-version}}"
+          python-version: "${{ matrix.python-version }}"
 
       - name: Install Python dependencies
         run: |
           pip install --no-cache-dir -r dev-requirements.txt
+          pip install --pre "jupyterhub==${{ matrix.jupyterhub-version }}"
           pip install .
 
       - name: Run tests
