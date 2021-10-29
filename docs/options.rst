@@ -113,8 +113,7 @@ For example, to allow any users who have an `example.com` email address to self-
 
 .. code-block:: python
 
-    import re
-    c.Authenticator.allow_self_approval_for = re.compile('[^@]+@example\.com$')
+    c.Authenticator.allow_self_approval_for = '[^@]+@example\.com$'
 
 Please note that activating this setting automatically also enables `ask_email_on_signup`.
 
