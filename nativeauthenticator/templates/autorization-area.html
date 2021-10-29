@@ -1,16 +1,18 @@
 {% extends "page.html" %}
+
 {% block main %}
 <div class="container">
-    <h1>Authorization Area</h1>
+    <h1>Authorization area</h1>
+
     <table class="table">
         <thead>
             <tr>
                 <th>Username</th>
-                {% if ask_email %}
-                <th>Email</th>
-                {% endif %}
-                <th>Has 2fa?</th>
-                <th>Is Authorized?</th>
+                {% if ask_email %}<th>Email</th>{% endif %}
+                <th>Has 2FA?</th>
+                <th>Is authorized?</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -18,31 +20,22 @@
             {% if user.is_authorized %}
             <tr class="success" id={{ user.username }}>
                 <td>{{ user.username }}</td>
-                {% if ask_email %}
-                <td>{{ user.email }}</td>
-                {% endif %}
+                {% if ask_email %}<td>{{ user.email }}</td>{% endif %}
                 <td>{{ user.has_2fa }}</td>
                 <td>Yes</td>
-                <td>
-                    <a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a>
-                </td>
+                <td><a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a></td>
                 <td></td>
-                {% else %}
+            </tr>
+            {% else %}
             <tr id={{ user.username }}>
                 <td>{{ user.username }}</td>
-                {% if ask_email %}
-                <td>{{ user.email }}</td>
-                {% endif %}
+                {% if ask_email %}<td>{{ user.email }}</td>{% endif %}
                 <td>{{ user.has_2fa }}</td>
                 <td>No</td>
-                <td>
-                    <a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a>
-                </td>
-                <td>
-                    <a class="btn btn-jupyter" href="{{ base_url }}discard/{{ user.username }}" role="button">Discard</a>
-                </td>
-                {% endif %}
+                <td><a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a></td>
+                <td><a class="btn btn-jupyter" href="{{ base_url }}discard/{{ user.username }}" role="button">Discard</a></td>
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>

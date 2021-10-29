@@ -1,74 +1,84 @@
 {% extends "page.html" %}
+
 {% if announcement_login %}
   {% set announcement = announcement_login %}
 {% endif %}
-{% block main %}
+
+{% block script %}
+{{ super() }}
 <script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    let button = document.getElementById('eye');
-    button.addEventListener("click", function(e) {
-        let pwd = document.getElementById("password_input");
-        if (pwd.getAttribute("type") === "password") {
-            pwd.setAttribute("type", "text");
-            button.textContent = "🔑";
-        } else {
-            pwd.setAttribute("type", "password");
-            button.textContent = "👁";
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        let button = document.getElementById('eye');
+        button.addEventListener("click", function(e) {
+            let pwd = document.getElementById("password_input");
+            if (pwd.getAttribute("type") === "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁";
+            }
+        });
     });
-});
+
+    if (window.location.protocol === "http:") {
+        // unhide http warning
+        let warning = document.getElementById('insecure-login-warning');
+        warning.className = warning.className.replace(/\bhidden\b/, '');
+    }
 </script>
+{% endblock script %}
+
+{% block main %}
 {% block login %}
 <div id="login-main" class="container">
     <form action="{{login_url}}?next={{next}}" method="post" role="form">
         <div class="auth-form-header">
             Sign In
         </div>
+
         <div class='auth-form-body'>
             <p id='insecure-login-warning' class='hidden'>
                 Warning: JupyterHub seems to be served over an unsecured HTTP connection.
                 We strongly recommend enabling HTTPS for JupyterHub.
             </p>
+
             {% if login_error %}
             <p class="login_error">
                 {{login_error}}
             </p>
             {% endif %}
+
             <label for="username_input">Username:</label>
-            <input id="username_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="username" val="{{username}}" tabindex="1" autofocus="autofocus" />
+            <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off" autocorrect="off" class="form-control" autofocus="autofocus" required />
             <p></p>
+
             <label for='password_input'>Password:</label>
             <div class="input-group">
-                <input type="password" class="form-control" name="password" id="password_input" tabindex="2" />
+                <input id="password_input" type="password" name="password" val="" autocapitalize="off" autocorrect="off" class="form-control" />
                 <span class="input-group-addon">
-                    <button style="border:0;" type="button" id="eye">
-                        👁
-                    </button>
+                    <button id="eye" type="button" style="border:0;">👁</button>
                 </span>
             </div>
-            {% if two_factor_auth %}
             <p></p>
-            <label for="2fa_input">Two Factor Authentication:</label>
-            <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2fa" tabindex="1" autofocus="autofocus" placeholder="If you don't have 2FA, leave empty" />
+
+            {% if two_factor_auth %}
+            <label for="2fa_input">2FA code:</label>
+            <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2fa" placeholder="If you don't have 2FA, leave empty" />
+            <p></p>
             {% endif %}
-            <input type="submit" id="login_submit" class='btn btn-jupyter' value='Sign In' tabindex="3" />
+
+            <input type="submit" id="login_submit" class='btn btn-jupyter' value='Sign In' />
+            <p></p>
+
             {% if enable_signup %}
-            <div style="padding-top: 25px;">
-                <p>Don't have an account? <a href="{{ base_url }}signup">Signup!</a></p>
-            </div>
+            <hr />
+            <p>
+                <a href="{{ base_url }}signup"> Sign up</a> to create a new user.
+            </p>
             {% endif %}
         </div>
     </form>
 </div>
 {% endblock login %}
-{% endblock %}
-{% block script %}
-{{ super() }}
-<script>
-if (window.location.protocol === "http:") {
-    // unhide http warning
-    let warning = document.getElementById('insecure-login-warning');
-    warning.className = warning.className.replace(/\bhidden\b/, '');
-}
-</script>
-{% endblock %}
+{% endblock main %}
