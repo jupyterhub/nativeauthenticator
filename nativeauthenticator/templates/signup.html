@@ -1,32 +1,46 @@
 {% extends "page.html" %}
-{% block main %}
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    let button = document.getElementById('eye');
-    button.addEventListener("click", function(e) {
-        let pwd = document.getElementById("pwd");
-        if (pwd.getAttribute("type") === "password") {
-            pwd.setAttribute("type", "text");
-            button.textContent = "🔑";
-        } else {
-            pwd.setAttribute("type", "password");
-            button.textContent = "👁";
-        }
+
+{% block script %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let button = document.getElementById('eye');
+        button.addEventListener("click", function(e) {
+            let pwd = document.getElementById("password_input");
+            if (pwd.getAttribute("type") === "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁";
+            }
+        });
     });
-});
-{% if tos %}
-document.addEventListener('DOMContentLoaded', function() {
-    let checkbox = document.getElementById('tos_check');
-    checkbox.addEventListener("click", function(e) {
-        let submit_button = document.getElementById("signup_submit");
-	submit_button.disabled = ! checkbox.checked;
+
+    {% if tos %}
+    document.addEventListener('DOMContentLoaded', function() {
+        let checkbox = document.getElementById('tos_check');
+        checkbox.addEventListener("click", function(e) {
+            let submit_button = document.getElementById("signup_submit");
+            submit_button.disabled = ! checkbox.checked;
+        });
     });
-});
-{% endif %}
+    {% endif %}
+
+    if (window.location.protocol === "http:") {
+        // unhide http warning
+        let warning = document.getElementById('insecure-login-warning');
+        warning.className = warning.className.replace(/\bhidden\b/, '');
+    }
 </script>
+
 {% if recaptcha_key %}
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endif %}
+{% endblock script %}
+
+
+{% block main %}
 {% block login %}
 <div id="login-main" class="container">
     <form action="{{post_url}}" method="post" role="form">
@@ -34,57 +48,73 @@ document.addEventListener('DOMContentLoaded', function() {
             Sign Up
         </div>
         <div class='auth-form-body'>
+            <p id='insecure-login-warning' class='hidden'>
+                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
+                We strongly recommend enabling HTTPS for JupyterHub.
+            </p>
+
+            {% if alert %}
+            <div class="alert {{alert}}" role="alert">
+                <p>
+                    {{result_message}}
+                </p>
+
+                {% if two_factor_auth_user %}
+                <p>
+                    <strong>Attention!</strong> You have configured two factor authentication.
+                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>.
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+
             <label for="username_input">Username:</label>
-            <input type="text" class="form-control" name="username" id="username_input" tabindex="2" required />
+            <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off" autocorrect="off" class="form-control" autofocus="autofocus" required />
+            <p></p>
+
             {% if ask_email %}
             <label for="email_input">Email:</label>
-            <input type="email" class="form-control" name="email" id="email_input" tabindex="2" required />
+            <input id="email_input" type="email" name="email" val="{{email}}" class="form-control" required />
+            <p></p>
             {% endif %}
-            <label for="pwd">Password:</label>
+
+            <label for="password_input">Password:</label>
             <div class="input-group">
-                <input type="password" class="form-control" name="pw" id="pwd" tabindex="2" required />
+                <input id="password_input" type="password" name="pw" val="" autocapitalize="off" autocorrect="off" class="form-control" />
                 <span class="input-group-addon">
-                    <button style="border:0;" type="button" id="eye">
-                        👁
-                    </button>
+                    <button id="eye" type="button" style="border:0;">👁</button>
                 </span>
             </div>
             <p></p>
+
             {% if two_factor_auth %}
-            <label for="2fa">Add two factor authentication:</label>
-            <input type="checkbox" name="2fa" value="2fa" id="2fa">
+            <input type="checkbox" id="2fa" name="2fa" value="2fa">
+                Setup two factor authentication
+            </input>
+            <p></p>
             {% endif %}
+
+            {% if tos %}
+            <input type="checkbox" id="tos_check">
+                {{tos|safe}}
+            </input>
+            <p></p>
+            {% endif %}
+
             {% if recaptcha_key %}
             <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
+            <p></p>
             {% endif %}
-	    {% if tos %}
-	    <span class="input-tos-check">
-		<input type="checkbox" id="tos_check">
-                   {{tos|safe}}
-		</input>
-	    </span><br/>
-	    {% endif %}
-            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' tabindex="3"
-	    {% if tos %}
-	    disabled
-	    {% endif %}
-	    />
-            <div style="padding-top: 25px;">
-                Already have an account? <a href="{{ base_url }}login">Login!</a>
-            </div>
-            {% if alert %}
-            <div class="alert {{alert}}" style="margin-top: 15px;" role="alert">
-                {{result_message}}
-                {% if two_factor_auth_user %}
-                    <br />
-                    <strong>Attention!</strong> You have configured two factor authentication.
-                    <br />
-                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>. Be sure to keep it safe :)
-                    {% endif %}
-            </div>
-            {% endif %}
+
+            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' {% if tos %}disabled{% endif %} />
+            <p></p>
+
+            <hr />
+            <p>
+                <a href="{{ base_url }}login">Login</a> with an existing user.
+            </p>
         </div>
     </form>
 </div>
 {% endblock login %}
-{% endblock %}
+{% endblock main %}
