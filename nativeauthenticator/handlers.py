@@ -153,7 +153,7 @@ class AuthorizationHandler(LocalBase):
     @admin_users_scope
     async def get(self):
         html = await self.render_template(
-            'autorization-area.html',
+            'authorization-area.html',
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
         )
