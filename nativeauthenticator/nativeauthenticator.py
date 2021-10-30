@@ -358,8 +358,14 @@ class NativeAuthenticator(Authenticator):
 
     def change_password(self, username, new_password):
         user = self.get_user(username)
+
+        criteria = [user is not None, self.is_password_strong(new_password)]
+        if not all(criteria):
+            return
+
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         self.db.commit()
+        return True
 
     def validate_username(self, username):
         invalid_chars = [',', ' ']

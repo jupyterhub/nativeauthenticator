@@ -69,14 +69,14 @@ class SignUpHandler(LocalBase):
                 alert = 'alert-danger'
                 pw_len = self.authenticator.minimum_password_length
                 if pw_len:
-                    message = ("Something went wrong. Be sure your "
-                               "password has at least {} characters, doesn't "
-                               "have spaces or commas and is not too "
-                               "common.").format(pw_len)
+                    message = ("Something went wrong. Be sure your username "
+                               "does not contain spaces or commas, your "
+                               "password has at least {} characters and is "
+                               "not too common.").format(pw_len)
                 else:
-                    message = ("Something went wrong. Be sure your password "
-                               "doesn't have spaces or commas and is not too "
-                               "common.")
+                    message = ("Something went wrong. Be sure your username "
+                               "does not contain spaces or commas and your "
+                               "password is not too common.")
 
             # If user creation went through & open-signup is enabled, success.
             elif self.authenticator.open_signup:
@@ -153,7 +153,7 @@ class AuthorizationHandler(LocalBase):
     @admin_users_scope
     async def get(self):
         html = await self.render_template(
-            'autorization-area.html',
+            'authorization-area.html',
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
         )
@@ -248,12 +248,23 @@ class ChangePasswordHandler(LocalBase):
     async def post(self):
         user = await self.get_current_user()
         new_password = self.get_body_argument('password', strip=False)
-        self.authenticator.change_password(user.name, new_password)
+        success = self.authenticator.change_password(user.name, new_password)
+
+        if success:
+            alert = 'alert-success'
+            msg = 'Your password has been changed successfully!'
+        else:
+            alert = 'alert-danger'
+            pw_len = self.authenticator.minimum_password_length
+            msg = ('Something went wrong! Be sure your new '
+                   'password has at least {} characters and is '
+                   'not too common.').format(pw_len)
 
         html = await self.render_template(
             'change-password.html',
             user_name=user.name,
-            result_message='Your password has been changed successfully',
+            result_message=msg,
+            alert=alert
         )
         self.finish(html)
 
@@ -274,13 +285,24 @@ class ChangePasswordAdminHandler(LocalBase):
     @admin_users_scope
     async def post(self, user_name):
         new_password = self.get_body_argument('password', strip=False)
-        self.authenticator.change_password(user_name, new_password)
+        success = self.authenticator.change_password(user_name, new_password)
 
-        message_template = 'The password for {} has been changed successfully'
+        if success:
+            alert = 'alert-success'
+            msg = ('The password for {} has been changed '
+                   'successfully').format(user_name)
+        else:
+            alert = 'alert-danger'
+            pw_len = self.authenticator.minimum_password_length
+            msg = ('Something went wrong! Be sure the new password '
+                   'for {} has at least {} characters and is '
+                   'not too common.').format(user_name, pw_len)
+
         html = await self.render_template(
             'change-password.html',
             user_name=user_name,
-            result_message=message_template.format(user_name),
+            result_message=msg,
+            alert=alert
         )
         self.finish(html)
 

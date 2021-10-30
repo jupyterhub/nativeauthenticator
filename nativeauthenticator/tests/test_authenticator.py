@@ -132,6 +132,41 @@ async def test_create_user_with_strong_passwords(password, min_len, expected,
     assert bool(user) == expected
 
 
+async def test_change_password(tmpcwd, app):
+    auth = NativeAuthenticator(db=app.db)
+    user = auth.create_user('johnsnow', 'password')
+    assert user.is_valid_password('password')
+    auth.change_password('johnsnow', 'newpassword')
+    assert not user.is_valid_password('password')
+    assert user.is_valid_password('newpassword')
+
+
+async def test_no_change_to_bad_password(tmpcwd, app):
+    '''Test that changing password doesn't bypass password requirements'''
+    auth = NativeAuthenticator(db=app.db)
+    auth.check_common_password = True
+    auth.minimum_password_length = 8
+
+    auth.create_user('johnsnow', 'ironwood')
+
+    # Can't change password of nonexistent users.
+    assert auth.change_password('samwelltarly', 'palanquin') is None
+    assert auth.get_user('johnsnow').is_valid_password('ironwood')
+
+    # Can't change password to something too short.
+    assert auth.change_password('johnsnow', 'mummer') is None
+    assert auth.get_user('johnsnow').is_valid_password('ironwood')
+
+    # Can't change password to something too common.
+    assert auth.change_password('johnsnow', 'dragon') is None
+    assert auth.get_user('johnsnow').is_valid_password('ironwood')
+
+    # CAN change password to something fulfilling criteria.
+    assert auth.change_password('johnsnow', 'DaenerysTargaryen') is not None
+    assert not auth.get_user('johnsnow').is_valid_password('ironwood')
+    assert auth.get_user('johnsnow').is_valid_password('DaenerysTargaryen')
+
+
 @pytest.mark.parametrize("enable_signup,expected_success", [
     (True, True),
     (False, False),
@@ -232,15 +267,6 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     time.sleep(12)
     response = await auth.authenticate(app, infos)
     assert response
-
-
-async def test_change_password(tmpcwd, app):
-    auth = NativeAuthenticator(db=app.db)
-    user = auth.create_user('johnsnow', 'password')
-    assert user.is_valid_password('password')
-    auth.change_password('johnsnow', 'newpassword')
-    assert not user.is_valid_password('password')
-    assert user.is_valid_password('newpassword')
 
 
 async def test_get_user(tmpcwd, app):
