@@ -69,14 +69,14 @@ class SignUpHandler(LocalBase):
                 alert = 'alert-danger'
                 pw_len = self.authenticator.minimum_password_length
                 if pw_len:
-                    message = ("Something went wrong. Be sure your "
-                               "password has at least {} characters, doesn't "
-                               "have spaces or commas and is not too "
-                               "common.").format(pw_len)
+                    message = ("Something went wrong. Be sure your username "
+                               "does not contain spaces or commas, your "
+                               "password has at least {} characters and is "
+                               "not too common.").format(pw_len)
                 else:
-                    message = ("Something went wrong. Be sure your password "
-                               "doesn't have spaces or commas and is not too "
-                               "common.")
+                    message = ("Something went wrong. Be sure your username "
+                               "does not contain spaces or commas and your "
+                               "password is not too common.")
 
             # If user creation went through & open-signup is enabled, success.
             elif self.authenticator.open_signup:
