@@ -139,7 +139,7 @@ async def test_change_password(tmpcwd, app):
     auth.change_password('johnsnow', 'newpassword')
     assert not user.is_valid_password('password')
     assert user.is_valid_password('newpassword')
-    
+
 
 async def test_no_change_to_bad_password(tmpcwd, app):
     '''Test that changing password doesn't bypass password requirements'''
@@ -147,20 +147,20 @@ async def test_no_change_to_bad_password(tmpcwd, app):
     auth.check_common_password = True
     auth.minimum_password_length = 8
 
-    user = auth.create_user('johnsnow', 'ironwood')
+    auth.create_user('johnsnow', 'ironwood')
 
     # Can't change password of nonexistent users.
     assert auth.change_password('samwelltarly', 'palanquin') is None
     assert auth.get_user('johnsnow').is_valid_password('ironwood')
-    
+
     # Can't change password to something too short.
     assert auth.change_password('johnsnow', 'mummer') is None
     assert auth.get_user('johnsnow').is_valid_password('ironwood')
-    
+
     # Can't change password to something too common.
     assert auth.change_password('johnsnow', 'dragon') is None
     assert auth.get_user('johnsnow').is_valid_password('ironwood')
-    
+
     # CAN change password to something fulfilling criteria.
     assert auth.change_password('johnsnow', 'DaenerysTargaryen') is not None
     assert not auth.get_user('johnsnow').is_valid_password('ironwood')

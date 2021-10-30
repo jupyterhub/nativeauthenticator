@@ -263,7 +263,7 @@ class ChangePasswordHandler(LocalBase):
         html = await self.render_template(
             'change-password.html',
             user_name=user.name,
-            result_message=msg
+            result_message=msg,
             alert=alert
         )
         self.finish(html)
@@ -285,7 +285,7 @@ class ChangePasswordAdminHandler(LocalBase):
     @admin_users_scope
     async def post(self, user_name):
         new_password = self.get_body_argument('password', strip=False)
-        success = self.authenticator.change_password(user.name, new_password)
+        success = self.authenticator.change_password(user_name, new_password)
 
         if success:
             alert = 'alert-success'
@@ -300,8 +300,8 @@ class ChangePasswordAdminHandler(LocalBase):
 
         html = await self.render_template(
             'change-password.html',
-            user_name=user.name,
-            result_message=msg
+            user_name=user_name,
+            result_message=msg,
             alert=alert
         )
         self.finish(html)
