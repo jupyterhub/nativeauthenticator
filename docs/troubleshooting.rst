@@ -5,6 +5,18 @@ These are some common problems that users sometimes run into and their respectiv
 
 If you find yourself running into issues that are not resolved with the advice found here, please consider `opening an issue or filing a bug report <https://github.com/jupyterhub/nativeauthenticator/issues>`_.
 
+Unable to log in with admin account
+-----------------------------------
+
+We often hear about problems with logging in with admin accounts on a fresh install. Note that adding an account into the `admin_users` configuration as shown below does not also create that account.
+You still need to sign up an account of that name and set a password (see also the `relevant documentation <https://native-authenticator.readthedocs.io/en/latest/quickstart.html#adding-new-users>`_).
+If the problem persists, make sure that your JupyterHub is using the correct configuration file.
+
+.. code-block:: python
+
+    c.Authenticator.admin_users = {'my-admin-account'}
+
+
 Internal Server Errors (500) after upgrading to >= 1.0
 ------------------------------------------------------
 
