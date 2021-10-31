@@ -276,6 +276,11 @@ class ChangePasswordHandler(LocalBase):
         old_password = self.get_body_argument("old_password", strip=False)
         new_password = self.get_body_argument("new_password", strip=False)
         confirmation = self.get_body_argument("con_password", strip=False)
+
+        correctpw = self.authenticator.get_user(user.name).is_valid_password(
+            old_password
+        )
+
         success = self.authenticator.user_change_password(
             user.name, old_password, new_password, confirmation
         )
@@ -283,6 +288,9 @@ class ChangePasswordHandler(LocalBase):
         if success:
             alert = "alert-success"
             msg = "Your password has been changed successfully!"
+        elif not correctpw:
+            alert = "alert-danger"
+            msg = "Your current password was incorrect. Please try again."
         else:
             alert = "alert-danger"
             pw_len = self.authenticator.minimum_password_length
