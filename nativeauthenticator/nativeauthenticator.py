@@ -11,7 +11,6 @@ from pathlib import Path
 import bcrypt
 from jupyterhub.auth import Authenticator
 from sqlalchemy import inspect
-from tornado import gen
 from tornado import web
 from traitlets import Bool
 from traitlets import Dict
@@ -231,8 +230,7 @@ class NativeAuthenticator(Authenticator):
         if self.login_attempts.get(username):
             self.login_attempts.pop(username)
 
-    @gen.coroutine
-    def authenticate(self, handler, data):
+    async def authenticate(self, handler, data):
         username = self.normalize_username(data["username"])
         password = data["password"]
 
