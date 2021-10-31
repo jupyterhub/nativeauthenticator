@@ -9,25 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  flake8:
-    name: Run flake8
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-
-      - name: Install Python dependencies
-        run: |
-          pip install --no-cache-dir -r dev-requirements.txt
-          pip install .
-
-      - name: Run tests
-        run: |
-          flake8
-
   pytest:
     name: Run pytests
     runs-on: ubuntu-20.04
