@@ -25,7 +25,7 @@ import requests
 
 from .orm import UserInfo
 
-TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
 
 class LocalBase(BaseHandler):
@@ -34,9 +34,9 @@ class LocalBase(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not LocalBase._template_dir_registered:
-            self.log.debug('Adding %s to template path', TEMPLATE_DIR)
+            self.log.debug("Adding %s to template path", TEMPLATE_DIR)
             loader = FileSystemLoader([TEMPLATE_DIR])
-            env = self.settings['jinja2_env']
+            env = self.settings["jinja2_env"]
             previous_loader = env.loader
             env.loader = ChoiceLoader([previous_loader, loader])
             LocalBase._template_dir_registered = True
@@ -50,7 +50,7 @@ class SignUpHandler(LocalBase):
             raise web.HTTPError(404)
 
         html = await self.render_template(
-            'signup.html',
+            "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
             two_factor_auth=self.authenticator.allow_2fa,
             recaptcha_key=self.authenticator.recaptcha_key,
@@ -59,14 +59,14 @@ class SignUpHandler(LocalBase):
         self.finish(html)
 
     def get_result_message(self, user, taken, human=True):
-        alert = 'alert-info'
-        message = 'Your information has been sent to the admin'
+        alert = "alert-info"
+        message = "Your information has been sent to the admin"
         if user and user.login_email_sent:
-            message = 'Check your email to authorize your access'
+            message = "Check your email to authorize your access"
 
         # Always error if username is taken.
         if taken:
-            alert = 'alert-danger'
+            alert = "alert-danger"
             message = (
                 "Something went wrong. It appears that this "
                 "username is already in use. Please try again "
@@ -75,7 +75,7 @@ class SignUpHandler(LocalBase):
         else:
             # Error if user creation was not successful.
             if not user:
-                alert = 'alert-danger'
+                alert = "alert-danger"
                 pw_len = self.authenticator.minimum_password_length
                 if pw_len:
                     message = (
@@ -93,14 +93,14 @@ class SignUpHandler(LocalBase):
 
             # If user creation went through & open-signup is enabled, success.
             elif self.authenticator.open_signup:
-                alert = 'alert-success'
+                alert = "alert-success"
                 message = (
-                    'The signup was successful. You can now go to '
-                    'home page and log in the system'
+                    "The signup was successful. You can now go to "
+                    "home page and log in the system"
                 )
 
         if not human:
-            alert = 'alert-danger'
+            alert = "alert-danger"
             message = "You failed the reCAPTCHA. Please try again"
 
         return alert, message
@@ -114,14 +114,14 @@ class SignUpHandler(LocalBase):
 
         if self.authenticator.recaptcha_key:
             recaptcha_response = self.get_body_argument(
-                'g-recaptcha-response', strip=True
+                "g-recaptcha-response", strip=True
             )
             if recaptcha_response == "":
                 assume_human = False
             else:
                 data = {
-                    'secret': self.authenticator.recaptcha_secret,
-                    'response': recaptcha_response,
+                    "secret": self.authenticator.recaptcha_secret,
+                    "response": recaptcha_response,
                 }
                 validation_status = requests.post(url, data=data)
                 assume_human = validation_status.json().get("success")
@@ -132,12 +132,12 @@ class SignUpHandler(LocalBase):
 
         if assume_human:
             user_info = {
-                'username': self.get_body_argument('username', strip=False),
-                'pw': self.get_body_argument('pw', strip=False),
-                'email': self.get_body_argument('email', '', strip=False),
-                'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
+                "username": self.get_body_argument("username", strip=False),
+                "pw": self.get_body_argument("pw", strip=False),
+                "email": self.get_body_argument("email", "", strip=False),
+                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
             }
-            taken = self.authenticator.user_exists(user_info['username'])
+            taken = self.authenticator.user_exists(user_info["username"])
             user = self.authenticator.create_user(**user_info)
         else:
             user = False
@@ -145,13 +145,13 @@ class SignUpHandler(LocalBase):
 
         alert, message = self.get_result_message(user, taken, assume_human)
 
-        otp_secret, user_2fa = '', ''
+        otp_secret, user_2fa = "", ""
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
 
         html = await self.render_template(
-            'signup.html',
+            "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
             alert=alert,
@@ -170,7 +170,7 @@ class AuthorizationHandler(LocalBase):
     @admin_users_scope
     async def get(self):
         html = await self.render_template(
-            'authorization-area.html',
+            "authorization-area.html",
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
         )
@@ -181,7 +181,7 @@ class ChangeAuthorizationHandler(LocalBase):
     @admin_users_scope
     async def get(self, slug):
         UserInfo.change_authorization(self.db, slug)
-        self.redirect(self.hub.base_url + 'authorize#' + slug)
+        self.redirect(self.hub.base_url + "authorize#" + slug)
 
 
 class AuthorizeHandler(LocalBase):
@@ -208,7 +208,7 @@ class AuthorizeHandler(LocalBase):
             # add POSIX user!!
 
         html = await self.render_template(
-            'my_message.html',
+            "my_message.html",
             message=msg,
         )
         self.finish(html)
@@ -258,7 +258,7 @@ class ChangePasswordHandler(LocalBase):
     async def get(self):
         user = await self.get_current_user()
         html = await self.render_template(
-            'change-password.html',
+            "change-password.html",
             user_name=user.name,
         )
         self.finish(html)
@@ -266,23 +266,23 @@ class ChangePasswordHandler(LocalBase):
     @web.authenticated
     async def post(self):
         user = await self.get_current_user()
-        new_password = self.get_body_argument('password', strip=False)
+        new_password = self.get_body_argument("password", strip=False)
         success = self.authenticator.change_password(user.name, new_password)
 
         if success:
-            alert = 'alert-success'
-            msg = 'Your password has been changed successfully!'
+            alert = "alert-success"
+            msg = "Your password has been changed successfully!"
         else:
-            alert = 'alert-danger'
+            alert = "alert-danger"
             pw_len = self.authenticator.minimum_password_length
             msg = (
-                'Something went wrong! Be sure your new '
-                f'password has at least {pw_len} characters and is '
-                'not too common.'
+                "Something went wrong! Be sure your new "
+                f"password has at least {pw_len} characters and is "
+                "not too common."
             )
 
         html = await self.render_template(
-            'change-password.html', user_name=user.name, result_message=msg, alert=alert
+            "change-password.html", user_name=user.name, result_message=msg, alert=alert
         )
         self.finish(html)
 
@@ -295,30 +295,30 @@ class ChangePasswordAdminHandler(LocalBase):
         if not self.authenticator.user_exists(user_name):
             raise web.HTTPError(404)
         html = await self.render_template(
-            'change-password.html',
+            "change-password.html",
             user_name=user_name,
         )
         self.finish(html)
 
     @admin_users_scope
     async def post(self, user_name):
-        new_password = self.get_body_argument('password', strip=False)
+        new_password = self.get_body_argument("password", strip=False)
         success = self.authenticator.change_password(user_name, new_password)
 
         if success:
-            alert = 'alert-success'
-            msg = f'The password for {user_name} has been changed successfully'
+            alert = "alert-success"
+            msg = f"The password for {user_name} has been changed successfully"
         else:
-            alert = 'alert-danger'
+            alert = "alert-danger"
             pw_len = self.authenticator.minimum_password_length
             msg = (
-                'Something went wrong! Be sure the new password '
-                f'for {user_name} has at least {pw_len} characters and is '
-                'not too common.'
+                "Something went wrong! Be sure the new password "
+                f"for {user_name} has at least {pw_len} characters and is "
+                "not too common."
             )
 
         html = await self.render_template(
-            'change-password.html', user_name=user_name, result_message=msg, alert=alert
+            "change-password.html", user_name=user_name, result_message=msg, alert=alert
         )
         self.finish(html)
 
@@ -326,17 +326,17 @@ class ChangePasswordAdminHandler(LocalBase):
 class LoginHandler(LoginHandler, LocalBase):
     def _render(self, login_error=None, username=None):
         return self.render_template(
-            'native-login.html',
-            next=url_escape(self.get_argument('next', default='')),
+            "native-login.html",
+            next=url_escape(self.get_argument("next", default="")),
             username=username,
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
-            login_url=self.settings['login_url'],
+            login_url=self.settings["login_url"],
             enable_signup=self.authenticator.enable_signup,
             two_factor_auth=self.authenticator.allow_2fa,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
-                {'next': self.get_argument('next', '')},
+                {"next": self.get_argument("next", "")},
             ),
         )
 
@@ -346,7 +346,7 @@ class LoginHandler(LoginHandler, LocalBase):
         for arg in self.request.arguments:
             data[arg] = self.get_argument(arg, strip=False)
 
-        auth_timer = self.statsd.timer('login.authenticate').start()
+        auth_timer = self.statsd.timer("login.authenticate").start()
         user = await self.login_user(data)
         auth_timer.stop(send=False)
 
@@ -357,19 +357,19 @@ class LoginHandler(LoginHandler, LocalBase):
             self.redirect(self.get_next_url(user))
         else:
             # default error mesage on unsuccessful login
-            error = 'Invalid username or password'
+            error = "Invalid username or password"
 
             # check is user exists and has correct password,
             # and is just not authorised
-            nuser = self.authenticator.get_user(data['username'])
+            nuser = self.authenticator.get_user(data["username"])
             if nuser is not None:
                 if (
-                    nuser.is_valid_password(data['password'])
+                    nuser.is_valid_password(data["password"])
                     and not nuser.is_authorized
                 ):
-                    error = 'User has not been authorized by administrator yet'
+                    error = "User has not been authorized by administrator yet"
 
-            html = await self._render(login_error=error, username=data['username'])
+            html = await self._render(login_error=error, username=data["username"])
             self.finish(html)
 
 
@@ -382,11 +382,11 @@ class DiscardHandler(LocalBase):
         if user is not None:
             if not user.is_authorized:
                 # Delete user from NativeAuthenticator db table (users_info)
-                user = type('User', (), {'name': user_name})
+                user = type("User", (), {"name": user_name})
                 self.authenticator.delete_user(user)
 
                 # Also delete user from jupyterhub registry, if present
                 if self.users.get(user_name) is not None:
                     self.users.delete(user_name)
 
-        self.redirect(self.hub.base_url + 'authorize')
+        self.redirect(self.hub.base_url + "authorize")

@@ -156,7 +156,7 @@ class NativeAuthenticator(Authenticator):
     )
 
     firstuse_db_path = Unicode(
-        'passwords.dbm',
+        "passwords.dbm",
         config=True,
         help="""
         Path to store the db file of FirstUse with username / pwd hash in
@@ -196,22 +196,22 @@ class NativeAuthenticator(Authenticator):
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
-        if 'users_info' not in inspector.get_table_names():
+        if "users_info" not in inspector.get_table_names():
             UserInfo.__table__.create(self.db.bind)
 
     def add_login_attempt(self, username):
         if not self.login_attempts.get(username):
-            self.login_attempts[username] = {'count': 1, 'time': datetime.now()}
+            self.login_attempts[username] = {"count": 1, "time": datetime.now()}
         else:
-            self.login_attempts[username]['count'] += 1
-            self.login_attempts[username]['time'] = datetime.now()
+            self.login_attempts[username]["count"] += 1
+            self.login_attempts[username]["time"] = datetime.now()
 
     def can_try_to_login_again(self, username):
         login_attempts = self.login_attempts.get(username)
         if not login_attempts:
             return True
 
-        time_last_attempt = datetime.now() - login_attempts['time']
+        time_last_attempt = datetime.now() - login_attempts["time"]
         if time_last_attempt.seconds > self.seconds_before_next_try:
             return True
 
@@ -220,7 +220,7 @@ class NativeAuthenticator(Authenticator):
     def is_blocked(self, username):
         logins = self.login_attempts.get(username)
 
-        if not logins or logins['count'] < self.allowed_failed_logins:
+        if not logins or logins["count"] < self.allowed_failed_logins:
             return False
 
         if self.can_try_to_login_again(username):
@@ -233,8 +233,8 @@ class NativeAuthenticator(Authenticator):
 
     @gen.coroutine
     def authenticate(self, handler, data):
-        username = self.normalize_username(data['username'])
-        password = data['password']
+        username = self.normalize_username(data["username"])
+        password = data["password"]
 
         user = self.get_user(username)
         if not user:
@@ -246,7 +246,7 @@ class NativeAuthenticator(Authenticator):
 
         validations = [user.is_authorized, user.is_valid_password(password)]
         if user.has_2fa:
-            validations.append(user.is_valid_token(data.get('2fa')))
+            validations.append(user.is_valid_token(data.get("2fa")))
 
         if all(validations):
             self.successful_login(username)
@@ -256,7 +256,7 @@ class NativeAuthenticator(Authenticator):
 
     def is_password_common(self, password):
         common_credentials_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 'common-credentials.txt'
+            os.path.dirname(os.path.abspath(__file__)), "common-credentials.txt"
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
@@ -310,11 +310,11 @@ class NativeAuthenticator(Authenticator):
             return
 
         encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {'username': username, 'password': encoded_pw}
+        infos = {"username": username, "password": encoded_pw}
         infos.update(kwargs)
 
         if self.open_signup or username in self.get_authed_users():
-            infos.update({'is_authorized': True})
+            infos.update({"is_authorized": True})
 
         try:
             user_info = UserInfo(**infos)
@@ -341,18 +341,18 @@ class NativeAuthenticator(Authenticator):
 
     def send_approval_email(self, dest, url):
         msg = EmailMessage()
-        msg['From'] = self.self_approval_email[0]
-        msg['Subject'] = self.self_approval_email[1]
+        msg["From"] = self.self_approval_email[0]
+        msg["Subject"] = self.self_approval_email[1]
         msg.set_content(self.self_approval_email[2].format(approval_url=url))
-        msg['To'] = dest
+        msg["To"] = dest
         try:
             if self.self_approval_server:
-                s = smtplib.SMTP_SSL(self.self_approval_server['url'])
+                s = smtplib.SMTP_SSL(self.self_approval_server["url"])
                 s.login(
-                    self.self_approval_server['usr'], self.self_approval_server['pwd']
+                    self.self_approval_server["usr"], self.self_approval_server["pwd"]
                 )
             else:
-                s = smtplib.SMTP('localhost')
+                s = smtplib.SMTP("localhost")
             s.send_message(msg)
             s.quit()
         except Exception as e:
@@ -386,22 +386,22 @@ class NativeAuthenticator(Authenticator):
         return True
 
     def validate_username(self, username):
-        invalid_chars = [',', ' ']
+        invalid_chars = [",", " "]
         if any((char in username) for char in invalid_chars):
             return False
         return super().validate_username(username)
 
     def get_handlers(self, app):
         native_handlers = [
-            (r'/login', LoginHandler),
-            (r'/signup', SignUpHandler),
-            (r'/discard/([^/]*)', DiscardHandler),
-            (r'/authorize', AuthorizationHandler),
-            (r'/authorize/([^/]*)', ChangeAuthorizationHandler),
+            (r"/login", LoginHandler),
+            (r"/signup", SignUpHandler),
+            (r"/discard/([^/]*)", DiscardHandler),
+            (r"/authorize", AuthorizationHandler),
+            (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
             # the following /confirm/ must be like in generate_approval_url()
-            (r'/confirm/([^/]*)', AuthorizeHandler),
-            (r'/change-password', ChangePasswordHandler),
-            (r'/change-password/([^/]+)', ChangePasswordAdminHandler),
+            (r"/confirm/([^/]*)", AuthorizeHandler),
+            (r"/change-password", ChangePasswordHandler),
+            (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
         ]
         return native_handlers
 
@@ -419,21 +419,21 @@ class NativeAuthenticator(Authenticator):
         db_complete_path = str(db_path.absolute())
 
         # necessary for BSD implementation of dbm lib
-        if os.path.exists(os.path.join(db_dir, db_name + '.db')):
-            os.remove(db_complete_path + '.db')
+        if os.path.exists(os.path.join(db_dir, db_name + ".db")):
+            os.remove(db_complete_path + ".db")
         else:
             os.remove(db_complete_path)
 
     def add_data_from_firstuse(self):
-        with dbm.open(self.firstuse_db_path, 'c', 0o600) as db:
+        with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
                 new_user = self.create_user(user.decode(), password)
                 if not new_user:
                     error = (
-                        f'User {user} was not created. Check password '
-                        'restrictions or username problems before trying '
-                        'again.'
+                        f"User {user} was not created. Check password "
+                        "restrictions or username problems before trying "
+                        "again."
                     )
                     raise ValueError(error)
 

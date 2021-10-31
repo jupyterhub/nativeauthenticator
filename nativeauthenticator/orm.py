@@ -14,7 +14,7 @@ from sqlalchemy.orm import validates
 
 
 class UserInfo(Base):
-    __tablename__ = 'users_info'
+    __tablename__ = "users_info"
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(128), nullable=False)
     password = Column(LargeBinary, nullable=False)
@@ -27,7 +27,7 @@ class UserInfo(Base):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if not self.otp_secret:
-            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
+            self.otp_secret = base64.b32encode(os.urandom(10)).decode("utf-8")
 
     @classmethod
     def find(cls, db, username):
@@ -53,7 +53,7 @@ class UserInfo(Base):
         db.commit()
         return user
 
-    @validates('email')
+    @validates("email")
     def validate_email(self, key, address):
         if not address:
             return

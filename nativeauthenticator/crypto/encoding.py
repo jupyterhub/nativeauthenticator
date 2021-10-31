@@ -11,7 +11,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return f'{super().__str__()}. You passed in {self.obj!r} ({type(self.obj)})'
+        return f"{super().__str__()}. You passed in {self.obj!r} ({type(self.obj)})"
 
 
 _PROTECTED_TYPES = (
@@ -34,7 +34,7 @@ def is_protected_type(obj):
     return isinstance(obj, _PROTECTED_TYPES)
 
 
-def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_str(), except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -56,7 +56,7 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     return s
 
 
-def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_bytes(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_bytes, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -65,10 +65,10 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     # Handle the common case first for performance reasons.
     if isinstance(s, bytes):
-        if encoding == 'utf-8':
+        if encoding == "utf-8":
             return s
         else:
-            return s.decode('utf-8', errors).encode(encoding, errors)
+            return s.decode("utf-8", errors).encode(encoding, errors)
     if strings_only and is_protected_type(s):
         return s
     if isinstance(s, memoryview):
@@ -83,11 +83,11 @@ _hextobyte = {
     (fmt % char).encode(): bytes((char,))
     for ascii_range in _ascii_ranges
     for char in ascii_range
-    for fmt in ['%02x', '%02X']
+    for fmt in ["%02x", "%02X"]
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
 # Unicode characters.
-_hexdig = '0123456789ABCDEFabcdef'
+_hexdig = "0123456789ABCDEFabcdef"
 _hextobyte.update(
     {(a + b).encode(): bytes.fromhex(a + b) for a in _hexdig[8:] for b in _hexdig}
 )
@@ -110,7 +110,7 @@ def uri_to_iri(uri):
     # second block, decode the first 2 bytes if they represent a hex code to
     # decode. The rest of the block is the part after '%AB', not containing
     # any '%'. Add that to the output without further processing.
-    bits = uri.split(b'%')
+    bits = uri.split(b"%")
     if len(bits) == 1:
         iri = uri
     else:
@@ -123,9 +123,9 @@ def uri_to_iri(uri):
                 append(hextobyte[item[:2]])
                 append(item[2:])
             else:
-                append(b'%')
+                append(b"%")
                 append(item)
-        iri = b''.join(parts)
+        iri = b"".join(parts)
     return repercent_broken_unicode(iri).decode()
 
 
@@ -148,7 +148,7 @@ def escape_uri_path(path):
 
 def punycode(domain):
     """Return the Punycode of the given domain if it's non-ASCII."""
-    return domain.encode('idna').decode('ascii')
+    return domain.encode("idna").decode("ascii")
 
 
 def repercent_broken_unicode(path):
@@ -191,10 +191,10 @@ def get_system_encoding():
     #10335 and #5846.
     """
     try:
-        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        encoding = locale.getdefaultlocale()[1] or "ascii"
         codecs.lookup(encoding)
     except Exception:
-        encoding = 'ascii'
+        encoding = "ascii"
     return encoding
 
 

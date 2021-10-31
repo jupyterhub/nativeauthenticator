@@ -48,5 +48,5 @@ c.NativeAuthenticator.tos = 'I agree to the <a href="your-url" target="_blank">T
 # }
 
 c.NativeAuthenticator.import_from_firstuse = False
-c.NativeAuthenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
+c.NativeAuthenticator.firstuse_dbm_path = "/home/user/passwords.dbm"
 c.NativeAuthenticator.delete_firstuse_db_after_import = False
