@@ -1,3 +1,11 @@
 [flake8]
+# Adjustments to comply with black autoformatting as described here:
+# https://black.readthedocs.io/en/latest/guides/using_black_with_other_tools.html#flake8
+#
+extend-ignore = E203
+max-line-length = 88
+
+# Project specific adjustments
+#
 builtins =
     c
