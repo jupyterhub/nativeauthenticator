@@ -32,15 +32,15 @@ start of the base64 JSON.
 There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
-
 import base64
 import datetime
-import re
 import json
+import re
 import time
 import zlib
 
-from .crypto import constant_time_compare, salted_hmac
+from .crypto import constant_time_compare
+from .crypto import salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 BASE62_ALPHABET = \
@@ -159,7 +159,7 @@ class Signer:
                 'Unsafe Signer separator: %r (cannot be empty or consist of '
                 'only A-z0-9-_=)' % sep,
             )
-        self.salt = salt or '%s.%s' % (
+        self.salt = salt or '{}.{}'.format(
                 self.__class__.__module__, self.__class__.__name__
                 )
         self.algorithm = algorithm or 'sha256'
@@ -170,7 +170,7 @@ class Signer:
                            algorithm=self.algorithm)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return f'{value}{self.sep}{self.signature(value)}'
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -225,7 +225,7 @@ class TimestampSigner(Signer):
         return b62_encode(int(time.time()))
 
     def sign(self, value):
-        value = '%s%s%s' % (value, self.sep, self.timestamp())
+        value = f'{value}{self.sep}{self.timestamp()}'
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -243,5 +243,5 @@ class TimestampSigner(Signer):
             age = time.time() - timestamp
             if age > max_age:
                 raise SignatureExpired(
-                    'Signature age %s > %s seconds' % (age, max_age))
+                    f'Signature age {age} > {max_age} seconds')
         return value

@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
 # This file does only contain a selection of the most common options. For a
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
-
 # -- Path setup --------------------------------------------------------------
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -15,18 +12,16 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
-
 # -- Project information -----------------------------------------------------
 
-project = u'Native Authenticator'
-copyright = u'2021, Leticia Portella'
-author = u'Leticia Portella'
+project = 'Native Authenticator'
+copyright = '2021, Leticia Portella'
+author = 'Leticia Portella'
 
 # The short X.Y version
-version = u''
+version = ''
 # The full version, including alpha/beta/rc tags
-release = u''
+release = ''
 
 
 # -- General configuration ---------------------------------------------------
@@ -63,7 +58,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -129,8 +124,8 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'NativeAuthenticator.tex',
-     u'Native Authenticator Documentation',
-     u'Leticia Portella', 'manual'),
+     'Native Authenticator Documentation',
+     'Leticia Portella', 'manual'),
 ]
 
 
@@ -139,7 +134,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'nativeauthenticator', u'Native Authenticator Documentation',
+    (master_doc, 'nativeauthenticator', 'Native Authenticator Documentation',
      [author], 1)
 ]
 
@@ -150,7 +145,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'NativeAuthenticator', u'Native Authenticator Documentation',
+    (master_doc, 'NativeAuthenticator', 'Native Authenticator Documentation',
      author, 'NativeAuthenticator', 'One line description of project.',
      'Miscellaneous'),
 ]

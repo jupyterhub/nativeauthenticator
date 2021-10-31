@@ -1,11 +1,15 @@
 import base64
-import bcrypt
 import os
 import re
-from jupyterhub.orm import Base
 
+import bcrypt
 import onetimepass
-from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
+from jupyterhub.orm import Base
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import LargeBinary
+from sqlalchemy import String
 from sqlalchemy.orm import validates
 
 
@@ -21,7 +25,7 @@ class UserInfo(Base):
     otp_secret = Column(String(16))
 
     def __init__(self, **kwargs):
-        super(UserInfo, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if not self.otp_secret:
             self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 

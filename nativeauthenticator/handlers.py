@@ -1,7 +1,10 @@
 import os
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
 from datetime import timezone as tz
-from jinja2 import ChoiceLoader, FileSystemLoader
+
+from jinja2 import ChoiceLoader
+from jinja2 import FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
 try:
@@ -181,11 +184,11 @@ class AuthorizeHandler(LocalBase):
 
         if not must_stop:
             username = data["username"]
-            msg = "{} was already authorized".format(username)
+            msg = f"{username} was already authorized"
             usr = UserInfo.find(self.db, username)
             if not usr.is_authorized:
                 UserInfo.change_authorization(self.db, username)
-                msg = "{} has been authorized".format(username)
+                msg = f"{username} has been authorized"
 
             # add POSIX user!!
 
