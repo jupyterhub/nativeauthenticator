@@ -5,13 +5,29 @@ name: Test
 
 on:
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "**.rst"
+      - ".github/workflows/*"
+      - "!.github/workflows/test.yaml"
   push:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "**.rst"
+      - ".github/workflows/*"
+      - "!.github/workflows/test.yaml"
+    branches-ignore:
+      - "dependabot/**"
+      - "pre-commit-ci-update-config"
   workflow_dispatch:
 
 jobs:
   pytest:
     name: Run pytests
     runs-on: ubuntu-20.04
+
     strategy:
       fail-fast: false
       matrix:
