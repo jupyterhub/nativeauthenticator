@@ -29,9 +29,7 @@ c.NativeAuthenticator.ask_email_on_signup = True
 
 c.NativeAuthenticator.allow_2fa = True
 
-c.NativeAuthenticator.tos = (
-    'I agree to the <a href="your-url" target="_blank">TOS</a>.'
-)
+c.NativeAuthenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>.'
 
 # c.NativeAuthenticator.recaptcha_key = "your key"
 # c.NativeAuthenticator.recaptcha_secret = "your secret"
@@ -50,5 +48,5 @@ c.NativeAuthenticator.tos = (
 # }
 
 c.NativeAuthenticator.import_from_firstuse = False
-c.NativeAuthenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
+c.NativeAuthenticator.firstuse_dbm_path = "/home/user/passwords.dbm"
 c.NativeAuthenticator.delete_firstuse_db_after_import = False

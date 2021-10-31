@@ -42,27 +42,28 @@ import zlib
 from .crypto import constant_time_compare
 from .crypto import salted_hmac
 
-_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
-BASE62_ALPHABET = \
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+_SEP_UNSAFE = re.compile(r"^[A-z0-9-_=]*$")
+BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 
 class BadSignature(Exception):
     """Signature does not match."""
+
     pass
 
 
 class SignatureExpired(BadSignature):
     """Signature timestamp is older than required max_age."""
+
     pass
 
 
 def b62_encode(s):
     if s == 0:
-        return '0'
-    sign = '-' if s < 0 else ''
+        return "0"
+    sign = "-" if s < 0 else ""
     s = abs(s)
-    encoded = ''
+    encoded = ""
     while s > 0:
         s, remainder = divmod(s, 62)
         encoded = BASE62_ALPHABET[remainder] + encoded
@@ -70,10 +71,10 @@ def b62_encode(s):
 
 
 def b62_decode(s):
-    if s == '0':
+    if s == "0":
         return 0
     sign = 1
-    if s[0] == '-':
+    if s[0] == "-":
         s = s[1:]
         sign = -1
     decoded = 0
@@ -83,18 +84,18 @@ def b62_decode(s):
 
 
 def b64_encode(s):
-    return base64.urlsafe_b64encode(s).strip(b'=')
+    return base64.urlsafe_b64encode(s).strip(b"=")
 
 
 def b64_decode(s):
-    pad = b'=' * (-len(s) % 4)
+    pad = b"=" * (-len(s) % 4)
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key, algorithm='sha1'):
+def base64_hmac(salt, value, key, algorithm="sha1"):
     return b64_encode(
-            salted_hmac(salt, value, key, algorithm=algorithm).digest()
-            ).decode()
+        salted_hmac(salt, value, key, algorithm=algorithm).digest()
+    ).decode()
 
 
 class JSONSerializer:
@@ -102,18 +103,17 @@ class JSONSerializer:
     Simple wrapper around json to be used in signing.dumps and
     signing.loads.
     """
+
     def dumps(self, obj):
-        return json.dumps(obj, separators=(',', ':')).encode('latin-1')
+        return json.dumps(obj, separators=(",", ":")).encode("latin-1")
 
     def loads(self, data):
-        return json.loads(data.decode('latin-1'))
+        return json.loads(data.decode("latin-1"))
 
 
-def dumps(obj,
-          key=None,
-          salt='django.core.signing',
-          serializer=JSONSerializer,
-          compress=False):
+def dumps(
+    obj, key=None, salt="django.core.signing", serializer=JSONSerializer, compress=False
+):
     """
     Return URL-safe, hmac signed base64 compressed JSON string. If key is
     None, raises Exception. The hmac algorithm is the default
@@ -130,47 +130,45 @@ def dumps(obj,
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(obj,
-                                                       serializer=serializer,
-                                                       compress=compress)
+    return TimestampSigner(key, salt=salt).sign_object(
+        obj, serializer=serializer, compress=compress
+    )
 
 
-def loads(s,
-          key=None,
-          salt='django.core.signing',
-          serializer=JSONSerializer,
-          max_age=None):
+def loads(
+    s, key=None, salt="django.core.signing", serializer=JSONSerializer, max_age=None
+):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt).unsign_object(s,
-                                                         serializer=serializer,
-                                                         max_age=max_age)
+    return TimestampSigner(key, salt=salt).unsign_object(
+        s, serializer=serializer, max_age=max_age
+    )
 
 
 class Signer:
-    def __init__(self, key, sep=':', salt=None, algorithm=None):
+    def __init__(self, key, sep=":", salt=None, algorithm=None):
         self.key = key
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
             raise ValueError(
-                'Unsafe Signer separator: %r (cannot be empty or consist of '
-                'only A-z0-9-_=)' % sep,
+                "Unsafe Signer separator: %r (cannot be empty or consist of "
+                "only A-z0-9-_=)" % sep,
             )
-        self.salt = salt or '{}.{}'.format(
-                self.__class__.__module__, self.__class__.__name__
-                )
-        self.algorithm = algorithm or 'sha256'
+        self.salt = salt or "{}.{}".format(
+            self.__class__.__module__, self.__class__.__name__
+        )
+        self.algorithm = algorithm or "sha256"
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer',
-                           value, self.key,
-                           algorithm=self.algorithm)
+        return base64_hmac(
+            self.salt + "signer", value, self.key, algorithm=self.algorithm
+        )
 
     def sign(self, value):
-        return f'{value}{self.sep}{self.signature(value)}'
+        return f"{value}{self.sep}{self.signature(value)}"
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -202,14 +200,14 @@ class Signer:
                 is_compressed = True
         base64d = b64_encode(data).decode()
         if is_compressed:
-            base64d = '.' + base64d
+            base64d = "." + base64d
         return self.sign(base64d)
 
     def unsign_object(self, signed_obj, serializer=JSONSerializer, **kwargs):
         # Signer.unsign() returns str but base64 and zlib compression operate
         # on bytes.
         base64d = self.unsign(signed_obj, **kwargs).encode()
-        decompress = base64d[:1] == b'.'
+        decompress = base64d[:1] == b"."
         if decompress:
             # It's compressed; uncompress it first.
             base64d = base64d[1:]
@@ -220,12 +218,11 @@ class Signer:
 
 
 class TimestampSigner(Signer):
-
     def timestamp(self):
         return b62_encode(int(time.time()))
 
     def sign(self, value):
-        value = f'{value}{self.sep}{self.timestamp()}'
+        value = f"{value}{self.sep}{self.timestamp()}"
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -242,6 +239,5 @@ class TimestampSigner(Signer):
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:
-                raise SignatureExpired(
-                    f'Signature age {age} > {max_age} seconds')
+                raise SignatureExpired(f"Signature age {age} > {max_age} seconds")
         return value
