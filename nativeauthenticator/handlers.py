@@ -58,7 +58,7 @@ class SignUpHandler(LocalBase):
         )
         self.finish(html)
 
-    def get_result_message(self, user, taken, human=True):
+    def get_result_message(self, user, taken, match, human=True):
         alert = "alert-info"
         message = "Your information has been sent to the admin"
         if user and user.login_email_sent:
@@ -72,6 +72,9 @@ class SignUpHandler(LocalBase):
                 "username is already in use. Please try again "
                 "with a different username."
             )
+        elif not match:
+            alert = "alert-danger"
+            message = "Your passwords did not match. Please try again."
         else:
             # Error if user creation was not successful.
             if not user:
@@ -134,6 +137,7 @@ class SignUpHandler(LocalBase):
             user_info = {
                 "username": self.get_body_argument("username", strip=False),
                 "pw": self.get_body_argument("pw", strip=False),
+                "pwc": self.get_body_argument("pwc", strip=False),
                 "email": self.get_body_argument("email", "", strip=False),
                 "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
             }
@@ -143,7 +147,10 @@ class SignUpHandler(LocalBase):
             user = False
             taken = False
 
-        alert, message = self.get_result_message(user, taken, assume_human)
+        match = self.get_body_argument("pw", strip=False) == self.get_body_argument(
+            "pwc", strip=False
+        )
+        alert, message = self.get_result_message(user, taken, match, assume_human)
 
         otp_secret, user_2fa = "", ""
         if user:
@@ -266,8 +273,12 @@ class ChangePasswordHandler(LocalBase):
     @web.authenticated
     async def post(self):
         user = await self.get_current_user()
-        new_password = self.get_body_argument("password", strip=False)
-        success = self.authenticator.change_password(user.name, new_password)
+        old_password = self.get_body_argument("old_password", strip=False)
+        new_password = self.get_body_argument("new_password", strip=False)
+        confirmation = self.get_body_argument("con_password", strip=False)
+        success = self.authenticator.user_change_password(
+            user.name, old_password, new_password, confirmation
+        )
 
         if success:
             alert = "alert-success"
@@ -295,19 +306,26 @@ class ChangePasswordAdminHandler(LocalBase):
         if not self.authenticator.user_exists(user_name):
             raise web.HTTPError(404)
         html = await self.render_template(
-            "change-password.html",
+            "change-password-admin.html",
             user_name=user_name,
         )
         self.finish(html)
 
     @admin_users_scope
     async def post(self, user_name):
-        new_password = self.get_body_argument("password", strip=False)
-        success = self.authenticator.change_password(user_name, new_password)
+        new_password = self.get_body_argument("new_password", strip=False)
+        confirmation = self.get_body_argument("con_password", strip=False)
+        success = self.authenticator.change_password(
+            user_name, new_password, confirmation
+        )
 
         if success:
             alert = "alert-success"
             msg = f"The password for {user_name} has been changed successfully"
+        elif not new_password == confirmation:
+            alert = "alert-danger"
+            pw_len = self.authenticator.minimum_password_length
+            msg = "The passwords didn't match. Please try again."
         else:
             alert = "alert-danger"
             pw_len = self.authenticator.minimum_password_length
@@ -318,7 +336,10 @@ class ChangePasswordAdminHandler(LocalBase):
             )
 
         html = await self.render_template(
-            "change-password.html", user_name=user_name, result_message=msg, alert=alert
+            "change-password-admin.html",
+            user_name=user_name,
+            result_message=msg,
+            alert=alert,
         )
         self.finish(html)
 

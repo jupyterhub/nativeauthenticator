@@ -297,13 +297,13 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, pw, **kwargs):
+    def create_user(self, username, pw, pwc, **kwargs):
         username = self.normalize_username(username)
 
-        if self.user_exists(username):
+        if self.user_exists(username) or not self.validate_username(username):
             return
 
-        if not self.is_password_strong(pw) or not self.validate_username(username):
+        if not self.is_password_strong(pw) or not (pw == pwc):
             return
 
         if not self.enable_signup:
@@ -374,16 +374,28 @@ class NativeAuthenticator(Authenticator):
 
         return unauthed
 
-    def change_password(self, username, new_password):
+    def change_password(self, username, new_password, confirmation):
         user = self.get_user(username)
 
-        criteria = [user is not None, self.is_password_strong(new_password)]
+        criteria = [
+            user is not None,
+            self.is_password_strong(new_password),
+            new_password == confirmation,
+        ]
         if not all(criteria):
             return
 
         user.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         self.db.commit()
         return True
+
+    def user_change_password(self, username, old_password, new_password, confirmation):
+        user = self.get_user(username)
+
+        if (user is None) or (not user.is_valid_password(old_password)):
+            return
+
+        return self.change_password(username, new_password, confirmation)
 
     def validate_username(self, username):
         invalid_chars = [",", " "]
@@ -428,7 +440,7 @@ class NativeAuthenticator(Authenticator):
         with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
-                new_user = self.create_user(user.decode(), password)
+                new_user = self.create_user(user.decode(), password, password)
                 if not new_user:
                     error = (
                         f"User {user} was not created. Check password "
