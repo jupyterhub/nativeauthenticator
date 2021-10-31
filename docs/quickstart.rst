@@ -41,7 +41,7 @@ Lastly, you need to add the following to the configuration file as well:
 .. code-block:: python
 
     import os, nativeauthenticator
-    c.JupyterHub.template_paths = ["{}/templates/".format(os.path.dirname(nativeauthenticator.__file__))]
+    c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__}/templates/"]
 
 
 Now you can run JupyterHub using the updated configuration file and start using JupyterHub with NativeAuthenticator:

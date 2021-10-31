@@ -430,10 +430,10 @@ class NativeAuthenticator(Authenticator):
                 password = db[user].decode()
                 new_user = self.create_user(user.decode(), password)
                 if not new_user:
-                    error = '''User {} was not created. Check password
-                               restrictions or username problems before trying
-                               again'''.format(
-                        user
+                    error = (
+                        f'User {user} was not created. Check password '
+                        'restrictions or username problems before trying '
+                        'again.'
                     )
                     raise ValueError(error)
 

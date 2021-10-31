@@ -11,9 +11,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return '{}. You passed in {!r} ({})'.format(
-            super().__str__(), self.obj, type(self.obj)
-        )
+        return f'{super().__str__()}. You passed in {self.obj!r} ({type(self.obj)})'
 
 
 _PROTECTED_TYPES = (
