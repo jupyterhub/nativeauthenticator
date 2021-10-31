@@ -37,6 +37,3 @@ On the project folder you can run tests by using pytest
 ```shell
 pytest
 ```
-
-
-

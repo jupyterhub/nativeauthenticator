@@ -34,5 +34,3 @@ To remedy this, you merely need to add the column to your `jupyterhub.sqlite` da
 .. code-block:: bash
 
    $ sqlite3 /path/to/your/jupyterhub.sqlite "ALTER TABLE users_info ADD login_email_sent Boolean NOT NULL DEFAULT (0)"
-
-
