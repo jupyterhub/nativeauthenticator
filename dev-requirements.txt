@@ -1,7 +1,7 @@
+bcrypt
 codecov
 flake8
+notebook>=6.4.1
+onetimepass
 pytest >= 3.7
 pytest-asyncio
-notebook>=6.4.1
-bcrypt
-onetimepass
