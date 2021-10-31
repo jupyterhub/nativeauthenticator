@@ -36,108 +36,123 @@ class NativeAuthenticator(Authenticator):
     COMMON_PASSWORDS = None
     recaptcha_key = Unicode(
         config=True,
-        help=("Your key to enable reCAPTCHA as described at "
-              "https://developers.google.com/recaptcha/intro")
+        help=(
+            "Your key to enable reCAPTCHA as described at "
+            "https://developers.google.com/recaptcha/intro"
+        ),
     ).tag(default=None)
 
     recaptcha_secret = Unicode(
         config=True,
-        help=("Your secret to enable reCAPTCHA as described at "
-              "https://developers.google.com/recaptcha/intro")
+        help=(
+            "Your secret to enable reCAPTCHA as described at "
+            "https://developers.google.com/recaptcha/intro"
+        ),
     ).tag(default=None)
 
     tos = Unicode(
         config=True,
-        help=("The HTML to present next to the Term of Service "
-              "checkbox")
+        help=("The HTML to present next to the Term of Service " "checkbox"),
     ).tag(default=None)
 
     self_approval_server = Dict(
         config=True,
-        help=("SMTP server information as a dictionary of 'url', 'usr'"
-              "and 'pwd' to use for sending email, e.g."
-              "self_approval_server={'url': 'smtp.gmail.com', 'usr': 'myself'"
-              "'pwd': 'mypassword'}")
+        help=(
+            "SMTP server information as a dictionary of 'url', 'usr'"
+            "and 'pwd' to use for sending email, e.g."
+            "self_approval_server={'url': 'smtp.gmail.com', 'usr': 'myself'"
+            "'pwd': 'mypassword'}"
+        ),
     ).tag(default=None)
 
     secret_key = Unicode(
         config=True,
-        help=("Secret key to cryptographically sign the "
-              "self-approved URL (if allow_self_approval is utilized)")
+        help=(
+            "Secret key to cryptographically sign the "
+            "self-approved URL (if allow_self_approval is utilized)"
+        ),
     ).tag(default="")
 
     allow_self_approval_for = Unicode(
         allow_none=True,
         config=True,
-        help=("Use self-service authentication (rather than "
-              "admin-based authentication) for users whose "
-              "email match this patter. Note that this forces "
-              "ask_email_on_signup to be True.")
+        help=(
+            "Use self-service authentication (rather than "
+            "admin-based authentication) for users whose "
+            "email match this patter. Note that this forces "
+            "ask_email_on_signup to be True."
+        ),
     ).tag(default=None)
 
     self_approval_email = Tuple(
-        Unicode(), Unicode(), Unicode(),
+        Unicode(),
+        Unicode(),
+        Unicode(),
         config=True,
-        default_value=("do-not-reply@my-domain.com",
-                       "Welcome to JupyterHub on my-domain",
-                       ("Your JupyterHub account on my-domain has been "
-                        "created, but it's inactive.\n"
-                        "If you did not create the account yourself, "
-                        "IGNORE this message:\n"
-                        "somebody is trying to use your email to get an "
-                        "unathorized account!\n"
-                        "If you did create the account yourself, navigate "
-                        "to {approval_url} to activate it.\n"))
-
+        default_value=(
+            "do-not-reply@my-domain.com",
+            "Welcome to JupyterHub on my-domain",
+            (
+                "Your JupyterHub account on my-domain has been "
+                "created, but it's inactive.\n"
+                "If you did not create the account yourself, "
+                "IGNORE this message:\n"
+                "somebody is trying to use your email to get an "
+                "unathorized account!\n"
+                "If you did create the account yourself, navigate "
+                "to {approval_url} to activate it.\n"
+            ),
+        ),
     )
 
     check_common_password = Bool(
         config=True,
-        help=("Creates a verification of password strength "
-              "when a new user makes signup")
+        help=(
+            "Creates a verification of password strength "
+            "when a new user makes signup"
+        ),
     ).tag(default=False)
 
     minimum_password_length = Integer(
         config=True,
-        help=("Check if the length of the password is at least this size on "
-              "signup")
+        help=("Check if the length of the password is at least this size on " "signup"),
     ).tag(default=1)
 
     allowed_failed_logins = Integer(
         config=True,
-        help=("Configures the number of failed attempts a user can have "
-              "before being blocked.")
+        help=(
+            "Configures the number of failed attempts a user can have "
+            "before being blocked."
+        ),
     ).tag(default=0)
 
     seconds_before_next_try = Integer(
         config=True,
-        help=("Configures the number of seconds a user has to wait "
-              "after being blocked. Default is 600.")
+        help=(
+            "Configures the number of seconds a user has to wait "
+            "after being blocked. Default is 600."
+        ),
     ).tag(default=600)
 
     enable_signup = Bool(
         config=True,
         default_value=True,
-        help=("Allows every user to registry a new account")
+        help=("Allows every user to registry a new account"),
     )
 
     open_signup = Bool(
         config=True,
         default_value=False,
-        help=("Allows every user that made sign up to automatically log in "
-              "the system without needing admin authorization")
+        help=(
+            "Allows every user that made sign up to automatically log in "
+            "the system without needing admin authorization"
+        ),
     )
 
-    ask_email_on_signup = Bool(
-        False,
-        config=True,
-        help="Asks for email on signup"
-    )
+    ask_email_on_signup = Bool(False, config=True, help="Asks for email on signup")
 
     import_from_firstuse = Bool(
-        False,
-        config=True,
-        help="Import users from FirstUse Authenticator database"
+        False, config=True, help="Import users from FirstUse Authenticator database"
     )
 
     firstuse_db_path = Unicode(
@@ -145,20 +160,16 @@ class NativeAuthenticator(Authenticator):
         config=True,
         help="""
         Path to store the db file of FirstUse with username / pwd hash in
-        """
+        """,
     )
 
     delete_firstuse_db_after_import = Bool(
         config=True,
         default_value=False,
-        help="Deletes FirstUse Authenticator database after the import"
+        help="Deletes FirstUse Authenticator database after the import",
     )
 
-    allow_2fa = Bool(
-        False,
-        config=True,
-        help=""
-    )
+    allow_2fa = Bool(False, config=True, help="")
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -178,8 +189,10 @@ class NativeAuthenticator(Authenticator):
                 self.log.error("self_approval and open_signup are conflicts!")
             self.ask_email_on_signup = True
             if len(self.secret_key) < 8:
-                raise ValueError("Secret_key must be a random string of "
-                                 "len > 8 when using self_approval")
+                raise ValueError(
+                    "Secret_key must be a random string of "
+                    "len > 8 when using self_approval"
+                )
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
@@ -188,8 +201,7 @@ class NativeAuthenticator(Authenticator):
 
     def add_login_attempt(self, username):
         if not self.login_attempts.get(username):
-            self.login_attempts[username] = {'count': 1,
-                                             'time': datetime.now()}
+            self.login_attempts[username] = {'count': 1, 'time': datetime.now()}
         else:
             self.login_attempts[username]['count'] += 1
             self.login_attempts[username]['time'] = datetime.now()
@@ -232,10 +244,7 @@ class NativeAuthenticator(Authenticator):
             if self.is_blocked(username):
                 return
 
-        validations = [
-            user.is_authorized,
-            user.is_valid_password(password)
-        ]
+        validations = [user.is_authorized, user.is_valid_password(password)]
         if user.has_2fa:
             validations.append(user.is_valid_token(data.get('2fa')))
 
@@ -247,8 +256,7 @@ class NativeAuthenticator(Authenticator):
 
     def is_password_common(self, password):
         common_credentials_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'common-credentials.txt'
+            os.path.dirname(os.path.abspath(__file__)), 'common-credentials.txt'
         )
         if not self.COMMON_PASSWORDS:
             with open(common_credentials_file) as f:
@@ -295,8 +303,7 @@ class NativeAuthenticator(Authenticator):
         if self.user_exists(username):
             return
 
-        if not self.is_password_strong(pw) or \
-           not self.validate_username(username):
+        if not self.is_password_strong(pw) or not self.validate_username(username):
             return
 
         if not self.enable_signup:
@@ -329,8 +336,7 @@ class NativeAuthenticator(Authenticator):
         if when is None:
             when = datetime.now(tz.utc) + timedelta(minutes=15)
         s = Signer(self.secret_key)
-        u = s.sign_object({"username": username,
-                           "expire": when.isoformat()})
+        u = s.sign_object({"username": username, "expire": when.isoformat()})
         return "/confirm/" + u
 
     def send_approval_email(self, dest, url):
@@ -342,18 +348,21 @@ class NativeAuthenticator(Authenticator):
         try:
             if self.self_approval_server:
                 s = smtplib.SMTP_SSL(self.self_approval_server['url'])
-                s.login(self.self_approval_server['usr'],
-                        self.self_approval_server['pwd'])
+                s.login(
+                    self.self_approval_server['usr'], self.self_approval_server['pwd']
+                )
             else:
                 s = smtplib.SMTP('localhost')
             s.send_message(msg)
             s.quit()
         except Exception as e:
             self.log.error(e)
-            raise web.HTTPError(503,
-                                reason="Self-authorization email could not " +
-                                "be sent. Please contact the jupyterhub " +
-                                "admin about this.")
+            raise web.HTTPError(
+                503,
+                reason="Self-authorization email could not "
+                + "be sent. Please contact the jupyterhub "
+                + "admin about this.",
+            )
 
     def get_unauthed_amount(self):
         unauthed = 0
@@ -423,7 +432,9 @@ class NativeAuthenticator(Authenticator):
                 if not new_user:
                     error = '''User {} was not created. Check password
                                restrictions or username problems before trying
-                               again'''.format(user)
+                               again'''.format(
+                        user
+                    )
                     raise ValueError(error)
 
         if self.delete_firstuse_db_after_import:

@@ -7,11 +7,14 @@ from jinja2 import ChoiceLoader
 from jinja2 import FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
+
 try:
     from jupyterhub.scopes import needs_scope
+
     admin_users_scope = needs_scope("admin:users")
 except ImportError:
     from jupyterhub.utils import admin_only
+
     admin_users_scope = admin_only
 
 from tornado import web
@@ -41,6 +44,7 @@ class LocalBase(BaseHandler):
 
 class SignUpHandler(LocalBase):
     """Render the sign in page."""
+
     async def get(self):
         if not self.authenticator.enable_signup:
             raise web.HTTPError(404)
@@ -63,33 +67,41 @@ class SignUpHandler(LocalBase):
         # Always error if username is taken.
         if taken:
             alert = 'alert-danger'
-            message = ("Something went wrong. It appears that this "
-                       "username is already in use. Please try again "
-                       "with a different username.")
+            message = (
+                "Something went wrong. It appears that this "
+                "username is already in use. Please try again "
+                "with a different username."
+            )
         else:
             # Error if user creation was not successful.
             if not user:
                 alert = 'alert-danger'
                 pw_len = self.authenticator.minimum_password_length
                 if pw_len:
-                    message = ("Something went wrong. Be sure your username "
-                               "does not contain spaces or commas, your "
-                               "password has at least {} characters and is "
-                               "not too common.").format(pw_len)
+                    message = (
+                        "Something went wrong. Be sure your username "
+                        "does not contain spaces or commas, your "
+                        "password has at least {} characters and is "
+                        "not too common."
+                    ).format(pw_len)
                 else:
-                    message = ("Something went wrong. Be sure your username "
-                               "does not contain spaces or commas and your "
-                               "password is not too common.")
+                    message = (
+                        "Something went wrong. Be sure your username "
+                        "does not contain spaces or commas and your "
+                        "password is not too common."
+                    )
 
             # If user creation went through & open-signup is enabled, success.
             elif self.authenticator.open_signup:
                 alert = 'alert-success'
-                message = ('The signup was successful. You can now go to '
-                           'home page and log in the system')
+                message = (
+                    'The signup was successful. You can now go to '
+                    'home page and log in the system'
+                )
 
         if not human:
             alert = 'alert-danger'
-            message = ("You failed the reCAPTCHA. Please try again")
+            message = "You failed the reCAPTCHA. Please try again"
 
         return alert, message
 
@@ -101,14 +113,15 @@ class SignUpHandler(LocalBase):
         url = "https://www.google.com/recaptcha/api/siteverify"
 
         if self.authenticator.recaptcha_key:
-            recaptcha_response = \
-                self.get_body_argument('g-recaptcha-response', strip=True)
+            recaptcha_response = self.get_body_argument(
+                'g-recaptcha-response', strip=True
+            )
             if recaptcha_response == "":
                 assume_human = False
             else:
                 data = {
                     'secret': self.authenticator.recaptcha_secret,
-                    'response': recaptcha_response
+                    'response': recaptcha_response,
                 }
                 validation_status = requests.post(url, data=data)
                 assume_human = validation_status.json().get("success")
@@ -122,7 +135,7 @@ class SignUpHandler(LocalBase):
                 'username': self.get_body_argument('username', strip=False),
                 'pw': self.get_body_argument('pw', strip=False),
                 'email': self.get_body_argument('email', '', strip=False),
-                'has_2fa': bool(self.get_body_argument('2fa', '', strip=False))
+                'has_2fa': bool(self.get_body_argument('2fa', '', strip=False)),
             }
             taken = self.authenticator.user_exists(user_info['username'])
             user = self.authenticator.create_user(**user_info)
@@ -153,6 +166,7 @@ class SignUpHandler(LocalBase):
 
 class AuthorizationHandler(LocalBase):
     """Render the sign in page."""
+
     @admin_users_scope
     async def get(self):
         html = await self.render_template(
@@ -177,7 +191,8 @@ class AuthorizeHandler(LocalBase):
         if self.authenticator.allow_self_approval_for:
             try:
                 data = AuthorizeHandler.validate_slug(
-                        slug, self.authenticator.secret_key)
+                    slug, self.authenticator.secret_key
+                )
                 must_stop = False
             except ValueError:
                 pass
@@ -202,6 +217,7 @@ class AuthorizeHandler(LocalBase):
     @staticmethod
     def validate_slug(slug, key):
         from .crypto.signing import Signer, BadSignature
+
         s = Signer(key)
         try:
             obj = s.unsign_object(slug)
@@ -216,9 +232,9 @@ class AuthorizeHandler(LocalBase):
 
         # before the T
         year_month_day = datestr.split("-")
-        dateobj = date(int(year_month_day[0]),
-                       int(year_month_day[1]),
-                       int(year_month_day[2]))
+        dateobj = date(
+            int(year_month_day[0]), int(year_month_day[1]), int(year_month_day[2])
+        )
 
         # after the T
         # manually parsing iso-8601 times with a colon in the timezone
@@ -259,15 +275,14 @@ class ChangePasswordHandler(LocalBase):
         else:
             alert = 'alert-danger'
             pw_len = self.authenticator.minimum_password_length
-            msg = ('Something went wrong! Be sure your new '
-                   'password has at least {} characters and is '
-                   'not too common.').format(pw_len)
+            msg = (
+                'Something went wrong! Be sure your new '
+                'password has at least {} characters and is '
+                'not too common.'
+            ).format(pw_len)
 
         html = await self.render_template(
-            'change-password.html',
-            user_name=user.name,
-            result_message=msg,
-            alert=alert
+            'change-password.html', user_name=user.name, result_message=msg, alert=alert
         )
         self.finish(html)
 
@@ -292,26 +307,25 @@ class ChangePasswordAdminHandler(LocalBase):
 
         if success:
             alert = 'alert-success'
-            msg = ('The password for {} has been changed '
-                   'successfully').format(user_name)
+            msg = ('The password for {} has been changed ' 'successfully').format(
+                user_name
+            )
         else:
             alert = 'alert-danger'
             pw_len = self.authenticator.minimum_password_length
-            msg = ('Something went wrong! Be sure the new password '
-                   'for {} has at least {} characters and is '
-                   'not too common.').format(user_name, pw_len)
+            msg = (
+                'Something went wrong! Be sure the new password '
+                'for {} has at least {} characters and is '
+                'not too common.'
+            ).format(user_name, pw_len)
 
         html = await self.render_template(
-            'change-password.html',
-            user_name=user_name,
-            result_message=msg,
-            alert=alert
+            'change-password.html', user_name=user_name, result_message=msg, alert=alert
         )
         self.finish(html)
 
 
 class LoginHandler(LoginHandler, LocalBase):
-
     def _render(self, login_error=None, username=None):
         return self.render_template(
             'native-login.html',
@@ -351,13 +365,13 @@ class LoginHandler(LoginHandler, LocalBase):
             # and is just not authorised
             nuser = self.authenticator.get_user(data['username'])
             if nuser is not None:
-                if (nuser.is_valid_password(data['password'])
-                        and not nuser.is_authorized):
+                if (
+                    nuser.is_valid_password(data['password'])
+                    and not nuser.is_authorized
+                ):
                     error = 'User has not been authorized by administrator yet'
 
-            html = await self._render(
-                login_error=error, username=data['username']
-            )
+            html = await self._render(login_error=error, username=data['username'])
             self.finish(html)
 
 

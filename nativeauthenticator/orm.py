@@ -57,8 +57,7 @@ class UserInfo(Base):
     def validate_email(self, key, address):
         if not address:
             return
-        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$",
-                        address)
+        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", address)
         return address
 
     def is_valid_token(self, token):

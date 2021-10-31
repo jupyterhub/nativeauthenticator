@@ -12,14 +12,15 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
 
     def __str__(self):
         return '{}. You passed in {!r} ({})'.format(
-                super().__str__(),
-                self.obj,
-                type(self.obj))
+            super().__str__(), self.obj, type(self.obj)
+        )
 
 
 _PROTECTED_TYPES = (
     type(None),
-    int, float, Decimal,
+    int,
+    float,
+    Decimal,
     datetime.datetime,
     datetime.date,
     datetime.time,
@@ -89,10 +90,9 @@ _hextobyte = {
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
 # Unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
-_hextobyte.update({
-    (a + b).encode(): bytes.fromhex(a + b)
-    for a in _hexdig[8:] for b in _hexdig
-})
+_hextobyte.update(
+    {(a + b).encode(): bytes.fromhex(a + b) for a in _hexdig[8:] for b in _hexdig}
+)
 
 
 def uri_to_iri(uri):
@@ -165,9 +165,8 @@ def repercent_broken_unicode(path):
         except UnicodeDecodeError as e:
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
-            repercent = quote(path[e.start:e.end],
-                              safe=b"/#%[]=:;$&()+,!?*@'~")
-            path = path[:e.start] + repercent.encode() + path[e.end:]
+            repercent = quote(path[e.start : e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+            path = path[: e.start] + repercent.encode() + path[e.end :]
         else:
             return path
 

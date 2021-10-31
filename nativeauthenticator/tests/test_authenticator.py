@@ -30,19 +30,21 @@ pytestmark = pytest.mark.asyncio
 pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 
 
-@pytest.mark.parametrize("is_admin,open_signup,expected_authorization", [
-    (False, False, False),
-    (True, False, True),
-    (False, True, True),
-    (True, True, True)
-])
-async def test_create_user(is_admin, open_signup, expected_authorization,
-                           tmpcwd, app):
-    '''Test method create_user for new user and authorization '''
+@pytest.mark.parametrize(
+    "is_admin,open_signup,expected_authorization",
+    [
+        (False, False, False),
+        (True, False, True),
+        (False, True, True),
+        (True, True, True),
+    ],
+)
+async def test_create_user(is_admin, open_signup, expected_authorization, tmpcwd, app):
+    '''Test method create_user for new user and authorization'''
     auth = NativeAuthenticator(db=app.db)
 
     if is_admin:
-        auth.admin_users = ({'johnsnow'})
+        auth.admin_users = {'johnsnow'}
     if open_signup:
         auth.open_signup = True
 
@@ -117,14 +119,18 @@ async def test_get_unauthed_amount(tmpcwd, app):
     assert auth.get_unauthed_amount() == 1
 
 
-@pytest.mark.parametrize("password,min_len,expected", [
-    ("qwerty", 1, False),
-    ("agameofthrones", 1, True),
-    ("agameofthrones", 15, False),
-    ("averyveryverylongpassword", 15, True),
-])
-async def test_create_user_with_strong_passwords(password, min_len, expected,
-                                                 tmpcwd, app):
+@pytest.mark.parametrize(
+    "password,min_len,expected",
+    [
+        ("qwerty", 1, False),
+        ("agameofthrones", 1, True),
+        ("agameofthrones", 15, False),
+        ("averyveryverylongpassword", 15, True),
+    ],
+)
+async def test_create_user_with_strong_passwords(
+    password, min_len, expected, tmpcwd, app
+):
     '''Test if method create_user and strong passwords mesh'''
     auth = NativeAuthenticator(db=app.db)
     auth.check_common_password = True
@@ -168,12 +174,14 @@ async def test_no_change_to_bad_password(tmpcwd, app):
     assert auth.get_user('johnsnow').is_valid_password('DaenerysTargaryen')
 
 
-@pytest.mark.parametrize("enable_signup,expected_success", [
-    (True, True),
-    (False, False),
-])
-async def test_create_user_disable(enable_signup, expected_success,
-                                   tmpcwd, app):
+@pytest.mark.parametrize(
+    "enable_signup,expected_success",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+async def test_create_user_disable(enable_signup, expected_success, tmpcwd, app):
     '''Test method get_or_create_user not create user if signup is disabled'''
     auth = NativeAuthenticator(db=app.db)
     auth.enable_signup = enable_signup
@@ -186,22 +194,25 @@ async def test_create_user_disable(enable_signup, expected_success,
         assert not user
 
 
-@pytest.mark.parametrize("username,password,authorized,expected", [
-    ("name", '123', False, False),
-    ("johnsnow", '123', True, False),
-    ("Snow", 'password', True, False),
-    ("johnsnow", 'password', False, False),
-    ("johnsnow", 'password', True, True),
-])
-async def test_authentication(username, password, authorized, expected,
-                              tmpcwd, app):
+@pytest.mark.parametrize(
+    "username,password,authorized,expected",
+    [
+        ("name", '123', False, False),
+        ("johnsnow", '123', True, False),
+        ("Snow", 'password', True, False),
+        ("johnsnow", 'password', False, False),
+        ("johnsnow", 'password', True, True),
+    ],
+)
+async def test_authentication(username, password, authorized, expected, tmpcwd, app):
     '''Test if authentication fails with a unexistent user'''
     auth = NativeAuthenticator(db=app.db)
     auth.create_user('johnsnow', 'password')
     if authorized:
         UserInfo.change_authorization(app.db, 'johnsnow')
-    response = await auth.authenticate(app, {'username': username,
-                                             'password': password})
+    response = await auth.authenticate(
+        app, {'username': username, 'password': password}
+    )
     assert bool(response) == expected
 
 
@@ -317,10 +328,13 @@ async def test_import_from_firstuse_delete_db_after(tmpcwd, app):
     assert ('passwords.dbm' not in files) and ('passwords.dbm.db' not in files)
 
 
-@pytest.mark.parametrize("user,pwd", [
-    ('user1', 'password'),
-    ('user 1', 'somethingelsereallysecure'),
-])
+@pytest.mark.parametrize(
+    "user,pwd",
+    [
+        ('user1', 'password'),
+        ('user 1', 'somethingelsereallysecure'),
+    ],
+)
 async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
     with dbm.open('passwords.dbm', 'c', 0o600) as db:
         db[user] = pwd

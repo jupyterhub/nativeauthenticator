@@ -32,9 +32,11 @@ def test_validate_method_correct_email(tmpdir, app):
 
 def test_all_users(tmpdir, app):
     assert len(UserInfo.all_users(app.db)) == 1
-    user = UserInfo(username='daenerystargaryen',
-                    password=b'yesispeakvalyrian',
-                    email='khaleesi@valyria.com')
+    user = UserInfo(
+        username='daenerystargaryen',
+        password=b'yesispeakvalyrian',
+        email='khaleesi@valyria.com',
+    )
     app.db.add(user)
     app.db.commit()
 

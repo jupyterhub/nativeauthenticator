@@ -43,17 +43,18 @@ from .crypto import constant_time_compare
 from .crypto import salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
-BASE62_ALPHABET = \
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
 
 class BadSignature(Exception):
     """Signature does not match."""
+
     pass
 
 
 class SignatureExpired(BadSignature):
     """Signature timestamp is older than required max_age."""
+
     pass
 
 
@@ -93,8 +94,8 @@ def b64_decode(s):
 
 def base64_hmac(salt, value, key, algorithm='sha1'):
     return b64_encode(
-            salted_hmac(salt, value, key, algorithm=algorithm).digest()
-            ).decode()
+        salted_hmac(salt, value, key, algorithm=algorithm).digest()
+    ).decode()
 
 
 class JSONSerializer:
@@ -102,6 +103,7 @@ class JSONSerializer:
     Simple wrapper around json to be used in signing.dumps and
     signing.loads.
     """
+
     def dumps(self, obj):
         return json.dumps(obj, separators=(',', ':')).encode('latin-1')
 
@@ -109,11 +111,9 @@ class JSONSerializer:
         return json.loads(data.decode('latin-1'))
 
 
-def dumps(obj,
-          key=None,
-          salt='django.core.signing',
-          serializer=JSONSerializer,
-          compress=False):
+def dumps(
+    obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False
+):
     """
     Return URL-safe, hmac signed base64 compressed JSON string. If key is
     None, raises Exception. The hmac algorithm is the default
@@ -130,24 +130,22 @@ def dumps(obj,
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(obj,
-                                                       serializer=serializer,
-                                                       compress=compress)
+    return TimestampSigner(key, salt=salt).sign_object(
+        obj, serializer=serializer, compress=compress
+    )
 
 
-def loads(s,
-          key=None,
-          salt='django.core.signing',
-          serializer=JSONSerializer,
-          max_age=None):
+def loads(
+    s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None
+):
     """
     Reverse of dumps(), raise BadSignature if signature fails.
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt).unsign_object(s,
-                                                         serializer=serializer,
-                                                         max_age=max_age)
+    return TimestampSigner(key, salt=salt).unsign_object(
+        s, serializer=serializer, max_age=max_age
+    )
 
 
 class Signer:
@@ -160,14 +158,14 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '{}.{}'.format(
-                self.__class__.__module__, self.__class__.__name__
-                )
+            self.__class__.__module__, self.__class__.__name__
+        )
         self.algorithm = algorithm or 'sha256'
 
     def signature(self, value):
-        return base64_hmac(self.salt + 'signer',
-                           value, self.key,
-                           algorithm=self.algorithm)
+        return base64_hmac(
+            self.salt + 'signer', value, self.key, algorithm=self.algorithm
+        )
 
     def sign(self, value):
         return f'{value}{self.sep}{self.signature(value)}'
@@ -220,7 +218,6 @@ class Signer:
 
 
 class TimestampSigner(Signer):
-
     def timestamp(self):
         return b62_encode(int(time.time()))
 
@@ -242,6 +239,5 @@ class TimestampSigner(Signer):
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:
-                raise SignatureExpired(
-                    f'Signature age {age} > {max_age} seconds')
+                raise SignatureExpired(f'Signature age {age} > {max_age} seconds')
         return value
