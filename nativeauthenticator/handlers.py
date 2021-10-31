@@ -181,11 +181,11 @@ class AuthorizeHandler(LocalBase):
 
         if not must_stop:
             username = data["username"]
-            msg = "{} was already authorized".format(username)
+            msg = f"{username} was already authorized"
             usr = UserInfo.find(self.db, username)
             if not usr.is_authorized:
                 UserInfo.change_authorization(self.db, username)
-                msg = "{} has been authorized".format(username)
+                msg = f"{username} has been authorized"
 
             # add POSIX user!!
 
