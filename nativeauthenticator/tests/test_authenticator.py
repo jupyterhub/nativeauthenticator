@@ -1,14 +1,15 @@
+import datetime
 import dbm
 import os
-import pytest
-import datetime
-from datetime import timezone as tz
 import time
+from datetime import timezone as tz
+
+import pytest
 from jupyterhub.tests.mocking import MockHub
 
-from nativeauthenticator import NativeAuthenticator
-from ..orm import UserInfo
 from ..handlers import AuthorizeHandler
+from ..orm import UserInfo
+from nativeauthenticator import NativeAuthenticator
 
 
 @pytest.fixture

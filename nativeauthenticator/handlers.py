@@ -1,7 +1,10 @@
 import os
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
 from datetime import timezone as tz
-from jinja2 import ChoiceLoader, FileSystemLoader
+
+from jinja2 import ChoiceLoader
+from jinja2 import FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
 try:

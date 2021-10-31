@@ -32,15 +32,15 @@ start of the base64 JSON.
 There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
-
 import base64
 import datetime
-import re
 import json
+import re
 import time
 import zlib
 
-from .crypto import constant_time_compare, salted_hmac
+from .crypto import constant_time_compare
+from .crypto import salted_hmac
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 BASE62_ALPHABET = \

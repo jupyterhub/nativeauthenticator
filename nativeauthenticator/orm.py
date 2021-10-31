@@ -1,11 +1,15 @@
 import base64
-import bcrypt
 import os
 import re
-from jupyterhub.orm import Base
 
+import bcrypt
 import onetimepass
-from sqlalchemy import Boolean, Column, Integer, String, LargeBinary
+from jupyterhub.orm import Base
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import LargeBinary
+from sqlalchemy import String
 from sqlalchemy.orm import validates
 
 

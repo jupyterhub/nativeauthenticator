@@ -1,25 +1,34 @@
-import bcrypt
 import dbm
 import os
 import re
 import smtplib
-from email.message import EmailMessage
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 from datetime import timezone as tz
-from jupyterhub.auth import Authenticator
+from email.message import EmailMessage
 from pathlib import Path
 
+import bcrypt
+from jupyterhub.auth import Authenticator
 from sqlalchemy import inspect
-from tornado import gen, web
-from traitlets import Bool, Integer, Unicode, Tuple, Dict
+from tornado import gen
+from tornado import web
+from traitlets import Bool
+from traitlets import Dict
+from traitlets import Integer
+from traitlets import Tuple
+from traitlets import Unicode
 
-from .handlers import (
-    AuthorizeHandler,
-    AuthorizationHandler, ChangeAuthorizationHandler, ChangePasswordHandler,
-    ChangePasswordAdminHandler, LoginHandler, SignUpHandler, DiscardHandler,
-)
-from .orm import UserInfo
 from .crypto.signing import Signer
+from .handlers import AuthorizationHandler
+from .handlers import AuthorizeHandler
+from .handlers import ChangeAuthorizationHandler
+from .handlers import ChangePasswordAdminHandler
+from .handlers import ChangePasswordHandler
+from .handlers import DiscardHandler
+from .handlers import LoginHandler
+from .handlers import SignUpHandler
+from .orm import UserInfo
 
 
 class NativeAuthenticator(Authenticator):
