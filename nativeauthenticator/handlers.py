@@ -58,7 +58,7 @@ class SignUpHandler(LocalBase):
         )
         self.finish(html)
 
-    def get_result_message(self, user, taken, match, human=True):
+    def get_result_message(self, user, taken, confirmation_matches, human=True):
         alert = "alert-info"
         message = "Your information has been sent to the admin"
         if user and user.login_email_sent:
@@ -72,9 +72,9 @@ class SignUpHandler(LocalBase):
                 "username is already in use. Please try again "
                 "with a different username."
             )
-        elif not match:
+        elif not confirmation_matches:
             alert = "alert-danger"
-            message = "Your passwords did not match. Please try again."
+            message = "Your password did not match the confirmation. Please try again."
         else:
             # Error if user creation was not successful.
             if not user:
@@ -136,8 +136,7 @@ class SignUpHandler(LocalBase):
         if assume_human:
             user_info = {
                 "username": self.get_body_argument("username", strip=False),
-                "pw": self.get_body_argument("pw", strip=False),
-                "pwc": self.get_body_argument("pwc", strip=False),
+                "signup_password": self.get_body_argument("pw", strip=False),
                 "email": self.get_body_argument("email", "", strip=False),
                 "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
             }
@@ -147,10 +146,15 @@ class SignUpHandler(LocalBase):
             user = False
             taken = False
 
-        match = self.get_body_argument("pw", strip=False) == self.get_body_argument(
-            "pwc", strip=False
+        password = self.get_body_argument("signup_password", strip=False)
+        confirmation = self.get_body_argument(
+            "signup_password_confirmation", strip=False
         )
-        alert, message = self.get_result_message(user, taken, match, assume_human)
+        confirmation_matches = password == confirmation
+
+        alert, message = self.get_result_message(
+            user, taken, confirmation_matches, assume_human
+        )
 
         otp_secret, user_2fa = "", ""
         if user:
@@ -194,7 +198,7 @@ class ChangeAuthorizationHandler(LocalBase):
 class AuthorizeHandler(LocalBase):
     async def get(self, slug):
         must_stop = True
-        msg = "Invalid URL"
+        message = "Invalid URL"
         if self.authenticator.allow_self_approval_for:
             try:
                 data = AuthorizeHandler.validate_slug(
@@ -206,17 +210,17 @@ class AuthorizeHandler(LocalBase):
 
         if not must_stop:
             username = data["username"]
-            msg = f"{username} was already authorized"
+            message = f"{username} was already authorized"
             usr = UserInfo.find(self.db, username)
             if not usr.is_authorized:
                 UserInfo.change_authorization(self.db, username)
-                msg = f"{username} has been authorized"
+                message = f"{username} has been authorized"
 
             # add POSIX user!!
 
         html = await self.render_template(
             "my_message.html",
-            message=msg,
+            message=message,
         )
         self.finish(html)
 
@@ -275,33 +279,41 @@ class ChangePasswordHandler(LocalBase):
         user = await self.get_current_user()
         old_password = self.get_body_argument("old_password", strip=False)
         new_password = self.get_body_argument("new_password", strip=False)
-        confirmation = self.get_body_argument("con_password", strip=False)
+        confirmation = self.get_body_argument("new_password_confirmation", strip=False)
 
-        correctpw = self.authenticator.get_user(user.name).is_valid_password(
-            old_password
-        )
+        correct_password_provided = self.authenticator.get_user(
+            user.name
+        ).is_valid_password(old_password)
 
-        success = self.authenticator.user_change_password(
-            user.name, old_password, new_password, confirmation
-        )
+        new_password_matches_confirmation = new_password == confirmation
 
-        if success:
-            alert = "alert-success"
-            msg = "Your password has been changed successfully!"
-        elif not correctpw:
+        if not correct_password_provided:
             alert = "alert-danger"
-            msg = "Your current password was incorrect. Please try again."
-        else:
+            message = "Your current password was incorrect. Please try again."
+        elif not new_password_matches_confirmation:
             alert = "alert-danger"
-            pw_len = self.authenticator.minimum_password_length
-            msg = (
-                "Something went wrong! Be sure your new "
-                f"password has at least {pw_len} characters and is "
-                "not too common."
+            message = (
+                "Your new password didn't match the confirmation. Please try again."
             )
+        else:
+            success = self.authenticator.change_password(user.name, new_password)
+            if success:
+                alert = "alert-success"
+                message = "Your password has been changed successfully!"
+            else:
+                alert = "alert-danger"
+                pw_len = self.authenticator.minimum_password_length
+                message = (
+                    "Something went wrong! Be sure your new "
+                    f"password has at least {pw_len} characters and is "
+                    "not too common."
+                )
 
         html = await self.render_template(
-            "change-password.html", user_name=user.name, result_message=msg, alert=alert
+            "change-password.html",
+            user_name=user.name,
+            result_message=message,
+            alert=alert,
         )
         self.finish(html)
 
@@ -322,31 +334,33 @@ class ChangePasswordAdminHandler(LocalBase):
     @admin_users_scope
     async def post(self, user_name):
         new_password = self.get_body_argument("new_password", strip=False)
-        confirmation = self.get_body_argument("con_password", strip=False)
-        success = self.authenticator.change_password(
-            user_name, new_password, confirmation
-        )
+        confirmation = self.get_body_argument("new_password_confirmation", strip=False)
 
-        if success:
-            alert = "alert-success"
-            msg = f"The password for {user_name} has been changed successfully"
-        elif not new_password == confirmation:
+        new_password_matches_confirmation = new_password == confirmation
+
+        if not new_password_matches_confirmation:
             alert = "alert-danger"
-            pw_len = self.authenticator.minimum_password_length
-            msg = "The passwords didn't match. Please try again."
-        else:
-            alert = "alert-danger"
-            pw_len = self.authenticator.minimum_password_length
-            msg = (
-                "Something went wrong! Be sure the new password "
-                f"for {user_name} has at least {pw_len} characters and is "
-                "not too common."
+            message = (
+                "The new password didn't match the confirmation. Please try again."
             )
+        else:
+            success = self.authenticator.change_password(user_name, new_password)
+            if success:
+                alert = "alert-success"
+                message = f"The password for {user_name} has been changed successfully"
+            else:
+                alert = "alert-danger"
+                pw_len = self.authenticator.minimum_password_length
+                message = (
+                    "Something went wrong! Be sure the new password "
+                    f"for {user_name} has at least {pw_len} characters and is "
+                    "not too common."
+                )
 
         html = await self.render_template(
             "change-password-admin.html",
             user_name=user_name,
-            result_message=msg,
+            result_message=message,
             alert=alert,
         )
         self.finish(html)

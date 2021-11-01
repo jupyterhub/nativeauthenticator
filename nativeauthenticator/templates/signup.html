@@ -7,7 +7,8 @@
         let button = document.getElementById('eye');
         button.addEventListener("click", function(e) {
             let pwd = document.getElementById("password_input");
-            let pwdc = document.getElementById("password_confirm");
+            let pwdc = document.getElementById("password_confirmation_input");
+
             if (pwd.getAttribute("type") === "password") {
                 pwd.setAttribute("type", "text");
                 pwdc.setAttribute("type", "text");
@@ -83,7 +84,7 @@
 
             <label for="password_input">Password:</label>
             <div class="input-group">
-                <input id="password_input" type="password" name="pw" val="" autocapitalize="off" autocorrect="off" class="form-control" />
+                <input id="password_input" type="password" name="signup_password" val="" autocapitalize="off" autocorrect="off" class="form-control" />
                 <span class="input-group-addon">
                     <button id="eye" type="button" style="border:0;">👁</button>
                 </span>
@@ -92,7 +93,7 @@
             
             <label for="password_confirm">Confirm password:</label>
             <div class="input-group">
-                <input id="password_confirm" type="password" name="pwc" val="" autocapitalize="off" autocorrect="off" class="form-control" />
+                <input id="password_confirmation_input" type="password" name="signup_password_confirmation" val="" autocapitalize="off" autocorrect="off" class="form-control" />
             </div>
             <p></p>
 

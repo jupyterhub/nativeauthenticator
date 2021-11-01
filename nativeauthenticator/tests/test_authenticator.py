@@ -48,7 +48,7 @@ async def test_create_user(is_admin, open_signup, expected_authorization, tmpcwd
     if open_signup:
         auth.open_signup = True
 
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
     user_info = UserInfo.find(app.db, "johnsnow")
     assert user_info.username == "johnsnow"
     assert user_info.is_authorized == expected_authorization
@@ -57,8 +57,8 @@ async def test_create_user(is_admin, open_signup, expected_authorization, tmpcwd
 async def test_create_user_bad_characters(tmpcwd, app):
     """Test method create_user with bad characters on username"""
     auth = NativeAuthenticator(db=app.db)
-    assert not auth.create_user("john snow", "password", "password")
-    assert not auth.create_user("john,snow", "password", "password")
+    assert not auth.create_user("john snow", "password")
+    assert not auth.create_user("john,snow", "password")
 
 
 async def test_create_user_twice(tmpcwd, app):
@@ -66,13 +66,13 @@ async def test_create_user_twice(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
 
     # First creation should succeed.
-    assert auth.create_user("johnsnow", "password", "password")
+    assert auth.create_user("johnsnow", "password")
 
     # Creating the same account again should fail.
-    assert not auth.create_user("johnsnow", "password", "password")
+    assert not auth.create_user("johnsnow", "password")
 
     # Creating a user with same handle but different pw should also fail.
-    assert not auth.create_user("johnsnow", "adifferentpassword", "adifferentpassword")
+    assert not auth.create_user("johnsnow", "adifferentpassword")
 
 
 async def test_get_authed_users(tmpcwd, app):
@@ -82,13 +82,13 @@ async def test_get_authed_users(tmpcwd, app):
     auth.admin_users = set()
     assert auth.get_authed_users() == set()
 
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
     assert auth.get_authed_users() == set()
 
     UserInfo.change_authorization(app.db, "johnsnow")
     assert auth.get_authed_users() == set({"johnsnow"})
 
-    auth.create_user("daenerystargaryen", "anotherpassword", "anotherpassword")
+    auth.create_user("daenerystargaryen", "anotherpassword")
     assert auth.get_authed_users() == set({"johnsnow"})
 
     auth.admin_users = set({"daenerystargaryen"})
@@ -103,16 +103,16 @@ async def test_get_unauthed_amount(tmpcwd, app):
     auth.admin_users = set()
     assert auth.get_unauthed_amount() == 0
 
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
     assert auth.get_unauthed_amount() == 1
 
     UserInfo.change_authorization(app.db, "johnsnow")
     assert auth.get_unauthed_amount() == 0
 
-    auth.create_user("daenerystargaryen", "anotherpassword", "anotherpassword")
+    auth.create_user("daenerystargaryen", "anotherpassword")
     assert auth.get_unauthed_amount() == 1
 
-    auth.create_user("tyrionlannister", "yetanotherpassword", "yetanotherpassword")
+    auth.create_user("tyrionlannister", "yetanotherpassword")
     assert auth.get_unauthed_amount() == 2
 
     auth.admin_users = set({"daenerystargaryen"})
@@ -135,15 +135,15 @@ async def test_create_user_with_strong_passwords(
     auth = NativeAuthenticator(db=app.db)
     auth.check_common_password = True
     auth.minimum_password_length = min_len
-    user = auth.create_user("johnsnow", password, password)
+    user = auth.create_user("johnsnow", password)
     assert bool(user) == expected
 
 
 async def test_change_password(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
-    user = auth.create_user("johnsnow", "password", "password")
+    user = auth.create_user("johnsnow", "password")
     assert user.is_valid_password("password")
-    auth.change_password("johnsnow", "newpassword", "newpassword")
+    auth.change_password("johnsnow", "newpassword")
     assert not user.is_valid_password("password")
     assert user.is_valid_password("newpassword")
 
@@ -157,65 +157,20 @@ async def test_no_change_to_bad_password(tmpcwd, app):
     auth.create_user("johnsnow", "ironwood", "ironwood")
 
     # Can't change password of nonexistent users.
-    assert auth.change_password("samwelltarly", "palanquin", "palanquin") is None
+    assert auth.change_password("samwelltarly", "palanquin") is None
     assert auth.get_user("johnsnow").is_valid_password("ironwood")
 
     # Can't change password to something too short.
-    assert auth.change_password("johnsnow", "mummer", "mummer") is None
+    assert auth.change_password("johnsnow", "mummer") is None
     assert auth.get_user("johnsnow").is_valid_password("ironwood")
 
     # Can't change password to something too common.
-    assert auth.change_password("johnsnow", "dragon", "dragon") is None
+    assert auth.change_password("johnsnow", "dragon") is None
     assert auth.get_user("johnsnow").is_valid_password("ironwood")
 
     # CAN change password to something fulfilling criteria.
-    assert auth.change_password("johnsnow", "Daenerys", "Daenerys") is not None
+    assert auth.change_password("johnsnow", "Daenerys") is not None
     assert not auth.get_user("johnsnow").is_valid_password("ironwood")
-    assert auth.get_user("johnsnow").is_valid_password("Daenerys")
-
-
-async def test_password_confirmation(tmpcwd, app):
-    """Test password confirmation mechanisms."""
-    auth = NativeAuthenticator(db=app.db)
-
-    # Can create with matching confirmation entry.
-    assert auth.create_user("johnsnow", "ironwood", "ironwood")
-    # Cannot create with empty confirmation entry.
-    assert not auth.create_user("johnsnow", "ironwood", "")
-    # Cannot create with incorrect confirmation entry.
-    assert not auth.create_user("johnsnow", "ironwood", "throne")
-
-    assert auth.get_user("johnsnow").is_valid_password("ironwood")
-
-    # Can change with matching confirmation entry.
-    assert auth.change_password("johnsnow", "westeros", "westeros") is not None
-    assert auth.get_user("johnsnow").is_valid_password("westeros")
-    # Cannot change with empty confirmation entry.
-    assert auth.change_password("johnsnow", "Daenerys", "") is None
-    assert auth.get_user("johnsnow").is_valid_password("westeros")
-    # Cannot change with incorrect confirmation entry.
-    assert auth.change_password("johnsnow", "Daenerys", "throne") is None
-    assert auth.get_user("johnsnow").is_valid_password("westeros")
-
-
-async def test_user_change_password(tmpcwd, app):
-    """Test user changing password needing current password."""
-    auth = NativeAuthenticator(db=app.db)
-    assert auth.create_user("johnsnow", "westeros", "westeros")
-
-    # Wrong previous password.
-    assert (
-        auth.user_change_password("johnsnow", "dragon", "Daenerys", "Daenerys") is None
-    )
-    assert auth.get_user("johnsnow").is_valid_password("westeros")
-    # Empty previous password.
-    assert auth.user_change_password("johnsnow", "", "Daenerys", "Daenerys") is None
-    assert auth.get_user("johnsnow").is_valid_password("westeros")
-    # Correct previous password.
-    assert (
-        auth.user_change_password("johnsnow", "westeros", "Daenerys", "Daenerys")
-        is not None
-    )
     assert auth.get_user("johnsnow").is_valid_password("Daenerys")
 
 
@@ -231,7 +186,7 @@ async def test_create_user_disable(enable_signup, expected_success, tmpcwd, app)
     auth = NativeAuthenticator(db=app.db)
     auth.enable_signup = enable_signup
 
-    user = auth.create_user("johnsnow", "password", "password")
+    user = auth.create_user("johnsnow", "password")
 
     if expected_success:
         assert user.username == "johnsnow"
@@ -252,7 +207,7 @@ async def test_create_user_disable(enable_signup, expected_success, tmpcwd, app)
 async def test_authentication(username, password, authorized, expected, tmpcwd, app):
     """Test if authentication fails with a unexistent user"""
     auth = NativeAuthenticator(db=app.db)
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
     if authorized:
         UserInfo.change_authorization(app.db, "johnsnow")
     response = await auth.authenticate(
@@ -289,7 +244,7 @@ async def test_authentication_login_count(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     infos = {"username": "johnsnow", "password": "password"}
     wrong_infos = {"username": "johnsnow", "password": "wrong_password"}
-    auth.create_user(infos["username"], infos["password"], infos["password"])
+    auth.create_user(infos["username"], infos["password"])
     UserInfo.change_authorization(app.db, "johnsnow")
 
     assert not auth.login_attempts
@@ -310,7 +265,7 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
     auth.secs_before_next_try = 10
 
     infos = {"username": "johnsnow", "password": "wrongpassword"}
-    auth.create_user(infos["username"], "password", "password")
+    auth.create_user(infos["username"], "password")
     UserInfo.change_authorization(app.db, "johnsnow")
 
     for i in range(3):
@@ -328,7 +283,7 @@ async def test_authentication_with_exceed_atempts_of_login(tmpcwd, app):
 
 async def test_get_user(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
 
     # Getting existing user is successful.
     assert auth.get_user("johnsnow") is not None
@@ -339,7 +294,7 @@ async def test_get_user(tmpcwd, app):
 
 async def test_delete_user(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
-    auth.create_user("johnsnow", "password", "password")
+    auth.create_user("johnsnow", "password")
 
     user = type("User", (), {"name": "johnsnow"})
     auth.delete_user(user)
@@ -393,7 +348,7 @@ async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
 async def test_secret_key(app):
     auth = NativeAuthenticator(db=app.db)
     auth.ask_email_on_signup = False
-    auth.allow_self_approval_for = ".*@some-domain.com$"
+    auth.allow_self_approval_for = ".*@example.com$"
     auth.secret_key = "short"
 
     with pytest.raises(ValueError):
@@ -407,7 +362,7 @@ async def test_secret_key(app):
 
 async def test_approval_url(app):
     auth = NativeAuthenticator(db=app.db)
-    auth.allow_self_approval_for = ".*@some-domain.com$"
+    auth.allow_self_approval_for = ".*@example.com$"
     auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
     auth.setup_self_approval()
 
