@@ -154,7 +154,7 @@ async def test_no_change_to_bad_password(tmpcwd, app):
     auth.check_common_password = True
     auth.minimum_password_length = 8
 
-    auth.create_user("johnsnow", "ironwood", "ironwood")
+    auth.create_user("johnsnow", "ironwood")
 
     # Can't change password of nonexistent users.
     assert auth.change_password("samwelltarly", "palanquin") is None

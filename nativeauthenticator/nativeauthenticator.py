@@ -429,7 +429,7 @@ class NativeAuthenticator(Authenticator):
         with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
-                new_user = self.create_user(user.decode(), password, password)
+                new_user = self.create_user(user.decode(), password)
                 if not new_user:
                     error = (
                         f"User {user} was not created. Check password "
