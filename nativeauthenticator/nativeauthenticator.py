@@ -295,20 +295,20 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, pw, **kwargs):
+    def create_user(self, username, password, **kwargs):
         username = self.normalize_username(username)
 
         if self.user_exists(username) or not self.validate_username(username):
             return
 
-        if not self.is_password_strong(pw):
+        if not self.is_password_strong(password):
             return
 
         if not self.enable_signup:
             return
 
-        encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {"username": username, "password": encoded_pw}
+        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
 
         if self.open_signup or username in self.get_authed_users():
