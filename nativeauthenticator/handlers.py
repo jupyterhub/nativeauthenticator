@@ -133,7 +133,7 @@ class SignUpHandler(LocalBase):
     async def post(self):
         """Rendering on POST requests (signup visits with data attached)."""
 
-        # 404 if user's aren't allowed to sign up.
+        # 404 if users aren't allowed to sign up.
         if not self.authenticator.enable_signup:
             raise web.HTTPError(404)
 
