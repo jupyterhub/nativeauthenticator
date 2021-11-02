@@ -19,14 +19,14 @@ from traitlets import Tuple
 from traitlets import Unicode
 
 from .crypto.signing import Signer
-from .handlers import AuthorizationHandler
-from .handlers import AuthorizeHandler
-from .handlers import ChangeAuthorizationHandler
+from .handlers import AuthorizationAreaHandler
 from .handlers import ChangePasswordAdminHandler
 from .handlers import ChangePasswordHandler
 from .handlers import DiscardHandler
+from .handlers import EmailAuthorizationHandler
 from .handlers import LoginHandler
 from .handlers import SignUpHandler
+from .handlers import ToggleAuthorizationHandler
 from .orm import UserInfo
 
 
@@ -397,10 +397,10 @@ class NativeAuthenticator(Authenticator):
             (r"/login", LoginHandler),
             (r"/signup", SignUpHandler),
             (r"/discard/([^/]*)", DiscardHandler),
-            (r"/authorize", AuthorizationHandler),
-            (r"/authorize/([^/]*)", ChangeAuthorizationHandler),
+            (r"/authorize", AuthorizationAreaHandler),
+            (r"/authorize/([^/]*)", ToggleAuthorizationHandler),
             # the following /confirm/ must be like in generate_approval_url()
-            (r"/confirm/([^/]*)", AuthorizeHandler),
+            (r"/confirm/([^/]*)", EmailAuthorizationHandler),
             (r"/change-password", ChangePasswordHandler),
             (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
         ]

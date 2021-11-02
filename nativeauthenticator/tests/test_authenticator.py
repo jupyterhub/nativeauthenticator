@@ -7,7 +7,7 @@ from datetime import timezone as tz
 import pytest
 from jupyterhub.tests.mocking import MockHub
 
-from ..handlers import AuthorizeHandler
+from ..handlers import EmailAuthorizationHandler
 from ..orm import UserInfo
 from nativeauthenticator import NativeAuthenticator
 
@@ -368,19 +368,19 @@ async def test_approval_url(app):
 
     # confirm that a forged slug cannot be used
     with pytest.raises(ValueError):
-        AuthorizeHandler.validate_slug("foo", auth.secret_key)
+        EmailAuthorizationHandler.validate_slug("foo", auth.secret_key)
 
     # confirm that an expired URL cannot be used
     expiration = datetime.datetime.now(tz.utc) - datetime.timedelta(days=2)
     url = auth.generate_approval_url("somebody", when=expiration)
     slug = url.split("/")[-1]
     with pytest.raises(ValueError):
-        AuthorizeHandler.validate_slug(slug, auth.secret_key)
+        EmailAuthorizationHandler.validate_slug(slug, auth.secret_key)
 
     # confirm that a non-expired, correctly signed URL can be used
     expiration = datetime.datetime.now(tz.utc) + datetime.timedelta(days=2)
     url = auth.generate_approval_url("somebody", when=expiration)
     slug = url.split("/")[-1]
-    out = AuthorizeHandler.validate_slug(slug, auth.secret_key)
+    out = EmailAuthorizationHandler.validate_slug(slug, auth.secret_key)
     assert out["username"] == "somebody"
     assert out["expire"] == expiration
