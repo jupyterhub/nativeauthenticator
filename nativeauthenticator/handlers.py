@@ -45,9 +45,8 @@ class LocalBase(BaseHandler):
 
 
 class SignUpHandler(LocalBase):
-    """Responsible for rendering the /hub/signup page,
-    validating input to that page, account creation
-    and giving accurate feedback to users."""
+    """Responsible for rendering the /hub/signup page, validating input to that
+    page, account creation and giving accurate feedback to users."""
 
     async def get(self):
         """Rendering on GET requests ("normal" visits)."""
@@ -240,7 +239,11 @@ class EmailAuthorizationHandler(LocalBase):
     cryptographic URLs for the self-serve-approval feature."""
 
     async def get(self, slug):
-        """Called on GET requests. The slug is given in the URL."""
+        """Called on GET requests. The slug is given in the URL after /confirm/.
+        It's a long-ish string of letters encoding which user this authorization
+        link is for and until when it is valid, cryptographically signed by the
+        secret key given in the configuration file. This is done to make the
+        approval URL not-reverse-engineer-able."""
 
         slug_validation_successful = False
         message = "Invalid URL"
@@ -311,8 +314,9 @@ class EmailAuthorizationHandler(LocalBase):
 
 
 class ChangePasswordHandler(LocalBase):
-    """Render the /hub/change-password page where
-    users can change their own password."""
+    """Responsible for rendering the /hub/change-password page where users can change
+    their own password. Both on GET requests, when simply navigating to the site,
+    and on POST requests, with the data to change the password attached."""
 
     @web.authenticated
     async def get(self):
@@ -381,8 +385,10 @@ class ChangePasswordHandler(LocalBase):
 
 
 class ChangePasswordAdminHandler(LocalBase):
-    """Render the /hub/change-password/[someusername] page
-    where admins can set new passwords for users."""
+    """Responsible for rendering the /hub/change-password/[someusername] page where
+    admins can change any user's password. Both on GET requests, when simply
+    navigating to the site, and on POST requests, with the data to change the
+    password attached."""
 
     @admin_users_scope
     async def get(self, user_name):
