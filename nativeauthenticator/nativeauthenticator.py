@@ -295,20 +295,20 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, pw, **kwargs):
+    def create_user(self, username, password, **kwargs):
         username = self.normalize_username(username)
 
-        if self.user_exists(username):
+        if self.user_exists(username) or not self.validate_username(username):
             return
 
-        if not self.is_password_strong(pw) or not self.validate_username(username):
+        if not self.is_password_strong(password):
             return
 
         if not self.enable_signup:
             return
 
-        encoded_pw = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
-        infos = {"username": username, "password": encoded_pw}
+        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
 
         if self.open_signup or username in self.get_authed_users():
@@ -358,7 +358,7 @@ class NativeAuthenticator(Authenticator):
             raise web.HTTPError(
                 503,
                 reason="Self-authorization email could not "
-                + "be sent. Please contact the jupyterhub "
+                + "be sent. Please contact the JupyterHub "
                 + "admin about this.",
             )
 
@@ -375,7 +375,10 @@ class NativeAuthenticator(Authenticator):
     def change_password(self, username, new_password):
         user = self.get_user(username)
 
-        criteria = [user is not None, self.is_password_strong(new_password)]
+        criteria = [
+            user is not None,
+            self.is_password_strong(new_password),
+        ]
         if not all(criteria):
             return
 
