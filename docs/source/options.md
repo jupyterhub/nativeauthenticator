@@ -20,9 +20,7 @@ c.Authenticator.minimum_password_length = 10
 
 If any of this configuration is available, the user will receive this message on SignUp:
 
-```{image} _static/wrong_signup.png
-
-```
+![](_static/wrong_signup.png)
 
 ## Block users after failed logins
 
@@ -38,9 +36,7 @@ You can also define the number of seconds a user must wait before trying again. 
 c.Authenticator.seconds_before_next_try = 1200
 ```
 
-```{image} _static/block_user_failed_logins.png
-
-```
+![](_static/block_user_failed_logins.png)
 
 ## Disable SignUp
 
@@ -199,12 +195,8 @@ c.Authenticator.allow_2fa = True
 
 Users will receive a message after signup with the two factor authentication code:
 
-```{image} _static/signup-two-factor-auth.png
-
-```
+![](_static/signup-two-factor-auth.png)
 
 And login will now require the two factor authentication code as well:
 
-```{image} _static/login-two-factor-auth.png
-
-```
+![](_static/login-two-factor-auth.png)
