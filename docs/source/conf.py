@@ -7,7 +7,7 @@ copyright = "2021, Leticia Portella"
 author = "Leticia Portella"
 
 
-# -- General MyST configuration -----------------------------------------------------
+# -- General MyST configuration ----------------------------------------------
 # ref: https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
 
 myst_enable_extensions = [
@@ -15,7 +15,7 @@ myst_enable_extensions = [
 ]
 
 
-# -- General Sphinx configuration ---------------------------------------------------
+# -- General Sphinx configuration --------------------------------------------
 # ref: https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
