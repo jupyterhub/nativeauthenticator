@@ -139,6 +139,16 @@ async def test_create_user_with_strong_passwords(
     assert bool(user) == expected
 
 
+async def test_pwned_passwords(tmpcwd, app):
+    """Tests the library interface to HaveIBeenPwned.com"""
+    auth = NativeAuthenticator(db=app.db)
+
+    assert auth.is_password_pwned("password")
+    assert auth.is_password_pwned("Daenerys")
+    assert not auth.is_password_pwned("9n+VX7QgVaaqy7PU#S8Bm5GB")
+    assert not auth.is_password_pwned("?JWR%9_gEQ-t%c4eJ%%CAqq=")
+
+
 async def test_change_password(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     user = auth.create_user("johnsnow", "password")

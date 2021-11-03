@@ -9,6 +9,7 @@ from email.message import EmailMessage
 from pathlib import Path
 
 import bcrypt
+import pwnedpasswords
 from jupyterhub.auth import Authenticator
 from sqlalchemy import inspect
 from tornado import web
@@ -268,6 +269,11 @@ class NativeAuthenticator(Authenticator):
             checks.append(not self.is_password_common(password))
 
         return all(checks)
+
+    def is_password_pwned(self, password):
+        """Checks against HaveIBeenPwned.com's database if this
+        password appears in any prominent data leaks."""
+        return pwnedpasswords.check(password, plain_text=True) > 0
 
     def get_user(self, username):
         return UserInfo.find(self.db, self.normalize_username(username))
