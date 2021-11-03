@@ -50,7 +50,7 @@ html_context = {
     "github_user": "jupyterhub",
     "github_repo": "nativeauthenticator",
     "github_version": "main",
-    "doc_path": "docs",
+    "doc_path": "docs/source",
 }
 
 html_static_path = ["_static"]
