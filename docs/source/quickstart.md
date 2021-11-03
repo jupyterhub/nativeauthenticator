@@ -48,11 +48,13 @@ $ jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
 A new user that wants access to a system running NativeAuthenticator must first visit the signup page and create a new account with a username and password. By default, this user will not have access to the system, they will need the authorization of an admin to actually be able to login the system. Thus, after executing the signup, the user will receive a message letting them know that their information was sent to an admin.
 
 ```{image} _static/native_auth_flow.png
+
 ```
 
 The admin must access the authorization panel and authorize the user so they be able to login:
 
 ```{image} _static/authorization_area.png
+
 ```
 
 ## Adding new users
@@ -74,6 +76,7 @@ Usernames cannot be empty or contain commas, spaces or slashes. If any of these 
 To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize` while logged in as an admin user. Alternatively, you can click the "Authorize Users" element on your home page. Authorized users will have a green background with a button to unauthorize them while unauthorized users will have a white background and an authorization button. From here, you can also discard users that attempted to sign up but whom you do not want to authorize (they will not be notified).
 
 ```{image} _static/authorization_area.png
+
 ```
 
 ## Change password
@@ -81,4 +84,5 @@ To authorize new users to enter the system or to manage those that already have 
 Users that are logged in the system can easily change their password by going to: `/hub/change-password` or clicking the "Change Password" element on their home page.
 
 ```{image} _static/change-password.png
+
 ```

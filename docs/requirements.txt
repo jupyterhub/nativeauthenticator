@@ -4,6 +4,6 @@
 # listed earlier.
 #
 myst-parser
+pydata-sphinx-theme
 sphinx-autobuild
 sphinx_copybutton
-pydata-sphinx-theme

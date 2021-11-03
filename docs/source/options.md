@@ -21,6 +21,7 @@ c.Authenticator.minimum_password_length = 10
 If any of this configuration is available, the user will receive this message on SignUp:
 
 ```{image} _static/wrong_signup.png
+
 ```
 
 ## Block users after failed logins
@@ -38,6 +39,7 @@ c.Authenticator.seconds_before_next_try = 1200
 ```
 
 ```{image} _static/block_user_failed_logins.png
+
 ```
 
 ## Disable SignUp
@@ -91,9 +93,9 @@ c.Authenticator.recaptcha_secret = "your secret"
 ## Allow self-serve approval
 
 By default, all users who sign up on NativeAuthenticator need a manual admin approval so they can actually log in the system. Or you can allow anybody without approval as described above with `open_signup`.
-Alternatively, depending on your situation, you may want something *like* `open_signup` but only for users in your own organization. This is what this option permits.
+Alternatively, depending on your situation, you may want something _like_ `open_signup` but only for users in your own organization. This is what this option permits.
 
-New users are still created as non-authorized, but they can self-authorize by navigating to a (cryptographically verified) URL which will be e-mailed to them *only* if the provided email address matches the specified regular expression.
+New users are still created as non-authorized, but they can self-authorize by navigating to a (cryptographically verified) URL which will be e-mailed to them _only_ if the provided email address matches the specified regular expression.
 
 For example, to allow any users who have an `example.com` email address to self-approve, you add the following to your configuration file:
 
@@ -126,7 +128,7 @@ c.Authenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself'
 
 If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
 
-Using GMail (as in the example above) is entirely optional, any other SMTP server accepting password authentication also works. However, if you *do* wish to use GMail as your SMTP server, you must also allow "less secure apps" for this to work, as described at [this link](https://support.google.com/accounts/answer/6010255).
+Using GMail (as in the example above) is entirely optional, any other SMTP server accepting password authentication also works. However, if you _do_ wish to use GMail as your SMTP server, you must also allow "less secure apps" for this to work, as described at [this link](https://support.google.com/accounts/answer/6010255).
 If you have 2FA enabled (with GMail, not NativeAuthenticator) you should disable it for JupyterHub to be able to send emails, as described [over here](https://support.google.com/accounts/answer/185833).
 Also see [this helpful StackExchange post](https://stackoverflow.com/questions/16512592/login-credentials-not-working-with-gmail-smtp) for additional GMail-specific SMTP details.
 
@@ -198,9 +200,11 @@ c.Authenticator.allow_2fa = True
 Users will receive a message after signup with the two factor authentication code:
 
 ```{image} _static/signup-two-factor-auth.png
+
 ```
 
 And login will now require the two factor authentication code as well:
 
 ```{image} _static/login-two-factor-auth.png
+
 ```
