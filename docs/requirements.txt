@@ -1,0 +1,9 @@
+# Beware that the ordering of these can matter when dependencies to them are
+# already installed, such as they are in the ReadTheDocs build system.
+# Dependency constraints for a given library will be better respected if its
+# listed earlier.
+#
+myst-parser
+pydata-sphinx-theme
+sphinx-autobuild
+sphinx_copybutton
