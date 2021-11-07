@@ -19,14 +19,14 @@ c.Authenticator.admin_users = {'my-admin-account'}
 One possible reason for this is that you're using an older database that doesn't have all necessary columns in the `users_info` table, as the column `login_email_sent` was only introduced in version 1.0.
 You can verify this by looking into your system's journal (`journalctl`). If you find a line like the following with your error, then this is indeed the problem.
 
-```bash
-[...]
+```shell
+# ...
 sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: users_info.login_email_sent
-[...]
+# ...
 ```
 
 To remedy this, you merely need to add the column to your `jupyterhub.sqlite` database with the command below. This is not done programatically on account of JupyterHub's SQL library [not being intended](https://docs.sqlalchemy.org/en/14/core/metadata.html#sqlalchemy.schema.Table.append_column) for a use-case such as this. They therefore recommend migrating the database manually.
 
-```bash
-$ sqlite3 /path/to/your/jupyterhub.sqlite "ALTER TABLE users_info ADD login_email_sent Boolean NOT NULL DEFAULT (0)"
+```shell
+sqlite3 /path/to/your/jupyterhub.sqlite "ALTER TABLE users_info ADD login_email_sent Boolean NOT NULL DEFAULT (0)"
 ```
