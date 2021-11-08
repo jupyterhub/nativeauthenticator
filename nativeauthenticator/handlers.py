@@ -70,6 +70,7 @@ class SignUpHandler(LocalBase):
         user,
         username_already_taken,
         confirmation_matches,
+        password_was_pwned,
         assume_user_is_human=True,
     ):
         """Helper function to discern exactly what message and alert level are
@@ -91,6 +92,13 @@ class SignUpHandler(LocalBase):
         elif not confirmation_matches:
             alert = "alert-danger"
             message = "Your password did not match the confirmation. Please try again."
+        elif password_was_pwned:
+            alert = "alert-danger"
+            message = (
+                "That password is known to be included in prominent leaks of user data "
+                "(via haveibeenpwned.com) and is therefore not considered secure. "
+                "Please use a different password."
+            )
         # Error if user creation was not successful.
         elif not user:
             alert = "alert-danger"
@@ -185,10 +193,15 @@ class SignUpHandler(LocalBase):
             "signup_password_confirmation", strip=False
         )
         confirmation_matches = password == confirmation
+        password_was_pwned = self.authenticator.is_password_pwned(password)
 
         # Call helper function from above for precise alert-level and message.
         alert, message = self.get_result_message(
-            user, username_already_taken, confirmation_matches, assume_user_is_human
+            user,
+            username_already_taken,
+            confirmation_matches,
+            password_was_pwned,
+            assume_user_is_human,
         )
 
         otp_secret, user_2fa = "", ""
@@ -343,6 +356,7 @@ class ChangePasswordHandler(LocalBase):
         ).is_valid_password(old_password)
 
         new_password_matches_confirmation = new_password == confirmation
+        password_was_pwned = self.authenticator.is_password_pwned(new_password)
 
         if not correct_password_provided:
             alert = "alert-danger"
@@ -351,6 +365,13 @@ class ChangePasswordHandler(LocalBase):
             alert = "alert-danger"
             message = (
                 "Your new password didn't match the confirmation. Please try again."
+            )
+        elif password_was_pwned:
+            alert = "alert-danger"
+            message = (
+                "That password is known to be included in prominent leaks of user data "
+                "(via haveibeenpwned.com) and is therefore not considered secure. "
+                "Please use a different password."
             )
         else:
             success = self.authenticator.change_password(user.name, new_password)
@@ -411,11 +432,19 @@ class ChangePasswordAdminHandler(LocalBase):
         confirmation = self.get_body_argument("new_password_confirmation", strip=False)
 
         new_password_matches_confirmation = new_password == confirmation
+        password_was_pwned = self.authenticator.is_password_pwned(new_password)
 
         if not new_password_matches_confirmation:
             alert = "alert-danger"
             message = (
                 "The new password didn't match the confirmation. Please try again."
+            )
+        elif password_was_pwned:
+            alert = "alert-danger"
+            message = (
+                "That password is known to be included in prominent leaks of user data "
+                "(via haveibeenpwned.com) and is therefore not considered secure. "
+                "Please use a different password."
             )
         else:
             success = self.authenticator.change_password(user_name, new_password)
