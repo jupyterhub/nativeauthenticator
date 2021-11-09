@@ -311,7 +311,10 @@ class NativeAuthenticator(Authenticator):
         infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
 
-        if self.open_signup or username in self.get_authed_users():
+        # Pre-authorized users (admins, or any users during open signup)
+        pre_authorized = self.open_signup or username in self.get_authed_users()
+
+        if pre_authorized:
             infos.update({"is_authorized": True})
 
         try:
@@ -319,7 +322,8 @@ class NativeAuthenticator(Authenticator):
         except AssertionError:
             return
 
-        if self.allow_self_approval_for:
+        # Don't send authorization emails to pre-authorized users.
+        if self.allow_self_approval_for and not pre_authorized:
             match = re.match(self.allow_self_approval_for, user_info.email)
             if match:
                 url = self.generate_approval_url(username)
