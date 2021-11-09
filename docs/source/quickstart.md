@@ -6,22 +6,22 @@ NativeAuthenticator is a authenticator plugin for [JupyterHub](https://github.co
 
 It is available on [Pypi](https://pypi.org/project/jupyterhub-nativeauthenticator/). The easiest way to install it is via pip:
 
-```bash
-$ pip install jupyterhub-nativeauthenticator
+```shell
+pip install jupyterhub-nativeauthenticator
 ```
 
 Alternatively, you can install this authenticator through the project's gitHub repository:
 
-```bash
-$ git clone https://github.com/jupyterhub/nativeauthenticator.git
-$ cd nativeauthenticator
-$ pip install -e .
+```shell
+git clone https://github.com/jupyterhub/nativeauthenticator.git
+cd nativeauthenticator
+pip install -e .
 ```
 
 After running the installation method of your choice, you must create the configuration file for JupyterHub:
 
-```bash
-$ jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
+```shell
+jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
 ```
 
 Also, change the default authenticator class to NativeAuthenticator:
@@ -39,8 +39,8 @@ c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}
 
 Now you can run JupyterHub using the updated configuration file and start using JupyterHub with NativeAuthenticator:
 
-```bash
-$ jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
+```shell
+jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
 ```
 
 ## Default workflow
