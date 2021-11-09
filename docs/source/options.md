@@ -7,7 +7,7 @@ By default, when a user signs up through Native Authenticator there is no passwo
 To verify if the password is not common (such as 'qwerty' or '1234'), you can add the following line to your config file:
 
 ```python
-c.Authenticator.check_common_password = True
+c.NativeAuthenticator.check_common_password = True
 ```
 
 The Authenticator will verify if the password is a common password and the user won't be able to sign up if it is. The list of the common passwords that are in our verification is available [on this link](https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-10000.txt).
@@ -15,7 +15,7 @@ The Authenticator will verify if the password is a common password and the user 
 You can also add a minimum password length that the user must have. To do this add the following line on the config file with an integer as a value:
 
 ```python
-c.Authenticator.minimum_password_length = 10
+c.NativeAuthenticator.minimum_password_length = 10
 ```
 
 If any of this configuration is available, the user will receive this message on SignUp:
@@ -27,13 +27,13 @@ If any of this configuration is available, the user will receive this message on
 One thing that can make systems more safe is to block users after a number of failed logins. With Native Authenticator you can add this feature by adding `allowed_failed_logins` on the config file. The default is 0, which means that the system will not block users ever.
 
 ```python
-c.Authenticator.allowed_failed_logins = 3
+c.NativeAuthenticator.allowed_failed_logins = 3
 ```
 
 You can also define the number of seconds a user must wait before trying again. The default value is 600 seconds.
 
 ```python
-c.Authenticator.seconds_before_next_try = 1200
+c.NativeAuthenticator.seconds_before_next_try = 1200
 ```
 
 ![](_static/block_user_failed_logins.png)
@@ -43,7 +43,7 @@ c.Authenticator.seconds_before_next_try = 1200
 By default Native Authenticator allows everyone to register user accounts. But you can add a option to disable signup. To do so, just add the following line to the config file:
 
 ```python
-c.Authenticator.enable_signup = False
+c.NativeAuthenticator.enable_signup = False
 ```
 
 ## Open SignUp
@@ -53,7 +53,7 @@ they can actually log in the system. You can change this behavior by adding an o
 open signup, where all users that do sign up can already log in the system. To do so, just add this line to the config file:
 
 ```python
-c.Authenticator.open_signup = True
+c.NativeAuthenticator.open_signup = True
 ```
 
 ## Ask for extra information on SignUp
@@ -62,7 +62,7 @@ Native Authenticator is based on username and password only. But if you need ext
 For now, the only extra information you can ask is email. To do so, you can add the following line to the config file:
 
 ```python
-c.Authenticator.ask_email_on_signup = True
+c.NativeAuthenticator.ask_email_on_signup = True
 ```
 
 ## Use reCaptcha to prevent scripted SignUp attacks
@@ -82,8 +82,8 @@ To enable reCAPTCHA on signup, add the following two lines to the configuration 
 substitute your own credentials.
 
 ```python
-c.Authenticator.recaptcha_key = "your key"
-c.Authenticator.recaptcha_secret = "your secret"
+c.NativeAuthenticator.recaptcha_key = "your key"
+c.NativeAuthenticator.recaptcha_secret = "your secret"
 ```
 
 ## Allow self-serve approval
@@ -96,7 +96,7 @@ New users are still created as non-authorized, but they can self-authorize by na
 For example, to allow any users who have an `example.com` email address to self-approve, you add the following to your configuration file:
 
 ```python
-c.Authenticator.allow_self_approval_for = '[^@]+@example\.com$'
+c.NativeAuthenticator.allow_self_approval_for = '[^@]+@example\.com$'
 ```
 
 Please note that activating this setting automatically also enables `ask_email_on_signup`.
@@ -104,13 +104,13 @@ Please note that activating this setting automatically also enables `ask_email_o
 To use the code, you must also provide a secret key (i.e. an arbitrary string, not too short) to cryptographically sign the URL. To prevents attacks, it is crucial that this key stays secret.
 
 ```python
-c.Authenticator.secret_key = "your-arbitrary-key"
+c.NativeAuthenticator.secret_key = "your-arbitrary-key"
 ```
 
 You should also customize the email sent to users with something as follows:
 
 ```python
-c.Authenticator.self_approval_email = ("from", "subject", "email body, including https://example.com{approval_url}")
+c.NativeAuthenticator.self_approval_email = ("from", "subject", "email body, including https://example.com{approval_url}")
 ```
 
 Note that you need to specify the domain where JupyterHub is running (`example.com` in the code block above) as well as the port, if you are using a non-standard one (e.g. `8000`).
@@ -119,7 +119,7 @@ Also the protocol must be the correct one you are serving your connections from 
 Furthermore, you may specify the SMTP server to use for sending the email. You can do that with
 
 ```python
-c.Authenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself', 'pwd': 'mypassword'}
+c.NativeAuthenticator.self_approval_server = {'url': 'smtp.gmail.com', 'usr': 'myself', 'pwd': 'mypassword'}
 ```
 
 If you do not specify a `self_approval_server`, it will attempt to use `localhost` without authentication.
@@ -151,7 +151,7 @@ You may require that users to click a checkbox agreeing to your TOS before they 
 To do so, you only need to add the following line to your config file and provide a link the where users can find your TOS.
 
 ```python
-c.Authenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
+c.NativeAuthenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>'
 ```
 
 ## Import users from FirstUse Authenticator
@@ -161,7 +161,7 @@ If you are using [FirstUse Authenticator](https://github.com/jupyterhub/firstuse
 To do so, you have to add the following line on the configuration file:
 
 ```python
-c.Authenticator.import_from_firstuse = True
+c.NativeAuthenticator.import_from_firstuse = True
 ```
 
 **Remark: unless you have configured the open signup configuration, the users will be created but they will not be able to login, because they don't have authorization by default.**
@@ -169,7 +169,7 @@ c.Authenticator.import_from_firstuse = True
 By default, Native Authenticator assumes that the path for the database is the same directory. If that's not the case, you can change the path the file through this variables:
 
 ```python
-c.Authenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
+c.NativeAuthenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
 ```
 
 Native Authenticator ensures that usernames are sanitized, so they won't have commas
@@ -181,7 +181,7 @@ error.
 You can also remove FirstUse's database file after the importation to Native Authenticator, to avoid leaving unused files on the system. To do so, you must add the following line to the configuration file:
 
 ```python
-c.Authenticator.delete_firstuse_db_after_import = True
+c.NativeAuthenticator.delete_firstuse_db_after_import = True
 ```
 
 ## Add two factor authentication obligatory for users
@@ -190,7 +190,7 @@ You can increase security making two factor authentication obligatory for all us
 To do so, add the following line on the config file:
 
 ```python
-c.Authenticator.allow_2fa = True
+c.NativeAuthenticator.allow_2fa = True
 ```
 
 Users will receive a message after signup with the two factor authentication code:

@@ -6,22 +6,22 @@ NativeAuthenticator is a authenticator plugin for [JupyterHub](https://github.co
 
 It is available on [Pypi](https://pypi.org/project/jupyterhub-nativeauthenticator/). The easiest way to install it is via pip:
 
-```bash
-$ pip install jupyterhub-nativeauthenticator
+```shell
+pip install jupyterhub-nativeauthenticator
 ```
 
 Alternatively, you can install this authenticator through the project's gitHub repository:
 
-```bash
-$ git clone https://github.com/jupyterhub/nativeauthenticator.git
-$ cd nativeauthenticator
-$ pip install -e .
+```shell
+git clone https://github.com/jupyterhub/nativeauthenticator.git
+cd nativeauthenticator
+pip install -e .
 ```
 
 After running the installation method of your choice, you must create the configuration file for JupyterHub:
 
-```bash
-$ jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
+```shell
+jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
 ```
 
 Also, change the default authenticator class to NativeAuthenticator:
@@ -39,8 +39,8 @@ c.JupyterHub.template_paths = [f"{os.path.dirname(nativeauthenticator.__file__)}
 
 Now you can run JupyterHub using the updated configuration file and start using JupyterHub with NativeAuthenticator:
 
-```bash
-$ jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
+```shell
+jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
 ```
 
 ## Default workflow
@@ -78,8 +78,14 @@ From here, you can also discard users that attempted to sign up but whom you do 
 To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**  
 Make sure to delete these separately, otherwise someone else could sign up with the same username later and inadvertently gain access to data that is not theirs.
 
-## Change password
+## Changing your own password
 
 Users that are logged in the system can easily change their password by going to: `/hub/change-password` or clicking the "Change Password" element on their home page.
 
-![](_static/change-password.png)
+![](_static/change_password_self.png)
+
+## Changing a user's password as admin
+
+In case any user forgets or misplaces their account password, admins can reset it to a password of their choosing. Simply navigate to `/hub/change-password/SomeUserName` or click the "Change Password" element of that user in the authorization area.
+
+![](_static/change_password_user.png)
