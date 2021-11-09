@@ -67,11 +67,16 @@ c.Authenticator.admin_users = {'username'}
 
 Usernames cannot be empty or contain commas, spaces or slashes. If any of these apply, the user will receive an error and will not be able to sign up.
 
-## Authorize or un-authorize users
+## Authorize, un-authorize or discard users
 
-To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize` while logged in as an admin user. Alternatively, you can click the "Authorize Users" element on your home page. Authorized users will have a green background with a button to unauthorize them while unauthorized users will have a white background and an authorization button. From here, you can also discard users that attempted to sign up but whom you do not want to authorize (they will not be notified).
+To authorize new users to enter the system or to manage those that already have access to the system you can go to `/hub/authorize` while logged in as an admin user. Alternatively, you can click the "Authorize Users" element on your home page. Authorized users will have a green background with a button to un-authorize them while un-authorized users will have a white background and an authorization button.
 
 ![](_static/authorization_area.png)
+
+From here, you can also discard users that attempted to sign up but whom you do not want to authorize. Users that are discarded will not be notified.
+
+To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**  
+Make sure to delete these separately, otherwise someone else could sign up with the same username later and inadvertently gain access to data that is not theirs.
 
 ## Change password
 
