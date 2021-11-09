@@ -68,9 +68,10 @@ class SignUpHandler(LocalBase):
     def get_result_message(
         self,
         user,
+        assume_user_is_human,
         username_already_taken,
         confirmation_matches,
-        assume_user_is_human=True,
+        user_is_admin,
     ):
         """Helper function to discern exactly what message and alert level are
         appropriate to display as a response. Called from post() below."""
@@ -111,11 +112,12 @@ class SignUpHandler(LocalBase):
                     "password is not too common."
                 )
         # If user creation went through & open-signup is enabled, success.
-        elif (user is not None) and self.authenticator.open_signup:
+        # If user creation went through & the user is an admin, also success.
+        elif (user is not None) and (self.authenticator.open_signup or user_is_admin):
             alert = "alert-success"
             message = (
                 "The signup was successful! You can now go to "
-                "the home page and log in the system."
+                "the home page and log in to the system."
             )
         else:
             # Default response if nothing goes wrong.
@@ -180,15 +182,21 @@ class SignUpHandler(LocalBase):
             username_already_taken = False
             user = None
 
+        # Collect various information for precise (error) messages.
         password = self.get_body_argument("signup_password", strip=False)
         confirmation = self.get_body_argument(
             "signup_password_confirmation", strip=False
         )
         confirmation_matches = password == confirmation
+        user_is_admin = user_info["username"] in self.authenticator.admin_users
 
         # Call helper function from above for precise alert-level and message.
         alert, message = self.get_result_message(
-            user, username_already_taken, confirmation_matches, assume_user_is_human
+            user,
+            assume_user_is_human,
+            username_already_taken,
+            confirmation_matches,
+            user_is_admin,
         )
 
         otp_secret, user_2fa = "", ""
