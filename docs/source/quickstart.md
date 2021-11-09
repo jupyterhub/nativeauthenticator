@@ -73,8 +73,14 @@ To authorize new users to enter the system or to manage those that already have 
 
 ![](_static/authorization_area.png)
 
-## Change password
+## Changing your own password
 
 Users that are logged in the system can easily change their password by going to: `/hub/change-password` or clicking the "Change Password" element on their home page.
 
-![](_static/change-password.png)
+![](_static/change_password_self.png)
+
+## Changing a user's password as admin
+
+In case any user forgets or misplaces their account password, admins can reset it to a password of their choosing. Simply navigate to `/hub/change-password/SomeUserName` or click the "Change Password" element of that user in the authorization area.
+
+![](_static/change_password_user.png)
