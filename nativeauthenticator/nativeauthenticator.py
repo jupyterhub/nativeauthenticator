@@ -68,7 +68,8 @@ class NativeAuthenticator(Authenticator):
         config=True,
         help=(
             "Secret key to cryptographically sign the "
-            "self-approved URL (if allow_self_approval is utilized)"
+            "self-approved URL (if allow_self_approval is utilized) "
+            "and any potential sigle-signup tokens."
         ),
     ).tag(default="")
 
@@ -341,6 +342,13 @@ class NativeAuthenticator(Authenticator):
         u = s.sign_object({"username": username, "expire": when.isoformat()})
         return "/confirm/" + u
 
+    def generate_signup_token(self, when=None):
+        if when is None:
+            when = datetime.now(tz.utc) + timedelta(days=3)
+        s = Signer(self.secret_key)
+        u = s.sign_object({"expire": when.isoformat()})
+        return u
+
     def send_approval_email(self, dest, url):
         msg = EmailMessage()
         msg["From"] = self.self_approval_email[0]
@@ -399,12 +407,12 @@ class NativeAuthenticator(Authenticator):
     def get_handlers(self, app):
         native_handlers = [
             (r"/login", LoginHandler),
-            (r"/signup", SignUpHandler),
-            (r"/discard/([^/]*)", DiscardHandler),
+            (r"/signup(/[^/]+)?", SignUpHandler),
+            (r"/discard/([^/]+)", DiscardHandler),
             (r"/authorize", AuthorizationAreaHandler),
-            (r"/authorize/([^/]*)", ToggleAuthorizationHandler),
+            (r"/authorize/([^/]+)", ToggleAuthorizationHandler),
             # the following /confirm/ must be like in generate_approval_url()
-            (r"/confirm/([^/]*)", EmailAuthorizationHandler),
+            (r"/confirm/([^/]+)", EmailAuthorizationHandler),
             (r"/change-password", ChangePasswordHandler),
             (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
         ]

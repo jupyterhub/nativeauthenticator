@@ -1,9 +1,33 @@
 {% extends "page.html" %}
 
+{% block script %}
+{{ super() }}
+<script>
+	function copyToClipBoard() {
+	  var copyText = document.getElementById("currentToken");
+	  navigator.clipboard.writeText(copyText.textContent);
+	}
+</script>
+{% endblock script %}
+
 {% block main %}
 <div class="container">
     <h1>Authorization area</h1>
+    
+    {% if ask_email %}
+    <h3>Signup Tokens</h3>
+    <p>General signup is currently disabled. If you wish to let individual users sign up anyway, give them this URL. It will be valid until three days from now.</p>
+    <div>
+        <p><samp id="currentToken">{{signup_url}}</samp></p><p></p>
+        <button class="btn btn-jupyter" onClick="window.location.href=window.location.href">Copy signup URL</button>
+        <!-- reloading the page gives new token -->
+    	<button class="btn btn-jupyter" onClick="window.location.reload();">Generate new signup URL</button>
+    	<p></p>
+    	</form>
+    </div>
+    {% endif %}
 
+    <h3>Current users</h3>
     <table class="table">
         <thead>
             <tr>
@@ -24,8 +48,8 @@
                 {% if ask_email %}<td>{{ user.email }}</td>{% endif %}
                 <td>{{ user.has_2fa }}</td>
                 <td>Yes</td>
-                <td><a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a></td>
-                <td><a class="btn btn-jupyter" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
+                <td><a class="btn btn-default col-xs-10" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a></td>
+                <td><a class="btn btn-jupyter col-xs-10" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
                 <td></td>
             </tr>
             {% else %}
@@ -34,9 +58,9 @@
                 {% if ask_email %}<td>{{ user.email }}</td>{% endif %}
                 <td>{{ user.has_2fa }}</td>
                 <td>No</td>
-                <td><a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a></td>
-                <td><a class="btn btn-jupyter" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
-                <td><a class="btn btn-jupyter" href="{{ base_url }}discard/{{ user.username }}" role="button">Discard</a></td>
+                <td><a class="btn btn-jupyter col-xs-10" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a></td>
+                <td><a class="btn btn-jupyter col-xs-10" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
+                <td><a class="btn btn-jupyter col-xs-10" href="{{ base_url }}discard/{{ user.username }}" role="button">Discard</a></td>
             </tr>
             {% endif %}
             {% endfor %}

@@ -48,11 +48,26 @@ class SignUpHandler(LocalBase):
     """Responsible for rendering the /hub/signup page, validating input to that
     page, account creation and giving accurate feedback to users."""
 
-    async def get(self):
+    def signup_token_is_valid(self, token):
+        try:
+            return int(token.strip("/")) % 2 == 0
+        except (ValueError, AttributeError):
+            return False
+
+    def signup_token_is_expired(self, token):
+        return False
+
+    async def get(self, slug):
         """Rendering on GET requests ("normal" visits)."""
 
-        # 404 if signup is not currently open.
-        if not self.authenticator.enable_signup:
+        self.authenticator.log.info(f"GET request to signup. The slug is {slug}")
+
+        # redirect invalid tokens to standard signup, allowed or not
+        if slug is not None and not self.signup_token_is_valid(slug):
+            self.redirect(self.hub.base_url + "signup")
+
+        # 404 if signup is not currently open and there was no valid token supplied.
+        if not self.authenticator.enable_signup and slug is None:
             raise web.HTTPError(404)
 
         # Render page with relevant settings from the authenticator.
@@ -62,6 +77,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
+            token=slug,
         )
         self.finish(html)
 
@@ -71,6 +87,7 @@ class SignUpHandler(LocalBase):
         assume_user_is_human,
         username_already_taken,
         confirmation_matches,
+        token_expired,
         user_is_admin,
     ):
         """Helper function to discern exactly what message and alert level are
@@ -92,6 +109,12 @@ class SignUpHandler(LocalBase):
         elif not confirmation_matches:
             alert = "alert-danger"
             message = "Your password did not match the confirmation. Please try again."
+        # Error if signup token expired in the past.
+        elif token_expired:
+            alert = "alert-danger"
+            message = (
+                "Your signup-token is expired. Please contact an admin for a fresh one."
+            )
         # Error if user creation was not successful.
         elif not user:
             alert = "alert-danger"
@@ -122,7 +145,7 @@ class SignUpHandler(LocalBase):
         else:
             # Default response if nothing goes wrong.
             alert = "alert-info"
-            message = "Your information has been sent to the admin."
+            message = "Your information has been sent to the admin for authorization."
 
             if (user is not None) and user.login_email_sent:
                 message = (
@@ -132,11 +155,17 @@ class SignUpHandler(LocalBase):
 
         return alert, message
 
-    async def post(self):
+    async def post(self, slug):
         """Rendering on POST requests (signup visits with data attached)."""
 
-        # 404 if users aren't allowed to sign up.
-        if not self.authenticator.enable_signup:
+        self.authenticator.log.info(f"POST request to signup. The slug is {slug}")
+
+        # redirect invalid tokens to standard signup, allowed or not
+        if slug is not None and not self.signup_token_is_valid(slug):
+            self.redirect(self.hub.base_url + "signup")
+
+        # 404 if signup is not currently open and there was no valid token supplied.
+        if not self.authenticator.enable_signup and slug is None:
             raise web.HTTPError(404)
 
         if not self.authenticator.recaptcha_key:
@@ -189,6 +218,7 @@ class SignUpHandler(LocalBase):
         )
         confirmation_matches = password == confirmation
         user_is_admin = user_info["username"] in self.authenticator.admin_users
+        token_expired = self.signup_token_is_expired(slug)
 
         # Call helper function from above for precise alert-level and message.
         alert, message = self.get_result_message(
@@ -196,6 +226,7 @@ class SignUpHandler(LocalBase):
             assume_user_is_human,
             username_already_taken,
             confirmation_matches,
+            token_expired,
             user_is_admin,
         )
 
@@ -223,10 +254,16 @@ class AuthorizationAreaHandler(LocalBase):
 
     @admin_users_scope
     async def get(self):
+
+        new_token = self.authenticator.generate_signup_token()
+        signup_url = " {your-domain} " + self.hub.base_url + "signup/" + new_token
+
         html = await self.render_template(
             "authorization-area.html",
             ask_email=self.authenticator.ask_email_on_signup,
             users=self.db.query(UserInfo).all(),
+            signup_disabled=not self.authenticator.enable_signup,
+            signup_url=signup_url,
         )
         self.finish(html)
 
