@@ -4,8 +4,10 @@
 {{ super() }}
 <script>
 	function copyToClipBoard() {
-	  var copyText = document.getElementById("currentToken");
-	  navigator.clipboard.writeText(copyText.textContent);
+	  var tokenText = document.getElementById("currentToken");
+	  var baseText = document.getElementById("url_input");
+	  var urlText = document.getElementById("url_suffix");
+	  navigator.clipboard.writeText(baseText.value + urlText.textContent + tokenText.textContent);
 	}
 </script>
 {% endblock script %}
@@ -14,12 +16,14 @@
 <div class="container">
     <h1>Authorization area</h1>
     
-    {% if ask_email %}
+    {% if signup_disabled %}
     <h3>Signup Tokens</h3>
-    <p>General signup is currently disabled. If you wish to let individual users sign up anyway, give them this URL. It will be valid until three days from now.</p>
+    <p>General signup is currently disabled. If you wish to let individual users sign up anyway, give them the signup URL below. It will be valid until three days from now.</p>
     <div>
-        <p><samp id="currentToken">{{signup_url}}</samp></p><p></p>
-        <button class="btn btn-jupyter" onClick="copyToClipBoard();">Copy signup URL</button>
+        <p><label for="url_input">Your URL base: </label><input style="margin-left:5px" type="text" id="url_input"><samp style="margin-left:5px" id="url_suffix">{{signup_url}}</samp><br/></p>
+        <p><label for="currentToken">Token: </label><samp style="margin-left:5px" id="currentToken">{{signup_token}}</samp></p>
+        <p></p>
+        <button class="btn btn-jupyter" onClick="copyToClipBoard();">Copy complete signup URL</button>
         <!-- reloading the page gives new token -->
     	<button class="btn btn-jupyter" onClick="window.location.reload();">Generate new signup URL</button>
     	<p></p>

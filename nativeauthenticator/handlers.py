@@ -1,6 +1,7 @@
 import os
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone as tz
 
 from jinja2 import ChoiceLoader
@@ -23,6 +24,7 @@ from tornado.httputil import url_concat
 
 import requests
 
+from .crypto.signing import SignatureExpired
 from .orm import UserInfo
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -50,36 +52,56 @@ class SignUpHandler(LocalBase):
 
     def signup_token_is_valid(self, token):
         try:
-            return int(token.strip("/")) % 2 == 0
-        except (ValueError, AttributeError):
+            out = EmailAuthorizationHandler.validate_slug(
+                token, self.authenticator.secret_key
+            )
+            return out is not None
+        except (AttributeError, TypeError, ValueError):
             return False
-
-    def signup_token_is_expired(self, token):
-        return False
 
     async def get(self, slug):
         """Rendering on GET requests ("normal" visits)."""
 
-        self.authenticator.log.info(f"GET request to signup. The slug is {slug}")
+        # Drop leading slash in slug.
+        if slug is not None and slug[0] == "/":
+            slug = slug[1:]
 
-        # redirect invalid tokens to standard signup, allowed or not
-        if slug is not None and not self.signup_token_is_valid(slug):
-            self.redirect(self.hub.base_url + "signup")
+        token_was_given = not (slug is None or slug == "")
+        token_is_expired = False
+
+        try:
+            token_is_valid = self.signup_token_is_valid(slug)
+        except SignatureExpired as e:
+            self.authenticator.log.error(e)
+            token_is_expired = True
 
         # 404 if signup is not currently open and there was no valid token supplied.
-        if not self.authenticator.enable_signup and slug is None:
+        if not token_was_given and not self.authenticator.enable_signup:
             raise web.HTTPError(404)
-
-        # Render page with relevant settings from the authenticator.
-        html = await self.render_template(
-            "signup.html",
-            ask_email=self.authenticator.ask_email_on_signup,
-            two_factor_auth=self.authenticator.allow_2fa,
-            recaptcha_key=self.authenticator.recaptcha_key,
-            tos=self.authenticator.tos,
-            token=slug,
-        )
-        self.finish(html)
+        # 403 if there was a token, but it expired in the past.
+        elif token_was_given and token_is_expired:
+            raise web.HTTPError(
+                403,
+                reason="Signup token expired. Please request a fresh one.",
+            )
+        # 403 if there was a token, but signature was bad or it was otherwise invalid.
+        elif token_was_given and not token_is_valid:
+            raise web.HTTPError(
+                403,
+                reason="Signup token is invalid. Please request a fresh one.",
+            )
+        # Otherwise, proceed as normal.
+        else:
+            # Render page with relevant settings from the authenticator.
+            html = await self.render_template(
+                "signup.html",
+                ask_email=self.authenticator.ask_email_on_signup,
+                two_factor_auth=self.authenticator.allow_2fa,
+                recaptcha_key=self.authenticator.recaptcha_key,
+                tos=self.authenticator.tos,
+                token=slug,
+            )
+            self.finish(html)
 
     def get_result_message(
         self,
@@ -87,7 +109,6 @@ class SignUpHandler(LocalBase):
         assume_user_is_human,
         username_already_taken,
         confirmation_matches,
-        token_expired,
         user_is_admin,
     ):
         """Helper function to discern exactly what message and alert level are
@@ -109,12 +130,6 @@ class SignUpHandler(LocalBase):
         elif not confirmation_matches:
             alert = "alert-danger"
             message = "Your password did not match the confirmation. Please try again."
-        # Error if signup token expired in the past.
-        elif token_expired:
-            alert = "alert-danger"
-            message = (
-                "Your signup-token is expired. Please contact an admin for a fresh one."
-            )
         # Error if user creation was not successful.
         elif not user:
             alert = "alert-danger"
@@ -158,95 +173,113 @@ class SignUpHandler(LocalBase):
     async def post(self, slug):
         """Rendering on POST requests (signup visits with data attached)."""
 
-        self.authenticator.log.info(f"POST request to signup. The slug is {slug}")
+        # Drop leading slash in slug.
+        if slug is not None and slug[0] == "/":
+            slug = slug[1:]
 
-        # redirect invalid tokens to standard signup, allowed or not
-        if slug is not None and not self.signup_token_is_valid(slug):
-            self.redirect(self.hub.base_url + "signup")
+        token_was_given = not (slug is None or slug == "")
+        token_is_expired = False
+
+        try:
+            token_is_valid = self.signup_token_is_valid(slug)
+        except SignatureExpired as e:
+            self.authenticator.log.error(e)
+            token_is_expired = True
 
         # 404 if signup is not currently open and there was no valid token supplied.
-        if not self.authenticator.enable_signup and slug is None:
+        if not token_was_given and not self.authenticator.enable_signup:
             raise web.HTTPError(404)
-
-        if not self.authenticator.recaptcha_key:
-            # If this option is not enabled, we proceed under
-            # the assumption that the user is human.
-            assume_user_is_human = True
-        else:
-            # If this option _is_ enabled, we assume the user
-            # is _not_ human until we know otherwise.
-            assume_user_is_human = False
-
-            recaptcha_response = self.get_body_argument(
-                "g-recaptcha-response", strip=True
+        # 403 if there was a token, but it expired in the past.
+        elif token_was_given and token_is_expired:
+            raise web.HTTPError(
+                403,
+                reason="Signup token expired. Please request a fresh one.",
             )
-            if recaptcha_response != "":
-                data = {
-                    "secret": self.authenticator.recaptcha_secret,
-                    "response": recaptcha_response,
-                }
+        # 403 if there was a token, but signature was bad or it was otherwise invalid.
+        elif token_was_given and not token_is_valid:
+            raise web.HTTPError(
+                403,
+                reason="Signup token is invalid. Please request a fresh one.",
+            )
+        # Otherwise, proceed as normal.
+        else:
+            if not self.authenticator.recaptcha_key:
+                # If this option is not enabled, we proceed under
+                # the assumption that the user is human.
+                assume_user_is_human = True
+            else:
+                # If this option _is_ enabled, we assume the user
+                # is _not_ human until we know otherwise.
+                assume_user_is_human = False
+
+                recaptcha_response = self.get_body_argument(
+                    "g-recaptcha-response", strip=True
+                )
+                if recaptcha_response != "":
+                    data = {
+                        "secret": self.authenticator.recaptcha_secret,
+                        "response": recaptcha_response,
+                    }
                 siteverify_url = "https://www.google.com/recaptcha/api/siteverify"
                 validation_status = requests.post(siteverify_url, data=data)
 
                 assume_user_is_human = validation_status.json().get("success")
 
-                # Logging result
-                if assume_user_is_human:
-                    self.authenticator.log.info("Passed reCaptcha")
-                else:
-                    self.authenticator.log.error("Failed reCaptcha")
+            # Logging result
+            if assume_user_is_human:
+                self.authenticator.log.info("Passed reCaptcha")
+            else:
+                self.authenticator.log.error("Failed reCaptcha")
 
-        if assume_user_is_human:
-            user_info = {
-                "username": self.get_body_argument("username", strip=False),
-                "password": self.get_body_argument("signup_password", strip=False),
-                "email": self.get_body_argument("email", "", strip=False),
-                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
-            }
-            username_already_taken = self.authenticator.user_exists(
-                user_info["username"]
+            if assume_user_is_human:
+                user_info = {
+                    "username": self.get_body_argument("username", strip=False),
+                    "password": self.get_body_argument("signup_password", strip=False),
+                    "email": self.get_body_argument("email", "", strip=False),
+                    "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
+                }
+                username_already_taken = self.authenticator.user_exists(
+                    user_info["username"]
+                )
+                user = self.authenticator.create_user(**user_info)
+            else:
+                username_already_taken = False
+                user = None
+
+            # Collect various information for precise (error) messages.
+            password = self.get_body_argument("signup_password", strip=False)
+            confirmation = self.get_body_argument(
+                "signup_password_confirmation", strip=False
             )
-            user = self.authenticator.create_user(**user_info)
-        else:
-            username_already_taken = False
-            user = None
+            confirmation_matches = password == confirmation
+            user_is_admin = user_info["username"] in self.authenticator.admin_users
 
-        # Collect various information for precise (error) messages.
-        password = self.get_body_argument("signup_password", strip=False)
-        confirmation = self.get_body_argument(
-            "signup_password_confirmation", strip=False
-        )
-        confirmation_matches = password == confirmation
-        user_is_admin = user_info["username"] in self.authenticator.admin_users
-        token_expired = self.signup_token_is_expired(slug)
+            # Call helper function from above for precise alert-level and message.
+            alert, message = self.get_result_message(
+                user,
+                assume_user_is_human,
+                username_already_taken,
+                confirmation_matches,
+                user_is_admin,
+            )
 
-        # Call helper function from above for precise alert-level and message.
-        alert, message = self.get_result_message(
-            user,
-            assume_user_is_human,
-            username_already_taken,
-            confirmation_matches,
-            token_expired,
-            user_is_admin,
-        )
+            otp_secret, user_2fa = "", ""
+            if user:
+                otp_secret = user.otp_secret
+                user_2fa = user.has_2fa
 
-        otp_secret, user_2fa = "", ""
-        if user:
-            otp_secret = user.otp_secret
-            user_2fa = user.has_2fa
-
-        html = await self.render_template(
-            "signup.html",
-            ask_email=self.authenticator.ask_email_on_signup,
-            result_message=message,
-            alert=alert,
-            two_factor_auth=self.authenticator.allow_2fa,
-            two_factor_auth_user=user_2fa,
-            two_factor_auth_value=otp_secret,
-            recaptcha_key=self.authenticator.recaptcha_key,
-            tos=self.authenticator.tos,
-        )
-        self.finish(html)
+            html = await self.render_template(
+                "signup.html",
+                ask_email=self.authenticator.ask_email_on_signup,
+                result_message=message,
+                alert=alert,
+                two_factor_auth=self.authenticator.allow_2fa,
+                two_factor_auth_user=user_2fa,
+                two_factor_auth_value=otp_secret,
+                recaptcha_key=self.authenticator.recaptcha_key,
+                tos=self.authenticator.tos,
+            )
+            self.finish(html)
 
 
 class AuthorizationAreaHandler(LocalBase):
@@ -255,8 +288,10 @@ class AuthorizationAreaHandler(LocalBase):
     @admin_users_scope
     async def get(self):
 
-        new_token = self.authenticator.generate_signup_token()
-        signup_url = " {your-domain} " + self.hub.base_url + "signup/" + new_token
+        expire_date = datetime.now(tz.utc) + timedelta(days=3)
+
+        new_token = self.authenticator.generate_approval_token("", when=expire_date)
+        signup_url = self.hub.base_url + "signup/"
 
         html = await self.render_template(
             "authorization-area.html",
@@ -264,6 +299,7 @@ class AuthorizationAreaHandler(LocalBase):
             users=self.db.query(UserInfo).all(),
             signup_disabled=not self.authenticator.enable_signup,
             signup_url=signup_url,
+            signup_token=new_token,
         )
         self.finish(html)
 

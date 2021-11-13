@@ -305,9 +305,6 @@ class NativeAuthenticator(Authenticator):
         if not self.is_password_strong(password):
             return
 
-        if not self.enable_signup:
-            return
-
         encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
@@ -327,7 +324,7 @@ class NativeAuthenticator(Authenticator):
         if self.allow_self_approval_for and not pre_authorized:
             match = re.match(self.allow_self_approval_for, user_info.email)
             if match:
-                url = self.generate_approval_url(username)
+                url = "/confirm/" + self.generate_approval_token(username)
                 self.send_approval_email(user_info.email, url)
                 user_info.login_email_sent = True
 
@@ -335,18 +332,11 @@ class NativeAuthenticator(Authenticator):
         self.db.commit()
         return user_info
 
-    def generate_approval_url(self, username, when=None):
+    def generate_approval_token(self, username, when=None):
         if when is None:
             when = datetime.now(tz.utc) + timedelta(minutes=15)
         s = Signer(self.secret_key)
         u = s.sign_object({"username": username, "expire": when.isoformat()})
-        return "/confirm/" + u
-
-    def generate_signup_token(self, when=None):
-        if when is None:
-            when = datetime.now(tz.utc) + timedelta(days=3)
-        s = Signer(self.secret_key)
-        u = s.sign_object({"expire": when.isoformat()})
         return u
 
     def send_approval_email(self, dest, url):
@@ -411,7 +401,6 @@ class NativeAuthenticator(Authenticator):
             (r"/discard/([^/]+)", DiscardHandler),
             (r"/authorize", AuthorizationAreaHandler),
             (r"/authorize/([^/]+)", ToggleAuthorizationHandler),
-            # the following /confirm/ must be like in generate_approval_url()
             (r"/confirm/([^/]+)", EmailAuthorizationHandler),
             (r"/change-password", ChangePasswordHandler),
             (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
