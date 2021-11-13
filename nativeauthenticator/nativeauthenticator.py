@@ -391,7 +391,7 @@ class NativeAuthenticator(Authenticator):
         return True
 
     def validate_username(self, username):
-        invalid_chars = [",", " "]
+        invalid_chars = [",", " ", "/"]
         if any((char in username) for char in invalid_chars):
             return False
         return super().validate_username(username)
