@@ -115,7 +115,7 @@ class NativeAuthenticator(Authenticator):
 
     minimum_password_length = Integer(
         config=True,
-        help=("Check if the length of the password is at least this size on " "signup"),
+        help=("Check if the length of the password is at least this size on signup"),
     ).tag(default=1)
 
     allowed_failed_logins = Integer(

@@ -220,14 +220,14 @@ async def test_handlers(app):
     """Test if all handlers are available on the Authenticator"""
     auth = NativeAuthenticator(db=app.db)
     handlers = auth.get_handlers(app)
-    assert handlers[0][0] == "/login"
-    assert handlers[1][0] == "/signup"
-    assert handlers[2][0] == "/discard/([^/]*)"
-    assert handlers[3][0] == "/authorize"
-    assert handlers[4][0] == "/authorize/([^/]*)"
-    assert handlers[5][0] == "/confirm/([^/]*)"
-    assert handlers[6][0] == "/change-password"
-    assert handlers[7][0] == "/change-password/([^/]+)"
+    assert handlers[0][0] == r"/login"
+    assert handlers[1][0] == r"/signup(/[^/]+)?"
+    assert handlers[2][0] == r"/discard/([^/]+)"
+    assert handlers[3][0] == r"/authorize"
+    assert handlers[4][0] == r"/authorize/([^/]+)"
+    assert handlers[5][0] == r"/confirm/([^/]+)"
+    assert handlers[6][0] == r"/change-password"
+    assert handlers[7][0] == r"/change-password/([^/]+)"
 
 
 async def test_add_new_attempt_of_login(tmpcwd, app):
@@ -383,4 +383,24 @@ async def test_approval_url(app):
     slug = url.split("/")[-1]
     out = EmailAuthorizationHandler.validate_slug(slug, auth.secret_key)
     assert out["username"] == "somebody"
+    assert out["expire"] == expiration
+
+
+async def test_signup_token(app):
+    auth = NativeAuthenticator(db=app.db)
+
+    # confirm that a forged slug cannot be used
+    with pytest.raises(ValueError):
+        EmailAuthorizationHandler.validate_slug("fake", auth.secret_key)
+
+    # confirm that an expired URL cannot be used
+    expiration = datetime.datetime.now(tz.utc) - datetime.timedelta(days=3)
+    token = auth.generate_signup_token(when=expiration)
+    with pytest.raises(ValueError):
+        EmailAuthorizationHandler.validate_slug(token, auth.secret_key)
+
+    # confirm that a non-expired, correctly signed URL can be used
+    expiration = datetime.datetime.now(tz.utc) + datetime.timedelta(days=3)
+    token = auth.generate_signup_token(when=expiration)
+    out = EmailAuthorizationHandler.validate_slug(token, auth.secret_key)
     assert out["expire"] == expiration

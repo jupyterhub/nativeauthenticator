@@ -19,7 +19,7 @@
     <p>General signup is currently disabled. If you wish to let individual users sign up anyway, give them this URL. It will be valid until three days from now.</p>
     <div>
         <p><samp id="currentToken">{{signup_url}}</samp></p><p></p>
-        <button class="btn btn-jupyter" onClick="window.location.href=window.location.href">Copy signup URL</button>
+        <button class="btn btn-jupyter" onClick="copyToClipBoard();">Copy signup URL</button>
         <!-- reloading the page gives new token -->
     	<button class="btn btn-jupyter" onClick="window.location.reload();">Generate new signup URL</button>
     	<p></p>
