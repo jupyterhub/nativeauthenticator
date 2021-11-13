@@ -100,7 +100,7 @@ class SignUpHandler(LocalBase):
             if minimum_password_length > 0:
                 message = (
                     "Something went wrong!\nBe sure your username "
-                    "does not contain spaces or commas, your "
+                    "does not contain spaces, commas or slashes, your "
                     f"password has at least {minimum_password_length} "
                     "characters and is not too common."
                 )
