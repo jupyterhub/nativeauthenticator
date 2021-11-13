@@ -108,7 +108,7 @@ class SignUpHandler(LocalBase):
             else:
                 message = (
                     "Something went wrong!\nBe sure your username "
-                    "does not contain spaces or commas and your "
+                    "does not contain spaces, commas or slashes and your "
                     "password is not too common."
                 )
         # If user creation went through & open-signup is enabled, success.
