@@ -175,26 +175,6 @@ async def test_no_change_to_bad_password(tmpcwd, app):
 
 
 @pytest.mark.parametrize(
-    "enable_signup,expected_success",
-    [
-        (True, True),
-        (False, False),
-    ],
-)
-async def test_create_user_disable(enable_signup, expected_success, tmpcwd, app):
-    """Test method get_or_create_user not create user if signup is disabled"""
-    auth = NativeAuthenticator(db=app.db)
-    auth.enable_signup = enable_signup
-
-    user = auth.create_user("johnsnow", "password")
-
-    if expected_success:
-        assert user.username == "johnsnow"
-    else:
-        assert not user
-
-
-@pytest.mark.parametrize(
     "username,password,authorized,expected",
     [
         ("name", "123", False, False),
