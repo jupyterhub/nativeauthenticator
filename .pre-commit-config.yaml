@@ -11,7 +11,7 @@
 repos:
   # Autoformat: Python code, syntax patterns are modernized
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.29.1
+    rev: v2.31.1
     hooks:
       - id: pyupgrade
         args:
@@ -19,14 +19,14 @@ repos:
 
   # Autoformat: Python code
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.1.0
     hooks:
       - id: black
         args: [--target-version=py36]
 
   # Autoformat: Python code
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.6.0
+    rev: v3.0.1
     hooks:
       - id: reorder-python-imports
         args: [--py3-plus]
