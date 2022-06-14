@@ -72,9 +72,11 @@
             </div>
             {% endif %}
 
+            {% if not use_email_as_username %}
             <label for="username_input">Username:</label>
             <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off" autocorrect="off" class="form-control" autofocus="autofocus" required />
             <p></p>
+            {% endif %}
 
             {% if ask_email %}
             <label for="email_input">Email:</label>

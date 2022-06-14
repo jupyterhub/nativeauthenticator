@@ -65,6 +65,17 @@ For now, the only extra information you can ask is email. To do so, you can add 
 c.NativeAuthenticator.ask_email_on_signup = True
 ```
 
+### Use email as username
+
+This option basically uses the email as username which prevents users from having to provide an username on the signup form
+
+```python
+c.NativeAuthenticator.use_email_as_username = True
+```
+
+If you are using DockerSpawner please notice that this have a direct impact on the container names since it uses the username to name the container.
+Also, if you are using dockerspawner < 12.0.0 you may face some issues due to a miss alginment with some changes done by the Docker team
+
 ## Use reCaptcha to prevent scripted SignUp attacks
 
 Since by default, anybody can sign up to the system, you may want to use the lightweight

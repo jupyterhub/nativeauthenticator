@@ -26,6 +26,8 @@ c.NativeAuthenticator.seconds_before_next_try = 600
 c.NativeAuthenticator.enable_signup = True
 c.NativeAuthenticator.open_signup = False
 c.NativeAuthenticator.ask_email_on_signup = True
+c.NativeAuthenticator.use_email_as_username = True
+c.NativeAuthenticator.open_signup = True
 
 c.NativeAuthenticator.allow_2fa = True
 

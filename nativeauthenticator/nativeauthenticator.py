@@ -149,6 +149,11 @@ class NativeAuthenticator(Authenticator):
     )
 
     ask_email_on_signup = Bool(False, config=True, help="Asks for email on signup")
+    use_email_as_username = Bool(
+        False,
+        config=True,
+        help="Use email as username. Note that this requires ask_email_on_signup to be True",
+    )
 
     import_from_firstuse = Bool(
         False, config=True, help="Import users from FirstUse Authenticator database"
@@ -181,6 +186,7 @@ class NativeAuthenticator(Authenticator):
             self.add_data_from_firstuse()
 
         self.setup_self_approval()
+        self.setup_use_email_as_username()
 
     def setup_self_approval(self):
         if self.allow_self_approval_for:
@@ -192,6 +198,10 @@ class NativeAuthenticator(Authenticator):
                     "Secret_key must be a random string of "
                     "len > 8 when using self_approval"
                 )
+
+    def setup_use_email_as_username(self):
+        if self.use_email_as_username:
+            self.ask_email_on_signup = True
 
     def add_new_table(self):
         inspector = inspect(self.db.bind)
