@@ -42,6 +42,8 @@ jobs:
             jupyterhub-version: "2.*"
           - python-version: "3.10"
             jupyterhub-version: "2.*"
+          - python-version: "3.11.0-rc.1"
+            jupyterhub-version: "3.*"
 
     steps:
       - uses: actions/checkout@v3
