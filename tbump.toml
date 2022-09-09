@@ -1,0 +1,30 @@
+# tbump is a tool to update version fields that we use
+# to update version in setup.py as documented
+# in RELEASE.md
+#
+# Config reference: https://github.com/your-tools/tbump#readme
+#
+[version]
+current = "1.0.5"
+
+regex = '''
+  (?P<major>\d+)
+  \.
+  (?P<minor>\d+)
+  \.
+  (?P<patch>\d+)
+  (?P<pre>((a|b|rc)\d+)|)
+  \.?
+  (?P<dev>(?<=\.)dev\d*|)
+  '''
+
+[git]
+message_template = "Bump to {new_version}"
+tag_template = "{new_version}"
+
+# For each file to patch, add a [[file]] config
+# section containing the path of the file, relative to the
+# tbump.toml location.
+[[file]]
+src = "setup.py"
+search = 'version="{current_version}"'
