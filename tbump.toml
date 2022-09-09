@@ -5,7 +5,7 @@
 # Config reference: https://github.com/your-tools/tbump#readme
 #
 [version]
-current = "1.1.0"
+current = "1.2.0.dev"
 
 regex = '''
   (?P<major>\d+)
