@@ -304,9 +304,8 @@ class NativeAuthenticator(Authenticator):
             else:
                 return
 
-        if not from_firstuse:
-            if not self.is_password_strong(password):
-                return
+        if not self.is_password_strong(password):
+            return
 
         if not self.enable_signup:
             return
