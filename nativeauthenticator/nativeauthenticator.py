@@ -295,19 +295,26 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, password, **kwargs):
+    def create_user(self, username, password, from_firstuse=False, **kwargs):
         username = self.normalize_username(username)
 
         if self.user_exists(username) or not self.validate_username(username):
-            return
+            if from_firstuse:
+                return True # only returned when importing passwords.dbm, so it should not affect any other code.
+            else:
+                return
 
-        if not self.is_password_strong(password):
-            return
+        if not from_firstuse:
+            if not self.is_password_strong(password):
+                return
 
         if not self.enable_signup:
             return
 
-        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        if not from_firstuse:
+            encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        else:
+            encoded_password = password
         infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
 
@@ -432,8 +439,8 @@ class NativeAuthenticator(Authenticator):
     def add_data_from_firstuse(self):
         with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
-                password = db[user].decode()
-                new_user = self.create_user(user.decode(), password)
+                password = db[user]
+                new_user = self.create_user(user.decode(), password, from_firstuse=True)
                 if not new_user:
                     error = (
                         f"User {user} was not created. Check password "
