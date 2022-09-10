@@ -296,13 +296,21 @@ class NativeAuthenticator(Authenticator):
         return self.get_user(username) is not None
 
     def create_user(self, username, password, from_firstuse=False, **kwargs):
+
+        # variable added to enable skipping adding existing users
+        add_to_db = True
+
         username = self.normalize_username(username)
 
-        if self.user_exists(username) or not self.validate_username(username):
+        # fail if the username is not valid
+        if not self.validate_username(username):
+            return
+
+        if self.user_exists(username):
             if from_firstuse:
-                return True  # only returned when importing passwords.dbm, so it should not affect any other code.
+                add_to_db = False  # only returned when importing passwords.dbm, so it should not affect any other code.
             else:
-                return
+                return  # fail if the user exists and it is not a FirstUseAuthenticator import
 
         if not self.is_password_strong(password):
             return
@@ -336,8 +344,9 @@ class NativeAuthenticator(Authenticator):
                 self.send_approval_email(user_info.email, url)
                 user_info.login_email_sent = True
 
-        self.db.add(user_info)
-        self.db.commit()
+        if add_to_db:
+            self.db.add(user_info)
+            self.db.commit()
         return user_info
 
     def generate_approval_url(self, username, when=None):
