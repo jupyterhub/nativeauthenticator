@@ -300,7 +300,7 @@ class NativeAuthenticator(Authenticator):
 
         if self.user_exists(username) or not self.validate_username(username):
             if from_firstuse:
-                return True # only returned when importing passwords.dbm, so it should not affect any other code.
+                return True  # only returned when importing passwords.dbm, so it should not affect any other code.
             else:
                 return
 
