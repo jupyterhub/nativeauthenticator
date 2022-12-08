@@ -1,8 +1,11 @@
 import os
+import io
 import socket
 from datetime import date
 from datetime import datetime
 from datetime import timezone as tz
+
+import qrcode
 
 from jinja2 import ChoiceLoader
 from jinja2 import FileSystemLoader
@@ -205,7 +208,12 @@ class SignUpHandler(LocalBase):
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
 
-        host = socket.gethostname()
+        if len(otp_secret) > 0:
+            hostname = socket.gethostname()
+            qrimg = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
+            qrbytes = io.BytesIO()
+            qrimg.save(qrbytes, format=qrimg.format)
+
         html = await self.render_template(
             "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
@@ -214,7 +222,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
-            two_factor_auth_uri=f'otpauth://totp/{user.username}@{host}?secret={user.otp_secret}&issuer={host}',
+            two_factor_auth_qrbytes=qrbytes,
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
         )
