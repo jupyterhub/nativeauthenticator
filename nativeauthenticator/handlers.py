@@ -203,7 +203,7 @@ class SignUpHandler(LocalBase):
             user_is_admin,
         )
 
-        otp_secret, user_2fa = "", ""
+        otp_secret, user_2fa, qrbytes = "", "", ""
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
