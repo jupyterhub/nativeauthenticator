@@ -1,6 +1,7 @@
 import os
 import io
 import socket
+import base64
 from datetime import date
 from datetime import datetime
 from datetime import timezone as tz
@@ -203,15 +204,16 @@ class SignUpHandler(LocalBase):
             user_is_admin,
         )
 
-        otp_secret, user_2fa, qrbytes = "", "", ""
+        otp_secret, user_2fa, qrimg_base64 = "", "", ""
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
             if user_2fa:
                 hostname = socket.gethostname()
-                qrimg = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
-                qrbytes = io.BytesIO()
-                qrimg.save(qrbytes, format=qrimg.format)
+                qrimg_pil = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
+                qrimg_bytes = io.BytesIO()
+                qrimg_pil.save(qrimg_bytes, format="PNG")
+                qrimg_base64 = base64.b64encode(qrimg_bytes.getvalue())
 
         html = await self.render_template(
             "signup.html",
@@ -221,7 +223,7 @@ class SignUpHandler(LocalBase):
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
-            two_factor_auth_qrbytes=qrbytes,
+            two_factor_auth_qrbytes=qrimg_base64,
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
         )
