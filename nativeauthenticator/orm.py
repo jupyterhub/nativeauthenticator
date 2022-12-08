@@ -1,9 +1,10 @@
 import base64
 import os
 import re
+import socket
 
 import bcrypt
-import onetimepass
+import pyotp
 from jupyterhub.orm import Base
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -56,8 +57,20 @@ class UserInfo(Base):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.otp_secret:
-            self.otp_secret = base64.b32encode(os.urandom(10)).decode("utf-8")
+        if self.has_2fa:
+            if not self.otp_secret:
+                google_auth = f"{os.path.expanduser(self.username)}/.google_authenticator"
+                if not os.path.exists(google_auth):
+                    os.system("google-authenticator" +
+                        f" --secret={google_auth}" +
+                        " --quiet --force --no-confirm" +
+                        " --time-based --allow-reuse --window-size=3" +
+                        " --rate-limit=3 --rate-time=30")
+                with open(google_auth, 'r') as f:
+                    self.otp_secret = f.readline().strip("\n")
+            host = socket.gethostname()
+            self.totp = pyotp.parse_uri(
+                f'otpauth://totp/{self.username}@{host}?secret={self.otp_secret}&issuer={host}')        
 
     @classmethod
     def find(cls, db, username):
@@ -117,4 +130,7 @@ class UserInfo(Base):
         module. Assuming the user generated a TOTP with a common shared one-time
         password secret (otp_secret), these passwords should match.
         """
-        return onetimepass.valid_totp(token, self.otp_secret)
+        if self.has_2fa:
+            return self.totp.verify(token)
+        else:
+            return True
