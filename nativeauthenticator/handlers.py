@@ -203,10 +203,9 @@ class SignUpHandler(LocalBase):
         otp_secret, user_2fa = "", ""
         if user:
             otp_secret = user.otp_secret
-            host = socket.gethostname()
-            otp_uri = f'otpauth://totp/{user.username}@{host}?secret={otp_secret}&issuer={host}'
             user_2fa = user.has_2fa
 
+        host = socket.gethostname()
         html = await self.render_template(
             "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
@@ -214,7 +213,8 @@ class SignUpHandler(LocalBase):
             alert=alert,
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=user_2fa,
-            two_factor_auth_value=otp_uri,
+            two_factor_auth_value=otp_secret,
+            two_factor_auth_uri=f'otpauth://totp/{user.username}@{host}?secret={user.otp_secret}&issuer={host}',
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
         )

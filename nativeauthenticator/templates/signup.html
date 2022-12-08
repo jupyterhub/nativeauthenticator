@@ -68,6 +68,10 @@
                     <strong>Attention!</strong> You have configured two factor authentication.
                     Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>.
                 </p>
+                <img src="https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr&chl={{ two_factor_auth_uri }}" 
+                     width="200" 
+                     height="200" 
+                     alt="{{ two_factor_auth_uri }}">
                 {% endif %}
             </div>
             {% endif %}
