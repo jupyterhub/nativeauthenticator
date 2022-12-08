@@ -1,7 +1,7 @@
-import base64
 import os
 import re
 import socket
+import shutil
 
 import bcrypt
 import pyotp
@@ -12,13 +12,6 @@ from sqlalchemy import Integer
 from sqlalchemy import LargeBinary
 from sqlalchemy import String
 from sqlalchemy.orm import validates
-
-def get_user_home(username):
-    with open('/etc/passwd', 'r') as f:
-        for line in f:
-            if username in line:
-                return line.split(':')[5]
-    raise KeyError(f"{username} not found in /etc/passwd")
 
 class UserInfo(Base):
     """
@@ -61,18 +54,9 @@ class UserInfo(Base):
     # to be matched against each other.
     otp_secret = Column(String(16))
 
-    def __init__(self, **kwargs):
+    def __init__(self, use_google_libpam=False, **kwargs):
         super().__init__(**kwargs)
-        if self.has_2fa and not self.otp_secret:
-            google_auth = f"{get_user_home(self.username)}/.google_authenticator"
-            if not os.path.exists(google_auth):
-                os.system("google-authenticator" +
-                    f" --secret={google_auth}" +
-                    " --quiet --force --no-confirm" +
-                    " --time-based --allow-reuse --window-size=3" +
-                    " --rate-limit=3 --rate-time=30")
-            with open(google_auth, 'r') as f:
-                self.otp_secret = f.readline().strip("\n")
+        self.otp_secret = self.get_otp_secret(use_google_libpam)
 
     @classmethod
     def find(cls, db, username):
@@ -101,6 +85,34 @@ class UserInfo(Base):
         user.is_authorized = not user.is_authorized
         db.commit()
         return user
+
+    def get_otp_secret(self, use_google_libpam):
+        """
+        Return the existing OTP secret or create a new one if it does not exist.
+
+        This does not modify self.otp_secret.
+        """
+        if self.has_2fa:
+            if not self.otp_secret:
+                google_libpam_installed = True if shutil.which('google-authenticator') else False
+                if use_google_libpam and google_libpam_installed:
+                    google_auth_file = f"{os.path.expanduser(f'~{self.username}')}/.google_authenticator"
+                    if not os.path.exists(google_auth_file):
+                        os.system("google-authenticator" +
+                            f" --secret={google_auth_file}" +
+                            " --quiet --force --no-confirm" +
+                            " --time-based --allow-reuse --window-size=3" +
+                            " --rate-limit=3 --rate-time=30")
+                    with open(google_auth_file, 'r') as f:
+                        otp_secret = f.readline().strip("\n")
+                else:
+                    otp_secret = pyotp.random_base32()
+            else:
+                otp_secret = self.otp_secret
+        else:
+            otp_secret = ""
+        return otp_secret
+        
 
     def is_valid_password(self, password):
         """

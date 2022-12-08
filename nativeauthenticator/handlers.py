@@ -32,6 +32,24 @@ from .orm import UserInfo
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+def generate_otp_uri(username, secret):
+    if secret:
+        hostname = socket.gethostname()
+        return f"otpauth://totp/{username}@{hostname}?secret={secret}&issuer={hostname}"
+    else:
+        return ""
+
+
+def generate_otp_qrcode(username, secret):
+    if secret:
+        qrobj = qrcode.make(generate_otp_uri(username, secret))
+        with io.BytesIO() as buffer:
+            qrobj.save(buffer, 'png')
+            otp_qrcode = base64.b64encode(buffer.getvalue()).decode()
+        return otp_qrcode
+    else:
+        return ""
+
 
 class LocalBase(BaseHandler):
     """Base class that all handlers below extend."""
@@ -204,16 +222,10 @@ class SignUpHandler(LocalBase):
             user_is_admin,
         )
 
-        otp_secret, user_2fa, otp_qrcode = "", "", ""
+        otp_secret, user_2fa = "", ""
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
-            if user_2fa:
-                hostname = socket.gethostname()
-                qrobj = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
-                with io.BytesIO() as buffer:
-                    qrobj.save(buffer, 'png')
-                    otp_qrcode = base64.b64encode(buffer.getvalue()).decode()
 
         html = await self.render_template(
             "signup.html",
@@ -224,7 +236,7 @@ class SignUpHandler(LocalBase):
             two_factor_host=socket.gethostname(),
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
-            two_factor_auth_qrcode=otp_qrcode,
+            two_factor_auth_qrcode=generate_otp_qrcode(user.username, otp_secret),
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
         )
@@ -332,6 +344,63 @@ class EmailAuthorizationHandler(LocalBase):
             raise ValueError("The URL has expired")
 
         return obj
+
+class Change2FAHandler(LocalBase):
+    """Responsible for rendering the /hub/change-otp page where users can add or modify
+    two-factor authentication for their account."""
+
+    @web.authenticated
+    async def get(self):
+        """Rendering on GET requests ("normal" visits)."""
+
+        user = await self.get_current_user()
+        userinfo = self.authenticator.get_user(user.name)
+        html = await self.render_demplate(
+            "change-otp.html",
+            user_name=user.name,
+            two_factor_auth=userinfo.has_2fa
+        )
+        self.finish(html)
+
+    @web.authenticated
+    async def post(self):
+        """Rendering on POST requests (requests with data attached)."""
+
+        user = await self.get_current_user()
+        password = self.get_body_argument("password", strip=False)
+        token = self.get_body_argument("token", strip=False)
+
+        userinfo = self.authenticator.get_user(user.name)
+        correct_password = userinfo.is_valid_password(password)
+        correct_token = userinfo.is_valid_token(token)
+        
+        if not correct_password:
+            alert = "alert-danger"
+            message = "Your current password was incorrect. Please try again."
+        elif not correct_token:
+            alert = "alert-danger"
+            message = "Your 2FA token was invalid. Please try again."
+        else:
+            success = self.authenticator.change_2fa(user.name)
+            if success:
+                alert = "alert-success"
+                action = "DISBALED" if userinfo.has_2fa else "ENABLED"
+                message = "You have successfully " + action + " two factor authentication!"
+            else:
+                alert = "alert-danger"
+                message = "Something went wrong! Please try again."
+
+        html = await self.render_template(
+            "change-2fa.html",
+            user_name=user.name,
+            result_message=message,
+            alert=alert,
+            two_factor_auth=userinfo.has_2fa,
+            otp_secret=userinfo.otp_secret,
+            otp_uri=generate_otp_uri(user.name, userinfo.otp_secret),
+            otp_qrcode=generate_otp_qrcode(user.name, userinfo.otp_secret)
+        )
+        self.finish()
 
 
 class ChangePasswordHandler(LocalBase):

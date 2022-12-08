@@ -184,9 +184,9 @@ You can also remove FirstUse's database file after the importation to Native Aut
 c.NativeAuthenticator.delete_firstuse_db_after_import = True
 ```
 
-## Add two factor authentication obligatory for users
+## Allow new users to enable two factor authentication during signup
 
-You can increase security making two factor authentication obligatory for all users.
+You can increase security allowing new users to register with two factor authentication.
 To do so, add the following line on the config file:
 
 ```python
@@ -200,3 +200,15 @@ Users will receive a message after signup with the two factor authentication cod
 And login will now require the two factor authentication code as well:
 
 ![](_static/login-two-factor-auth.png)
+
+Users who have not previously activated 2FA during sign up can do so through the account administration page or ask the server admin to enable it for them.
+
+## Use Google Authenticator PAM Module for 2FA
+
+You can configure Native Authenticator to re-use the existing OTP secret key in `/home/user/.google_authenticator`, or create a new one using the [Google Authenticator PAM module](https://github.com/google/google-authenticator-libpam) if it doesn't already exist.
+
+```python
+c.NativeAuthenticator.use_google_libpam = True
+```
+
+This is particularly useful when you want system users to log into mutliple services on the server using a single 2FA credential shared through the `/home/user/.google_authenticator` file.
