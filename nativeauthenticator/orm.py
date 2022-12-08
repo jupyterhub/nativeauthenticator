@@ -54,7 +54,6 @@ class UserInfo(Base):
     # are enabled to generate the same one-time password's, which enables them
     # to be matched against each other.
     otp_secret = Column(String(16))
-    otp_uri = Column(String(128))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
