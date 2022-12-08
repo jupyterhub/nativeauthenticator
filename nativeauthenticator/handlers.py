@@ -204,16 +204,16 @@ class SignUpHandler(LocalBase):
             user_is_admin,
         )
 
-        otp_secret, user_2fa, qrimg_base64 = "", "", ""
+        otp_secret, user_2fa, otp_qrcode = "", "", ""
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
             if user_2fa:
                 hostname = socket.gethostname()
-                qrimg_pil = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
-                qrimg_bytes = io.BytesIO()
-                qrimg_pil.save(qrimg_bytes, format="PNG")
-                qrimg_base64 = base64.b64encode(qrimg_bytes.getvalue())
+                qrobj = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
+                with io.BytesIO() as buffer:
+                    qrobj.save(buffer, 'png')
+                    otp_qrcode = base64.b64encode(buffer.getvalue()).decode()
 
         html = await self.render_template(
             "signup.html",
@@ -221,9 +221,10 @@ class SignUpHandler(LocalBase):
             result_message=message,
             alert=alert,
             two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_host=socket.gethostname(),
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
-            two_factor_auth_qrbytes=qrimg_base64,
+            two_factor_auth_qrcode=otp_qrcode,
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
         )
