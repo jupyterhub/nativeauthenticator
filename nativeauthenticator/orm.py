@@ -132,7 +132,9 @@ class UserInfo(Base):
         module. Assuming the user generated a TOTP with a common shared one-time
         password secret (otp_secret), these passwords should match.
         """
-        host = socket.gethostname()
-        otp_uri = f'otpauth://totp/{self.username}@{host}?secret={self.otp_secret}&issuer={host}'
-        totp = pyotp.parse_uri(otp_uri)
-        return totp.verify(token)
+        if self.has_2fa:
+            host = socket.gethostname()
+            otp_uri = f'otpauth://totp/{self.username}@{host}?secret={self.otp_secret}&issuer={host}'
+            totp = pyotp.parse_uri(otp_uri)
+            return totp.verify(token)
+        return True

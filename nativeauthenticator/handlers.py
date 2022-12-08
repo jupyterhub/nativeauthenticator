@@ -207,12 +207,11 @@ class SignUpHandler(LocalBase):
         if user:
             otp_secret = user.otp_secret
             user_2fa = user.has_2fa
-
-        if len(otp_secret) > 0:
-            hostname = socket.gethostname()
-            qrimg = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
-            qrbytes = io.BytesIO()
-            qrimg.save(qrbytes, format=qrimg.format)
+            if user_2fa:
+                hostname = socket.gethostname()
+                qrimg = qrcode.make(f"otpauth://totp/{user.username}@{hostname}?secret={otp_secret}&issuer={hostname}")
+                qrbytes = io.BytesIO()
+                qrimg.save(qrbytes, format=qrimg.format)
 
         html = await self.render_template(
             "signup.html",
