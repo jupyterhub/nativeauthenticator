@@ -478,11 +478,11 @@ class ChangePasswordHandler(LocalBase):
         """Rendering on GET requests ("normal" visits)."""
 
         user = await self.get_current_user()
+        userinfo = self.authenticator.get_user(user.name)
         html = await self.render_template(
             "change-password.html",
             user_name=user.name,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
-            two_factor_auth_require=self.authenticator.require_2fa
+            two_factor_auth_user=userinfo.has_2fa
         )
         self.finish(html)
 
@@ -541,8 +541,7 @@ class ChangePasswordHandler(LocalBase):
             user_name=user.name,
             result_message=message,
             alert=alert,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
-            two_factor_auth_require=self.authenticator.require_2fa
+            two_factor_auth_user=userinfo.has_2fa
         )
         self.finish(html)
 
