@@ -358,7 +358,7 @@ class Change2FAHandler(LocalBase):
         userinfo = self.authenticator.get_user(user.name)
         html = await self.render_template(
             "change-2fa.html",
-            user_name=user.name,
+            user_name=userinfo.username,
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=userinfo.has_2fa
         )
@@ -395,15 +395,15 @@ class Change2FAHandler(LocalBase):
 
         html = await self.render_template(
             "change-2fa.html",
-            user_name=user.name,
+            user_name=userinfo.username,
             result_message=message,
             alert=alert,
             success=success,
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_value=userinfo.otp_secret,
-            two_factor_auth_uri=generate_otp_uri(user.name, userinfo.otp_secret),
-            two_factor_auth_qrcode=generate_otp_qrcode(user.name, userinfo.otp_secret)
+            two_factor_auth_uri=generate_otp_uri(userinfo.username, userinfo.otp_secret),
+            two_factor_auth_qrcode=generate_otp_qrcode(userinfo.username, userinfo.otp_secret)
         )
         self.finish(html)
 
