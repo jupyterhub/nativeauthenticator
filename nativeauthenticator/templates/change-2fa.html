@@ -7,6 +7,7 @@
         let button = document.getElementById('eye');
         button.addEventListener("click", function(e) {
             let pwd = document.getElementById("password_input");
+            let token = document.getElementById("2fa_input");
             if (pwd.getAttribute("type") === "password") {
                 pwd.setAttribute("type", "text");
                 button.textContent = "🔑";
@@ -41,7 +42,7 @@
         
             {% if two_factor_auth_user %}
             <label for="2fa_input">2FA code:</label>
-            <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="token" placeholder="If you don't have 2FA, leave empty" />
+            <input id="2fa_input" type="text" name="token" autocapitalize="off" autocorrect="off" class="form-control"  placeholder="If you don't have 2FA, leave empty" />
             <p></p>
             <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Disable 2FA' />
             <p></p>
@@ -50,7 +51,7 @@
             <p></p>
             {% endif %}
         {% else %}
-            <p>Two factor authentication is not enabled on this server. Please contact the administrator to request a change.</p>
+            <p>Two factor authentication is not enabled on this server. Please contact the [administrator](mailto:admin@calculon.dev) to request a change.</p>
         {% endif %}
 
         </div>

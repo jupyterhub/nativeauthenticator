@@ -398,7 +398,6 @@ class Change2FAHandler(LocalBase):
             user_name=userinfo.username,
             result_message=message,
             alert=alert,
-            success=success,
             two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_value=userinfo.otp_secret,
