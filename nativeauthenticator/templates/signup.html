@@ -65,14 +65,19 @@
 
                 {% if two_factor_auth_user %}
                 <p>
-                    <strong>Attention!</strong> You have enabled two factor authentication.
-                    Your two factor authentication secret is <strong>{{ two_factor_auth_value }}</strong>.
+                    <strong>Attention!</strong>
+                    {% if two_factor_auth_require %}
+                    Two factor authentication is mandated by the server and cannot be disabled.
+                    {% else %}
+                    You have enabled two factor authentication.
+                    {% endif %}
+                    Your secret key is <strong>{{ two_factor_auth_value }}</strong>.
                     Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate your one-time passwords.
                 </p>
                 <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
                 {% if two_factor_auth_google %}
                 <p>
-                    This server has the Google Authenticator PAM Module enabled. Your 2FA secret key and recovery tokens are available under <pre>/home/{{user_name}}/.google_authenticator</pre>.
+                    Google Authenticator PAM Module credentials are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
                 </p>
                 {% endif %}
                 {% endif %}
@@ -104,7 +109,7 @@
             </div>
             <p></p>
 
-            {% if two_factor_auth %}
+            {% if two_factor_auth_allow and not two_factor_auth_require %}
             <input type="checkbox" id="2fa" name="2fa" value="2fa">
                 Setup two factor authentication
             </input>

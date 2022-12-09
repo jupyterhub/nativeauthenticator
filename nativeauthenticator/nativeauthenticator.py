@@ -170,9 +170,11 @@ class NativeAuthenticator(Authenticator):
         help="Deletes FirstUse Authenticator database after the import",
     )
 
-    allow_2fa = Bool(False, config=True, help="Permit new users to be created with two-factor authentication.")
+    allow_2fa = Bool(False, config=True, help="Permit new and existing users to optionally enable two factor authentication.")
 
-    use_google_libpam = Bool(False, config=True, help="Link JupyterHub 2FA to the Google Authenticator PAM Module.")
+    require_2fa = Bool(False, config=True, help="Force both new and existing users to enable two factor authentication.")
+
+    use_google_libpam = Bool(False, config=True, help="Use Google Authenticator PAM Module to generate JupyterHub 2FA secret keys.")
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)

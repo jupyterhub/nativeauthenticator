@@ -4,25 +4,20 @@
 <div class="container">
     <form action="{{post_url}}" method="post" role="form">
         <h1>
-            Enable/Disable two factor authentication for {{user_name}}
+            Enable/disable two factor authentication for {{user_name}}
         </h1>
         
         <p></p>
 
         {% if two_factor_auth %}
         <div class="form-group">
-            {% if two_factor_auth_user %}
-            <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Disable 2FA' />
+            <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value={{ two_factor_auth_user|yesno:"Disable 2FA,Enable 2FA" }} />
             <p></p>
-            {% else %}
-            <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Enable 2FA' />
-            <p></p>
-            {% endif %}
         </div>
         {% else %}
         <p>
             <strong>Two factor authorization is not enabled on this server.</strong>
-            You can turn it on by adding <pre>c.NativeAuthenticator.allow_2fa = True</pre> to the server's <pre>jupyterhub_config.py</pre> file.
+            It can be turned on by setting <pre>c.NativeAuthenticator.allow_2fa = True</pre> in the <pre>jupyterhub_config.py</pre> file and restarting JupyterHub.
         </p>
         {% endif %}
     </form>
@@ -35,13 +30,13 @@
             
             {% if two_factor_auth_user %}
             <p>
-                Two factor authentication secret for {{user_name}} is <strong>{{ two_factor_auth_secret }}</strong>.
+                Two factor authentication secret key for {{user_name}} is <strong>{{ two_factor_auth_secret }}</strong>.
                 Please instruct the user to scan the QR code below or directly use the <a href="{{two_factor_auth_uri}}">OTP URI</a> with their authenticator app.
             </p>
             <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
             {% if two_factor_auth_google %}
             <p>
-                This server has the Google Authenticator PAM Module enabled. 2FA secret key and recovery tokens for {{user_name}} are available under <pre>/home/{{user_name}}/.google_authenticator</pre>.
+                Google Authenticator PAM Module credentials for {{user_name}} are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
             </p>
             {% endif %}
             {% endif %}
