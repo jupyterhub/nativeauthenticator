@@ -369,10 +369,10 @@ class Change2FAHandler(LocalBase):
         """Rendering on POST requests (requests with data attached)."""
 
         user = await self.get_current_user()
-        password = self.get_body_argument("password", strip=False)
-        token = self.get_body_argument("2fa", strip=False)
-
         userinfo = self.authenticator.get_user(user.name)
+        password = self.get_body_argument("password", strip=False)
+        token = self.get_body_argument("2fa", strip=False) if userinfo.has_2fa else None
+        
         correct_password = userinfo.is_valid_password(password)
         correct_token = userinfo.is_valid_token(token)
         

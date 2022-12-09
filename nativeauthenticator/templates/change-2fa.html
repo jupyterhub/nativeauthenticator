@@ -41,7 +41,7 @@
             {% if two_factor_auth_user %}
             <label for="2fa_input">2FA code:</label>
             <div class="input-group col-xs-6">
-                <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="2fa" placeholder="If you don't have 2FA, leave empty" />
+                <input id="2fa_input" type="text" autocapitalize="off" val="" autocorrect="off" class="form-control" name="2fa" />
             </div>
             <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Disable 2FA' />
             <p></p>
