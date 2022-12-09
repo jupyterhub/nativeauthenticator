@@ -211,4 +211,4 @@ You can configure Native Authenticator to re-use the existing OTP secret key in 
 c.NativeAuthenticator.use_google_libpam = True
 ```
 
-This is particularly useful when you want system users to log into mutliple services on the server using a single 2FA credential shared through the `/home/user/.google_authenticator` file.
+This is particularly useful when you want system users to log into mutliple services on the server using a single 2FA credential shared between the services through the `/home/user/.google_authenticator` file.

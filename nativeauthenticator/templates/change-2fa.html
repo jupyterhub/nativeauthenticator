@@ -68,6 +68,11 @@
                 Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate matching one-time passwords.
             </p>
             <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
+            {% if two_factor_auth_google %}
+            <p>
+                This server has the Google Authenticator PAM Module enabled. Your 2FA secret key and recovery tokens are available under <pre>/home/{{user_name}}/.google_authenticator</pre>.
+            </p>
+            {% endif %}
             {% endif %}
         </div>
     {% endif %}
