@@ -370,7 +370,7 @@ class Change2FAHandler(LocalBase):
 
         user = await self.get_current_user()
         password = self.get_body_argument("password", strip=False)
-        token = self.get_body_argument("token", strip=False)
+        token = self.get_body_argument("2fa", strip=False)
 
         userinfo = self.authenticator.get_user(user.name)
         correct_password = userinfo.is_valid_password(password)
