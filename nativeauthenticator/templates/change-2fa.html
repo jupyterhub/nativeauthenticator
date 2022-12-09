@@ -30,7 +30,7 @@
         <p>
             Two factor authentication is mandated by the server and cannot be disabled.
         </p>
-        {% if two_factor_auth_allow and not two_factor_auth_require %}
+        {% elif two_factor_auth_allow %}
         <p>
             Please enter your current password and your 2FA code (if enabled). If you have forgotten your password, an admin can reset it for you.
         </p>
@@ -78,11 +78,11 @@
             Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate matching one-time passwords.
         </p>
         <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
-        {% if two_factor_auth_google %}
-        <p>
-            Google Authenticator PAM Module credentials are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
-        </p>
-        {% endif %}
+            {% if two_factor_auth_google %}
+            <p>
+                Google Authenticator PAM Module credentials are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
+            </p>
+            {% endif %}
         {% endif %}
     </div>
     {% endif %}

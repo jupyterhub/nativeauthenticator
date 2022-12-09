@@ -9,7 +9,7 @@
         
         <p></p>
 
-        {% if two_factor_auth %}
+        {% if two_factor_auth_allow %}
         <div class="form-group">
             <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value={{ two_factor_auth_user|yesno:"Disable 2FA,Enable 2FA" }} />
             <p></p>
@@ -34,11 +34,11 @@
                 Please instruct the user to scan the QR code below or directly use the <a href="{{two_factor_auth_uri}}">OTP URI</a> with their authenticator app.
             </p>
             <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
-            {% if two_factor_auth_google %}
-            <p>
-                Google Authenticator PAM Module credentials for {{user_name}} are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
-            </p>
-            {% endif %}
+                {% if two_factor_auth_google %}
+                <p>
+                    Google Authenticator PAM Module credentials for {{user_name}} are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
+                </p>
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}
