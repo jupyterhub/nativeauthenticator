@@ -28,6 +28,7 @@ c.NativeAuthenticator.open_signup = False
 c.NativeAuthenticator.ask_email_on_signup = True
 
 c.NativeAuthenticator.allow_2fa = True
+c.NativeAuthenticator.use_google_libpam = True
 
 c.NativeAuthenticator.tos = 'I agree to the <a href="your-url" target="_blank">TOS</a>.'
 
