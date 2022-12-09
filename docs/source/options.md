@@ -184,9 +184,10 @@ You can also remove FirstUse's database file after the importation to Native Aut
 c.NativeAuthenticator.delete_firstuse_db_after_import = True
 ```
 
-## Allow new users to enable two factor authentication during signup
+## Allow users to enable two factor authentication
 
-You can increase security allowing new users to register with two factor authentication.
+You can increase security by allowing users to activate two factor authentication.
+
 To do so, add the following line on the config file:
 
 ```python
@@ -202,6 +203,20 @@ And login will now require the two factor authentication code as well:
 ![](_static/login-two-factor-auth.png)
 
 Users who have not previously activated 2FA during sign up can do so through the account administration page or ask the server admin to enable it for them.
+
+## Require two factor authentication for all users
+
+To increase security even further, you can mandate all users to activate two factor authentication.
+
+To do so, add the following line to the config file:
+
+```python
+c.NativeAuthenticator.require_2fa = True
+```
+
+This setting overrides the `c.NativeAuthenticator.allow_2fa` option.
+
+New users will be automatically registered with two factor authentication while existing users will receive their two factor authentication secret key the next time they sign on with their existing credentials.
 
 ## Use Google Authenticator PAM Module for 2FA
 
