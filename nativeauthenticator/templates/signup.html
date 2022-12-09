@@ -65,12 +65,12 @@
 
                 {% if two_factor_auth_user %}
                 <p>
-                    <strong>Attention!</strong> You have configured two factor authentication.
-                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>.
-                    Scan the QR code below with your authenticator app or copy the <a href="otpauth://totp/{{username}}@{{hostname}}?secret={{two_factor_auth_value}}&issuer={{hostname}}">OTP URI</a> into the app to generate matching one-time passwords.
+                    <strong>Attention!</strong> You have enabled two factor authentication.
+                    Your two factor authentication secret is <strong>{{ two_factor_auth_value }}</strong>.
+                    Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate your one-time passwords.
                 </p>
                 <img src="data:image/png;base64,{{two_factor_auth_qrcode}}"
-                     alt="otpauth://totp/{{username}}@{{hostname}}?secret={{two_factor_auth_value}}&issuer={{hostname}}">
+                     alt="{{two_factor_auth_uri}}">
                 {% endif %}
             </div>
             {% endif %}

@@ -25,7 +25,7 @@
         <h1>
             Enable/Disable two factor authentication for {{user_name}}
         </h1>
-        
+        {% if two_factor_auth %}
         <p>Please enter your current password and your 2FA code (if enabled). If you have forgotten your password, an admin can reset it for you.</p>
 
         <div class="form-group">
@@ -38,7 +38,7 @@
             </div>
             <p></p>
         
-        {% if two_factor_auth %}
+        
             {% if two_factor_auth_user %}
             <label for="2fa_input">2FA code:</label>
             <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="token" placeholder="If you don't have 2FA, leave empty" />

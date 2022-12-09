@@ -233,9 +233,9 @@ class SignUpHandler(LocalBase):
             result_message=message,
             alert=alert,
             two_factor_auth=self.authenticator.allow_2fa,
-            two_factor_host=socket.gethostname(),
             two_factor_auth_user=user_2fa,
             two_factor_auth_value=otp_secret,
+            two_factor_auth_uri=generate_otp_uri(user.username, otp_secret),
             two_factor_auth_qrcode=generate_otp_qrcode(user.username, otp_secret),
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
@@ -399,6 +399,7 @@ class Change2FAHandler(LocalBase):
             result_message=message,
             alert=alert,
             success=success,
+            two_factor_auth=self.authenticator.allow_2fa,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_value=userinfo.otp_secret,
             two_factor_auth_uri=generate_otp_uri(user.name, userinfo.otp_secret),
@@ -419,9 +420,12 @@ class Change2FAAdminHandler(LocalBase):
         if not self.authenticator.user_exists(user_name):
             raise web.HTTPError(404)
 
+        userinfo = self.authenticator.get_user(user_name)
         html = await self.render_template(
             "change-2fa-admin.html",
             user_name=user_name,
+            two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_auth_user=userinfo.has_2fa
         )
         self.finish(html)
 
@@ -443,10 +447,11 @@ class Change2FAAdminHandler(LocalBase):
             user_name=user_name,
             result_message=message,
             alert=alert,
-            two_factor_auth=userinfo.has_2fa,
-            otp_secret=userinfo.otp_secret,
-            otp_uri=generate_otp_uri(user_name, userinfo.otp_secret),
-            otp_qrcode=generate_otp_qrcode(user_name, userinfo.otp_secret)
+            two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_auth_user=userinfo.has_2fa,
+            two_factor_auth_secret=userinfo.otp_secret,
+            two_factor_auth_uri=generate_otp_uri(user_name, userinfo.otp_secret),
+            two_factor_auth_qrcode=generate_otp_qrcode(user_name, userinfo.otp_secret)
         )
         self.finish(html)
 
