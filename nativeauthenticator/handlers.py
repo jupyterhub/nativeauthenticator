@@ -1,13 +1,12 @@
-import os
-import io
-import socket
 import base64
+import io
+import os
+import socket
 from datetime import date
 from datetime import datetime
 from datetime import timezone as tz
 
 import qrcode
-
 from jinja2 import ChoiceLoader
 from jinja2 import FileSystemLoader
 from jupyterhub.handlers import BaseHandler
@@ -32,6 +31,7 @@ from .orm import UserInfo
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
 
+
 def generate_otp_uri(username, secret):
     if secret:
         hostname = socket.gethostname()
@@ -44,7 +44,7 @@ def generate_otp_qrcode(username, secret):
     if secret:
         qrobj = qrcode.make(generate_otp_uri(username, secret))
         with io.BytesIO() as buffer:
-            qrobj.save(buffer, 'png')
+            qrobj.save(buffer, "png")
             otp_qrcode = base64.b64encode(buffer.getvalue()).decode()
         return otp_qrcode
     else:
@@ -196,7 +196,8 @@ class SignUpHandler(LocalBase):
                 "username": self.get_body_argument("username", strip=False),
                 "password": self.get_body_argument("signup_password", strip=False),
                 "email": self.get_body_argument("email", "", strip=False),
-                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)) or self.authenticator.require_2fa,
+                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False))
+                or self.authenticator.require_2fa,
             }
             username_already_taken = self.authenticator.user_exists(
                 user_info["username"]
@@ -233,7 +234,8 @@ class SignUpHandler(LocalBase):
             ask_email=self.authenticator.ask_email_on_signup,
             result_message=message,
             alert=alert,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
             two_factor_auth_google=self.authenticator.use_google_libpam,
             two_factor_auth_user=user_2fa,
@@ -348,9 +350,10 @@ class EmailAuthorizationHandler(LocalBase):
 
         return obj
 
+
 class Change2FAHandler(LocalBase):
     """Responsible for rendering the /hub/change-otp page where users can add or modify
-    2FA for their account. Both on GET requests, when simply navigating to the site, 
+    2FA for their account. Both on GET requests, when simply navigating to the site,
     and on POST requests, with the data to change the 2FA setting."""
 
     @web.authenticated
@@ -362,13 +365,18 @@ class Change2FAHandler(LocalBase):
         html = await self.render_template(
             "change-2fa.html",
             user_name=userinfo.username,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
             two_factor_auth_google=self.authenticator.use_google_libpam,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_value=userinfo.otp_secret,
-            two_factor_auth_uri=generate_otp_uri(userinfo.username, userinfo.otp_secret),
-            two_factor_auth_qrcode=generate_otp_qrcode(userinfo.username, userinfo.otp_secret)
+            two_factor_auth_uri=generate_otp_uri(
+                userinfo.username, userinfo.otp_secret
+            ),
+            two_factor_auth_qrcode=generate_otp_qrcode(
+                userinfo.username, userinfo.otp_secret
+            ),
         )
         self.finish(html)
 
@@ -380,10 +388,10 @@ class Change2FAHandler(LocalBase):
         userinfo = self.authenticator.get_user(user.name)
         password = self.get_body_argument("password", strip=False)
         token = self.get_body_argument("2fa", "", strip=False)
-        
+
         correct_password = userinfo.is_valid_password(password)
         correct_token = userinfo.is_valid_token(token)
-        
+
         if not correct_password:
             alert = "alert-danger"
             message = "Your current password was incorrect. Please try again."
@@ -396,7 +404,9 @@ class Change2FAHandler(LocalBase):
             if success:
                 alert = "alert-success"
                 action = "ENABLED" if userinfo.has_2fa else "DISABLED"
-                message = "You have successfully " + action + " two factor authentication!"
+                message = (
+                    "You have successfully " + action + " two factor authentication!"
+                )
             else:
                 alert = "alert-danger"
                 message = "Something went wrong! Please try again."
@@ -406,15 +416,21 @@ class Change2FAHandler(LocalBase):
             user_name=userinfo.username,
             result_message=message,
             alert=alert,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
             two_factor_auth_google=self.authenticator.use_google_libpam,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_value=userinfo.otp_secret,
-            two_factor_auth_uri=generate_otp_uri(userinfo.username, userinfo.otp_secret),
-            two_factor_auth_qrcode=generate_otp_qrcode(userinfo.username, userinfo.otp_secret)
+            two_factor_auth_uri=generate_otp_uri(
+                userinfo.username, userinfo.otp_secret
+            ),
+            two_factor_auth_qrcode=generate_otp_qrcode(
+                userinfo.username, userinfo.otp_secret
+            ),
         )
         self.finish(html)
+
 
 class Change2FAAdminHandler(LocalBase):
     """Responsible for rendering the /hub/change-otp/[someusername] page where
@@ -433,9 +449,10 @@ class Change2FAAdminHandler(LocalBase):
         html = await self.render_template(
             "change-2fa-admin.html",
             user_name=user_name,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
-            two_factor_auth_user=userinfo.has_2fa
+            two_factor_auth_user=userinfo.has_2fa,
         )
         self.finish(html)
 
@@ -447,7 +464,13 @@ class Change2FAAdminHandler(LocalBase):
         if success:
             alert = "alert-success"
             action = "ENABLED" if userinfo.has_2fa else "DISABLED"
-            message = f"You have successfully " + action + " two factor authentication for " + user_name + "!"
+            message = (
+                f"You have successfully "
+                + action
+                + " two factor authentication for "
+                + user_name
+                + "!"
+            )
         else:
             alert = "action-danger"
             message = "Something went wrong! Please try again."
@@ -457,13 +480,14 @@ class Change2FAAdminHandler(LocalBase):
             user_name=user_name,
             result_message=message,
             alert=alert,
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
             two_factor_auth_google=self.authenticator.use_google_libpam,
             two_factor_auth_user=userinfo.has_2fa,
             two_factor_auth_secret=userinfo.otp_secret,
             two_factor_auth_uri=generate_otp_uri(user_name, userinfo.otp_secret),
-            two_factor_auth_qrcode=generate_otp_qrcode(user_name, userinfo.otp_secret)
+            two_factor_auth_qrcode=generate_otp_qrcode(user_name, userinfo.otp_secret),
         )
         self.finish(html)
 
@@ -482,7 +506,7 @@ class ChangePasswordHandler(LocalBase):
         html = await self.render_template(
             "change-password.html",
             user_name=user.name,
-            two_factor_auth_user=userinfo.has_2fa
+            two_factor_auth_user=userinfo.has_2fa,
         )
         self.finish(html)
 
@@ -541,7 +565,7 @@ class ChangePasswordHandler(LocalBase):
             user_name=user.name,
             result_message=message,
             alert=alert,
-            two_factor_auth_user=userinfo.has_2fa
+            two_factor_auth_user=userinfo.has_2fa,
         )
         self.finish(html)
 
@@ -626,13 +650,15 @@ class LoginHandler(LoginHandler, LocalBase):
             enable_signup=self.authenticator.enable_signup,
             authenticator_login_url=url_concat(
                 self.authenticator.login_url(self.hub.base_url),
-                {"next": self.get_argument("next", "")}),
-            two_factor_auth_allow=self.authenticator.allow_2fa or self.authenticator.require_2fa,
+                {"next": self.get_argument("next", "")},
+            ),
+            two_factor_auth_allow=self.authenticator.allow_2fa
+            or self.authenticator.require_2fa,
             two_factor_auth_require=self.authenticator.require_2fa,
             two_factor_auth_google=self.authenticator.use_google_libpam,
             two_factor_auth_value=otp_secret,
             two_factor_auth_uri=generate_otp_uri(username, otp_secret),
-            two_factor_auth_qrcode=generate_otp_qrcode(username, otp_secret)
+            two_factor_auth_qrcode=generate_otp_qrcode(username, otp_secret),
         )
 
     async def post(self):
@@ -676,7 +702,9 @@ class LoginHandler(LoginHandler, LocalBase):
             else:
                 error = f"User {username} does not exist. Please try again."
 
-            html = await self._render(login_error=error, username=username, otp_secret=otp_secret)
+            html = await self._render(
+                login_error=error, username=username, otp_secret=otp_secret
+            )
             self.finish(html)
 
 

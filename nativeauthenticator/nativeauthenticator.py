@@ -20,10 +20,10 @@ from traitlets import Unicode
 
 from .crypto.signing import Signer
 from .handlers import AuthorizationAreaHandler
-from .handlers import ChangePasswordAdminHandler
-from .handlers import ChangePasswordHandler
 from .handlers import Change2FAAdminHandler
 from .handlers import Change2FAHandler
+from .handlers import ChangePasswordAdminHandler
+from .handlers import ChangePasswordHandler
 from .handlers import DiscardHandler
 from .handlers import EmailAuthorizationHandler
 from .handlers import LoginHandler
@@ -170,11 +170,23 @@ class NativeAuthenticator(Authenticator):
         help="Deletes FirstUse Authenticator database after the import",
     )
 
-    allow_2fa = Bool(False, config=True, help="Permit new and existing users to optionally enable two factor authentication.")
+    allow_2fa = Bool(
+        False,
+        config=True,
+        help="Permit new and existing users to optionally enable two factor authentication.",
+    )
 
-    require_2fa = Bool(False, config=True, help="Force both new and existing users to enable two factor authentication.")
+    require_2fa = Bool(
+        False,
+        config=True,
+        help="Force both new and existing users to enable two factor authentication.",
+    )
 
-    use_google_libpam = Bool(False, config=True, help="Use Google Authenticator PAM Module to generate JupyterHub 2FA secret keys.")
+    use_google_libpam = Bool(
+        False,
+        config=True,
+        help="Use Google Authenticator PAM Module to generate JupyterHub 2FA secret keys.",
+    )
 
     def __init__(self, add_new_table=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -430,7 +442,7 @@ class NativeAuthenticator(Authenticator):
             (r"/change-password", ChangePasswordHandler),
             (r"/change-password/([^/]+)", ChangePasswordAdminHandler),
             (r"/change-2fa", Change2FAHandler),
-            (r"/change-2fa/([^/]+)", Change2FAAdminHandler)
+            (r"/change-2fa/([^/]+)", Change2FAAdminHandler),
         ]
         return native_handlers
 
