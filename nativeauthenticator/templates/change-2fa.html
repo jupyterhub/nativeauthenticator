@@ -37,8 +37,9 @@
                 </span>
             </div>
             <p></p>
-
-            {% if two_factor_auth %}
+        
+        {% if two_factor_auth %}
+            {% if two_factor_auth_user %}
             <label for="2fa_input">2FA code:</label>
             <input id="2fa_input" type="text" autocapitalize="off" autocorrect="off" class="form-control" name="token" placeholder="If you don't have 2FA, leave empty" />
             <p></p>
@@ -48,6 +49,9 @@
             <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Enable 2FA' />
             <p></p>
             {% endif %}
+        {% else %}
+            <p>Two factor authentication is not enabled on this server. Please contact the administrator to request a change.</p>
+        {% endif %}
 
         </div>
     </form>
@@ -58,12 +62,12 @@
                 {{result_message}}
             </p>
             
-            {% if two_factor_auth %}
+            {% if two_factor_auth_user %}
             <p>
-                Your two factor authentication code is <strong>{{ otp_secret }}</strong>.
-                Scan the QR code below with your authenticator app or copy the <a href="{{otp_uri}}">OTP URI</a> into the app to generate matching one-time passwords.
+                Your two factor authentication secret is <strong>{{ two_factor_auth_value }}</strong>.
+                Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate matching one-time passwords.
             </p>
-            <img src="data:image/png;base64,{{otp_qrcode}}" alt="{{otp_uri}}">
+            <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
             {% endif %}
         </div>
     {% endif %}

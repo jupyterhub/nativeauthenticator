@@ -347,7 +347,8 @@ class EmailAuthorizationHandler(LocalBase):
 
 class Change2FAHandler(LocalBase):
     """Responsible for rendering the /hub/change-otp page where users can add or modify
-    two-factor authentication for their account."""
+    2FA for their account. Both on GET requests, when simply navigating to the site, 
+    and on POST requests, with the data to change the 2FA setting."""
 
     @web.authenticated
     async def get(self):
@@ -358,7 +359,8 @@ class Change2FAHandler(LocalBase):
         html = await self.render_demplate(
             "change-otp.html",
             user_name=user.name,
-            two_factor_auth=userinfo.has_2fa
+            two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_auth_user=userinfo.has_2fa
         )
         self.finish(html)
 
@@ -382,9 +384,10 @@ class Change2FAHandler(LocalBase):
             message = "Your 2FA token was invalid. Please try again."
         else:
             success = self.authenticator.change_2fa(user.name)
+            userinfo = self.authenticator.get_user(user.name)
             if success:
                 alert = "alert-success"
-                action = "DISBALED" if userinfo.has_2fa else "ENABLED"
+                action = "ENABLED" if userinfo.has_2fa else "DISABLED"
                 message = "You have successfully " + action + " two factor authentication!"
             else:
                 alert = "alert-danger"
@@ -395,12 +398,57 @@ class Change2FAHandler(LocalBase):
             user_name=user.name,
             result_message=message,
             alert=alert,
+            success=success,
+            two_factor_auth_user=userinfo.has_2fa,
+            two_factor_auth_value=userinfo.otp_secret,
+            two_factor_auth_uri=generate_otp_uri(user.name, userinfo.otp_secret),
+            two_factor_auth_qrcode=generate_otp_qrcode(user.name, userinfo.otp_secret)
+        )
+        self.finish(html)
+
+class Change2FAAdminHandler(LocalBase):
+    """Responsible for rendering the /hub/change-otp/[someusername] page where
+    uadmins can modify any user's 2FA setting. Both on GET requests, when simply
+    navigating to the site, and on POST requests, with the data to change the
+    2FA setting."""
+
+    @admin_users_scope
+    async def get(self, user_name):
+        """Rendering on GET requests ("normal" visits)."""
+
+        if not self.authenticator.user_exists(user_name):
+            raise web.HTTPError(404)
+
+        html = await self.render_template(
+            "change-2fa-admin.html",
+            user_name=user_name,
+        )
+        self.finish(html)
+
+    @admin_users_scope
+    async def post(self, user_name):
+        """Rendering on POST requests (requests with data attached)."""
+        success = self.authenticator.change_2fa(user_name)
+        userinfo = self.authenticator.get_user(user_name)
+        if success:
+            alert = "alert-success"
+            action = "ENABLED" if userinfo.has_2fa else "DISABLED"
+            message = f"You have successfully " + action + " two factor authentication for " + user_name + "!"
+        else:
+            alert = "action-danger"
+            message = "Something went wrong! Please try again."
+
+        html = await self.render_template(
+            "change-2fa-admin.html",
+            user_name=user_name,
+            result_message=message,
+            alert=alert,
             two_factor_auth=userinfo.has_2fa,
             otp_secret=userinfo.otp_secret,
-            otp_uri=generate_otp_uri(user.name, userinfo.otp_secret),
-            otp_qrcode=generate_otp_qrcode(user.name, userinfo.otp_secret)
+            otp_uri=generate_otp_uri(user_name, userinfo.otp_secret),
+            otp_qrcode=generate_otp_qrcode(user_name, userinfo.otp_secret)
         )
-        self.finish()
+        self.finish(html)
 
 
 class ChangePasswordHandler(LocalBase):
