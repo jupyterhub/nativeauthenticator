@@ -288,7 +288,7 @@ class NativeAuthenticator(Authenticator):
             user = self.get_user(info.username)
             if user is not None:
                 if user.is_authorized:
-                    authed.update(set({info.username}))
+                    authed.update({info.username})
 
         return authed.union(allowed.union(self.admin_users))
 
