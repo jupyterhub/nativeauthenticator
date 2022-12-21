@@ -107,8 +107,11 @@ class UserInfo(Base):
         """
         if not address:
             return
-        assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", address)
-        return address
+        # assert re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", address)
+        if re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", address):
+            return address
+        else:
+            return
 
     def is_valid_token(self, token):
         """
