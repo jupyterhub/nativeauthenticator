@@ -31,7 +31,6 @@ from .orm import UserInfo
 
 
 class NativeAuthenticator(Authenticator):
-
     COMMON_PASSWORDS = None
     recaptcha_key = Unicode(
         config=True,
