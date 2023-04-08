@@ -59,6 +59,7 @@ class SignUpHandler(LocalBase):
         html = await self.render_template(
             "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
+            use_email_as_username=self.authenticator.use_email_as_username,
             two_factor_auth=self.authenticator.allow_2fa,
             recaptcha_key=self.authenticator.recaptcha_key,
             tos=self.authenticator.tos,
@@ -169,11 +170,14 @@ class SignUpHandler(LocalBase):
 
         if assume_user_is_human:
             user_info = {
-                "username": self.get_body_argument("username", strip=False),
+                "username": self.get_body_argument("username", "", strip=False),
                 "password": self.get_body_argument("signup_password", strip=False),
                 "email": self.get_body_argument("email", "", strip=False),
                 "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
             }
+            if self.authenticator.use_email_as_username:
+                user_info["username"] = user_info["email"]
+
             username_already_taken = self.authenticator.user_exists(
                 user_info["username"]
             )
@@ -207,6 +211,7 @@ class SignUpHandler(LocalBase):
         html = await self.render_template(
             "signup.html",
             ask_email=self.authenticator.ask_email_on_signup,
+            use_email_as_username=self.authenticator.use_email_as_username,
             result_message=message,
             alert=alert,
             two_factor_auth=self.authenticator.allow_2fa,
@@ -466,6 +471,7 @@ class LoginHandler(LoginHandler, LocalBase):
             "native-login.html",
             next=url_escape(self.get_argument("next", default="")),
             username=username,
+            use_email_as_username=self.authenticator.use_email_as_username,
             login_error=login_error,
             custom_html=self.authenticator.custom_html,
             login_url=self.settings["login_url"],
