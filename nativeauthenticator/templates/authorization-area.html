@@ -2,7 +2,7 @@
 
 {% block main %}
 <div class="container">
-    <h1>Authorization area</h1>
+    <h1>Authorization Area</h1>
 
     <table class="table">
         <thead>
@@ -26,6 +26,7 @@
                 <td>Yes</td>
                 <td><a class="btn btn-default" href="{{ base_url }}authorize/{{ user.username }}" role="button">Unauthorize</a></td>
                 <td><a class="btn btn-jupyter" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
+                <td><a class="btn btn-jupyter" href="{{ base_url }}change-2fa/{{ user.username }}" role="button">Change 2FA</a></td>
                 <td></td>
             </tr>
             {% else %}
@@ -36,6 +37,7 @@
                 <td>No</td>
                 <td><a class="btn btn-jupyter" href="{{ base_url }}authorize/{{ user.username }}" role="button">Authorize</a></td>
                 <td><a class="btn btn-jupyter" href="{{ base_url }}change-password/{{ user.username }}" role="button">Change password</a></td>
+                <td><a class="btn btn-jupyter" href="{{ base_url }}change-2fa/{{ user.username }}" role="button">Change 2FA</a></td>
                 <td><a class="btn btn-jupyter" href="{{ base_url }}discard/{{ user.username }}" role="button">Discard</a></td>
             </tr>
             {% endif %}

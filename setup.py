@@ -15,6 +15,6 @@ setup(
     author_email="leportella@protonmail.com",
     license="3 Clause BSD",
     packages=find_packages(),
-    install_requires=["jupyterhub>=1.3", "bcrypt", "onetimepass"],
+    install_requires=["jupyterhub>=1.3", "bcrypt", "pyotp", "qrcode"],
     include_package_data=True,
 )

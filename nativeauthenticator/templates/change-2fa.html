@@ -1,0 +1,91 @@
+{% extends "page.html" %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        let button = document.getElementById('eye');
+        button.addEventListener("click", function(e) {
+            let pwd = document.getElementById("password_input");
+            if (pwd.getAttribute("type") === "password") {
+                pwd.setAttribute("type", "text");
+                button.textContent = "🔑";
+            } else {
+                pwd.setAttribute("type", "password");
+                button.textContent = "👁";
+            }
+        });
+    });
+</script>
+{% endblock script %}
+
+{% block main %}
+<div class="container">
+    <form action="{{post_url}}" method="post" role="form">
+        <h1>
+            Enable/disable two factor authentication
+        </h1>
+
+        {% if two_factor_auth_require %}
+        <p>
+            Two factor authentication is mandated by the server and cannot be disabled.
+        </p>
+        {% elif two_factor_auth_allow %}
+        <p>
+            Please enter your current password and your 2FA code (if enabled). If you have forgotten your password, an admin can reset it for you.
+        </p>
+
+        <div class="form-group">
+            <label for="password_input">Current password:</label>
+            <div class="input-group col-xs-6">
+                <input id="password_input" type="password" name="password" val="" autocapitalize="off" autocorrect="off" class="form-control" />
+                <span class="input-group-addon">
+                    <button id="eye" type="button" style="border:0;">👁</button>
+                </span>
+            </div>
+            <p></p>
+        
+            {% if two_factor_auth_user %}
+            <label for="2fa_input">2FA code:</label>
+            <div class="input-group col-xs-6">
+                <input id="2fa_input" type="text" autocapitalize="off" val="" autocorrect="off" class="form-control" name="2fa" />
+            </div>
+            <p></p>
+            <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Disable 2FA' />
+            <p></p>
+            {% else %}
+            <input type="submit" id="change_2fa_submit" class='btn btn-jupyter' value='Enable 2FA' />
+            <p></p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>
+            Two factor authentication is not enabled on this server. Please contact the [administrator](mailto:admin@calculon.dev) to request a change.
+        </p>
+        {% endif %}
+    </form>
+
+    {% if result_message %}
+    <div class="alert {{alert}} col-xs-6" role="alert">
+        {% if result_message %}
+        <p>
+            {{result_message}}
+        </p>
+        {% endif %}
+        
+        {% if two_factor_auth_user %}
+        <p>
+            Your two factor authentication secret is <strong>{{ two_factor_auth_value }}</strong>.
+            Scan the QR code below with your authenticator app or copy the <a href="{{two_factor_auth_uri}}">OTP URI</a> into the app to generate matching one-time passwords.
+        </p>
+        <img src="data:image/png;base64,{{two_factor_auth_qrcode}}" alt="{{two_factor_auth_uri}}">
+            {% if two_factor_auth_google %}
+            <p>
+                Google Authenticator PAM Module credentials are stored in <pre>/home/{{user_name}}/.google_authenticator</pre>.
+            </p>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
