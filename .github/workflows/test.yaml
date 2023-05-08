@@ -41,9 +41,9 @@ jobs:
           - python-version: "3.9"
             jupyterhub-version: "2.*"
           - python-version: "3.10"
-            jupyterhub-version: "2.*"
-          - python-version: "3.11.0-rc.1"
             jupyterhub-version: "3.*"
+          - python-version: "3.11"
+            jupyterhub-version: "4.*"
 
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +55,14 @@ jobs:
         run: |
           pip install --no-cache-dir -r dev-requirements.txt
           pip install --pre "jupyterhub==${{ matrix.jupyterhub-version }}"
+          if [ $(echo "${{ matrix.jupyterhub-version }}" | grep '[12]\.') ]; then
+            # pin sqlalchemy 1 on jupyterhub < 3
+            pip install 'sqlalchemy==1.*'
+          fi
           pip install .
+
+      - name: List packages
+        run: pip freeze
 
       - name: Run tests
         continue-on-error: ${{ matrix.accept-failure == true }}
