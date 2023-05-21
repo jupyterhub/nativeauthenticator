@@ -14,6 +14,22 @@ setup(
     author_email="leportella@protonmail.com",
     license="3 Clause BSD",
     packages=find_packages(),
-    install_requires=["jupyterhub>=1.3", "bcrypt", "onetimepass"],
+    install_requires=[
+        "jupyterhub>=1.3",
+        "bcrypt",
+        "onetimepass",
+    ],
+    extras_require={
+        "test": [
+            "bcrypt",
+            "codecov",
+            "flake8",
+            "notebook>=6.4.1",
+            "onetimepass",
+            "pre-commit",
+            "pytest>=3.7",
+            "pytest-asyncio",
+        ],
+    },
     include_package_data=True,
 )

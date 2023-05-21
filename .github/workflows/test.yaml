@@ -33,17 +33,20 @@ jobs:
       matrix:
         include:
           - python-version: "3.6"
-            jupyterhub-version: "1.3.*"
+            pip-install-spec: "jupyterhub==1.3.* sqlalchemy==1.*"
           - python-version: "3.7"
-            jupyterhub-version: "1.4.*"
+            pip-install-spec: "jupyterhub==1.4.* sqlalchemy==1.*"
           - python-version: "3.8"
-            jupyterhub-version: "1.*"
+            pip-install-spec: "jupyterhub==1.* sqlalchemy==1.*"
           - python-version: "3.9"
-            jupyterhub-version: "2.*"
+            pip-install-spec: "jupyterhub==2.* sqlalchemy==1.*"
           - python-version: "3.10"
-            jupyterhub-version: "3.*"
+            pip-install-spec: "jupyterhub==3.*"
           - python-version: "3.11"
-            jupyterhub-version: "4.*"
+            pip-install-spec: "jupyterhub==4.*"
+          - python-version: "3.x"
+            pip-install-spec: "--pre jupyterhub"
+            accept-failure: true
 
     steps:
       - uses: actions/checkout@v3
@@ -53,13 +56,8 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --no-cache-dir -r dev-requirements.txt
-          pip install --pre "jupyterhub==${{ matrix.jupyterhub-version }}"
-          if [ $(echo "${{ matrix.jupyterhub-version }}" | grep '[12]\.') ]; then
-            # pin sqlalchemy 1 on jupyterhub < 3
-            pip install 'sqlalchemy==1.*'
-          fi
-          pip install .
+          pip install ${{ matrix.pip-install-spec }}
+          pip install ".[test]"
 
       - name: List packages
         run: pip freeze
