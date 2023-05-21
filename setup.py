@@ -14,6 +14,17 @@ setup(
     author_email="leportella@protonmail.com",
     license="3 Clause BSD",
     packages=find_packages(),
+    entry_points={
+        # Thanks to this, user are able to do:
+        #
+        #     c.JupyterHub.authenticator_class = "native"
+        #
+        # ref: https://jupyterhub.readthedocs.io/en/4.0.0/reference/authenticators.html#registering-custom-authenticators-via-entry-points
+        #
+        "jupyterhub.authenticators": [
+            "native = nativeauthenticator:NativeAuthenticator",
+        ],
+    },
     install_requires=[
         "jupyterhub>=1.3",
         "bcrypt",

@@ -27,7 +27,7 @@ jupyterhub --generate-config -f /etc/jupyterhub/jupyterhub_config.py
 Also, change the default authenticator class to NativeAuthenticator:
 
 ```python
-c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
+c.JupyterHub.authenticator_class = 'native'
 ```
 
 Lastly, you need to add the following to the configuration file as well:
