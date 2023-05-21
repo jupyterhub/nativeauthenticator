@@ -8,14 +8,12 @@ on:
     paths-ignore:
       - "docs/**"
       - "**.md"
-      - "**.rst"
       - ".github/workflows/*"
       - "!.github/workflows/test.yaml"
   push:
     paths-ignore:
       - "docs/**"
       - "**.md"
-      - "**.rst"
       - ".github/workflows/*"
       - "!.github/workflows/test.yaml"
     branches-ignore:
@@ -25,7 +23,8 @@ on:
 
 jobs:
   pytest:
-    name: Run pytests
+    # FIXME: ubuntu-20.04 comes with py36, but ubuntu-22.04 doesn't, so only
+    #        bump this when we stop testing py36
     runs-on: ubuntu-20.04
 
     strategy:
