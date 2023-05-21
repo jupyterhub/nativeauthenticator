@@ -1,42 +1,53 @@
 # How to make a release
 
-`jupyterhub-nativeauthenticator` is a package [available on
-PyPI](https://pypi.org/project/jupyterhub-nativeauthenticator/). These are
-instructions on how to make a release on PyPI. The PyPI release is done
-automatically by CI when a tag is pushed.
+`jupyterhub-tmpauthenticator` is a package available on [PyPI].
 
-For you to follow along according to these instructions, you need:
+These are the instructions on how to make a release.
 
-- To have push rights to the [jupyterhub GitHub repository](https://github.com/jupyterhub/nativeauthenticator).
-- To have [`tbump`](https://pypi.org/project/tbump) installed.
+## Pre-requisites
+
+- Push rights to this GitHub repository
 
 ## Steps to make a release
 
-1. Make sure `CHANGELOG.md` is up-to-date using [github-activity][] ahead of
-   time in a dedicated PR.
+1. Create a PR updating `CHANGELOG.md` with [github-activity] and continue when
+   its merged.
 
-1. Checkout main and make sure it is up to date.
+   Advice on this procedure can be found in [this team compass
+   issue](https://github.com/jupyterhub/team-compass/issues/563).
+
+2. Checkout main and make sure it is up to date.
 
    ```shell
-   ORIGIN=${ORIGIN:-origin} # set to the canonical remote, e.g. 'upstream' if 'origin' is not the official repo
    git checkout main
-   git fetch $ORIGIN main
-   git reset --hard $ORIGIN/main
+   git fetch origin main
+   git reset --hard origin/main
    ```
 
-1. Update the version with `tbump`. You can see what will happen without making
-   any changes with `tbump --dry-run ${VERSION}`.
+3. Update the version, make commits, and push a git tag with `tbump`.
 
    ```shell
+   pip install tbump
+   ```
+
+   `tbump` will ask for confirmation before doing anything.
+
+   ```shell
+   # Example versions to set: 1.0.0, 1.0.0b1
+   VERSION=
    tbump ${VERSION}
    ```
 
-   This will tag and publish a release, which will be finished on CI.
+   Following this, the [CI system] will build and publish a release.
 
-1. Reset the version back to dev, e.g. `2.1.0.dev` after releasing `2.0.0`
+4. Reset the version back to dev, e.g. `1.0.1.dev` after releasing `1.0.0`.
 
    ```shell
+   # Example version to set: 1.0.1.dev
+   NEXT_VERSION=
    tbump --no-tag ${NEXT_VERSION}.dev
    ```
 
 [github-activity]: https://github.com/executablebooks/github-activity
+[pypi]: https://pypi.org/project/jupyterhub-nativeauthenticator/
+[ci system]: https://github.com/jupyterhub/jupyterhub-nativeauthenticator/actions/workflows/release.yaml
