@@ -21,14 +21,10 @@ setup(
     ],
     extras_require={
         "test": [
-            "bcrypt",
-            "codecov",
-            "flake8",
             "notebook>=6.4.1",
-            "onetimepass",
-            "pre-commit",
-            "pytest>=3.7",
+            "pytest",
             "pytest-asyncio",
+            "pytest-cov",
         ],
     },
     include_package_data=True,

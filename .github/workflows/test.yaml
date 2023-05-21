@@ -67,5 +67,5 @@ jobs:
         run: |
           pytest --maxfail=2
 
-      - name: Upload code coverage report
-        run: codecov
+      # GitHub action reference: https://github.com/codecov/codecov-action
+      - uses: codecov/codecov-action@v3
