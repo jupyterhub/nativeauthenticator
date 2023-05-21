@@ -2,7 +2,6 @@ import os
 
 import nativeauthenticator
 
-
 c.JupyterHub.spawner_class = "simple"
 c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
 c.Authenticator.admin_users = {"admin"}

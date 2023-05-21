@@ -11,8 +11,6 @@ from .encoding import force_bytes
 class InvalidAlgorithm(ValueError):
     """Algorithm is not supported by hashlib."""
 
-    pass
-
 
 def salted_hmac(key_salt, value, secret, *, algorithm="sha1"):
     """

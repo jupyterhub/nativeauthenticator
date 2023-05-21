@@ -7,9 +7,10 @@ from datetime import timezone as tz
 import pytest
 from jupyterhub.tests.mocking import MockHub
 
+from nativeauthenticator import NativeAuthenticator
+
 from ..handlers import EmailAuthorizationHandler
 from ..orm import UserInfo
-from nativeauthenticator import NativeAuthenticator
 
 
 @pytest.fixture
