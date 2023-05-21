@@ -39,8 +39,7 @@ import re
 import time
 import zlib
 
-from .crypto import constant_time_compare
-from .crypto import salted_hmac
+from .crypto import constant_time_compare, salted_hmac
 
 _SEP_UNSAFE = re.compile(r"^[A-z0-9-_=]*$")
 BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -49,13 +48,9 @@ BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
 class BadSignature(Exception):
     """Signature does not match."""
 
-    pass
-
 
 class SignatureExpired(BadSignature):
     """Signature timestamp is older than required max_age."""
-
-    pass
 
 
 def b62_encode(s):

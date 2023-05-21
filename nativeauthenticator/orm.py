@@ -5,11 +5,7 @@ import re
 import bcrypt
 import onetimepass
 from jupyterhub.orm import Base
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import LargeBinary
-from sqlalchemy import String
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.orm import validates
 
 

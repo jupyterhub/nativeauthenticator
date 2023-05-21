@@ -2,8 +2,7 @@ import dbm
 import os
 import re
 import smtplib
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from datetime import timezone as tz
 from email.message import EmailMessage
 from pathlib import Path
@@ -12,21 +11,19 @@ import bcrypt
 from jupyterhub.auth import Authenticator
 from sqlalchemy import inspect
 from tornado import web
-from traitlets import Bool
-from traitlets import Dict
-from traitlets import Integer
-from traitlets import Tuple
-from traitlets import Unicode
+from traitlets import Bool, Dict, Integer, Tuple, Unicode
 
 from .crypto.signing import Signer
-from .handlers import AuthorizationAreaHandler
-from .handlers import ChangePasswordAdminHandler
-from .handlers import ChangePasswordHandler
-from .handlers import DiscardHandler
-from .handlers import EmailAuthorizationHandler
-from .handlers import LoginHandler
-from .handlers import SignUpHandler
-from .handlers import ToggleAuthorizationHandler
+from .handlers import (
+    AuthorizationAreaHandler,
+    ChangePasswordAdminHandler,
+    ChangePasswordHandler,
+    DiscardHandler,
+    EmailAuthorizationHandler,
+    LoginHandler,
+    SignUpHandler,
+    ToggleAuthorizationHandler,
+)
 from .orm import UserInfo
 
 

@@ -1,10 +1,8 @@
 import os
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
 from datetime import timezone as tz
 
-from jinja2 import ChoiceLoader
-from jinja2 import FileSystemLoader
+from jinja2 import ChoiceLoader, FileSystemLoader
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.handlers.login import LoginHandler
 
@@ -17,11 +15,10 @@ except ImportError:
 
     admin_users_scope = admin_only
 
+import requests
 from tornado import web
 from tornado.escape import url_escape
 from tornado.httputil import url_concat
-
-import requests
 
 from .orm import UserInfo
 
@@ -286,7 +283,7 @@ class EmailAuthorizationHandler(LocalBase):
     def validate_slug(slug, key):
         """This function makes sure the given slug is
         not expired and has a valid signature."""
-        from .crypto.signing import Signer, BadSignature
+        from .crypto.signing import BadSignature, Signer
 
         s = Signer(key)
         try:
