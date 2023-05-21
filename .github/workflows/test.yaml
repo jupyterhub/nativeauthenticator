@@ -67,7 +67,7 @@ jobs:
       - name: Run tests
         continue-on-error: ${{ matrix.accept-failure == true }}
         run: |
-          pytest --verbose --maxfail=2 --color=yes
+          pytest --maxfail=2
 
       - name: Upload code coverage report
         run: codecov

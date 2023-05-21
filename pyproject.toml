@@ -33,6 +33,16 @@ target_version = [
 profile = "black"
 
 
+# pytest is used for running Python based tests
+#
+# ref: https://docs.pytest.org/en/stable/
+#
+[tool.pytest.ini_options]
+addopts = "--verbose --color=yes --durations=10"
+asyncio_mode = "auto"
+testpaths = ["nativeauthenticator/tests"]
+
+
 # tbump is used to simplify and standardize the release process when updating
 # the version, making a git commit and tag, and pushing changes.
 #
