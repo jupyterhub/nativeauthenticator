@@ -8,18 +8,10 @@ for a friendly and welcoming collaborative environment.
 
 ## Setting up a development environment
 
-### Install requirements
-
-First install [JupyterHub](https://github.com/jupyterhub/jupyterhub). Then you can install de development requirements for Native Authenticator:
+### Install
 
 ```shell
-pip install -r dev-requirements.txt
-```
-
-And then installing Native Authenticator from master branch:
-
-```shell
-pip install -e .
+pip install -e ".[test]"
 ```
 
 ### Configure pre-commit
@@ -37,7 +29,8 @@ following command from the root of this repository next to the
 `.pre-commit-config.yaml` file.
 
 ```shell
-pre-commit install
+pip install pre-commit
+pre-commit install --install-hooks
 ```
 
 ### Running your local project

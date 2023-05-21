@@ -1,8 +1,0 @@
-bcrypt
-codecov
-flake8
-notebook>=6.4.1
-onetimepass
-pre-commit
-pytest >= 3.7
-pytest-asyncio

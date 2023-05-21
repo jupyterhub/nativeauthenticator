@@ -5,30 +5,11 @@ import time
 from datetime import timezone as tz
 
 import pytest
-from jupyterhub.tests.mocking import MockHub
 
 from nativeauthenticator import NativeAuthenticator
 
 from ..handlers import EmailAuthorizationHandler
 from ..orm import UserInfo
-
-
-@pytest.fixture
-def tmpcwd(tmpdir):
-    tmpdir.chdir()
-
-
-@pytest.fixture
-def app():
-    hub = MockHub()
-    hub.init_db()
-    return hub
-
-
-# use pytest-asyncio
-pytestmark = pytest.mark.asyncio
-# run each test in a temporary working directory
-pytestmark = pytestmark(pytest.mark.usefixtures("tmpcwd"))
 
 
 @pytest.mark.parametrize(
@@ -346,7 +327,7 @@ async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
         auth.add_data_from_firstuse()
 
 
-async def test_secret_key(app):
+async def test_secret_key(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     auth.ask_email_on_signup = False
     auth.allow_self_approval_for = ".*@example.com$"
@@ -361,7 +342,7 @@ async def test_secret_key(app):
     assert auth.ask_email_on_signup is True
 
 
-async def test_approval_url(app):
+async def test_approval_url(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     auth.allow_self_approval_for = ".*@example.com$"
     auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"

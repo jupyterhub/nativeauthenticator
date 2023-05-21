@@ -33,11 +33,11 @@ The latest documentation is always on readTheDocs, available [here](https://nati
 To run the tests locally, you can install the development dependencies like so:
 
 ```shell
-pip install -r dev-requirements.txt
+pip install -e ".[test]"
 ```
 
 Then run tests with pytest:
 
-```
+```shell
 pytest
 ```
