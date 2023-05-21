@@ -3,7 +3,7 @@ import os
 import nativeauthenticator
 
 c.JupyterHub.spawner_class = "simple"
-c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
+c.JupyterHub.authenticator_class = "native"
 c.Authenticator.admin_users = {"admin"}
 
 # Required configuration of templates location
