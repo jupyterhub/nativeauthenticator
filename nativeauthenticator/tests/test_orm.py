@@ -1,20 +1,7 @@
 import pytest
-from jupyterhub.tests.mocking import MockHub
 from sqlalchemy.exc import StatementError
 
 from ..orm import UserInfo
-
-
-@pytest.fixture
-def tmpcwd(tmpdir):
-    tmpdir.chdir()
-
-
-@pytest.fixture
-def app():
-    hub = MockHub()
-    hub.init_db()
-    return hub
 
 
 @pytest.mark.parametrize("email", ["john", "john@john"])
