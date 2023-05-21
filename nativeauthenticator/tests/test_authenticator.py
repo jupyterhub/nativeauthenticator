@@ -327,7 +327,7 @@ async def test_import_from_firstuse_invalid_password(user, pwd, tmpcwd, app):
         auth.add_data_from_firstuse()
 
 
-async def test_secret_key(app, tmpcwd):
+async def test_secret_key(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     auth.ask_email_on_signup = False
     auth.allow_self_approval_for = ".*@example.com$"
@@ -342,7 +342,7 @@ async def test_secret_key(app, tmpcwd):
     assert auth.ask_email_on_signup is True
 
 
-async def test_approval_url(app, tmpcwd):
+async def test_approval_url(tmpcwd, app):
     auth = NativeAuthenticator(db=app.db)
     auth.allow_self_approval_for = ".*@example.com$"
     auth.secret_key = "very long and kind-of random asdgaisgfjbafksdgasg"
