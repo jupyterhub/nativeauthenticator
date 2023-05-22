@@ -52,7 +52,7 @@ testpaths = ["nativeauthenticator/tests"]
 github_url = "https://github.com/jupyterhub/nativeauthenticator"
 
 [tool.tbump.version]
-current = "1.2.0.dev"
+current = "1.2.0"
 regex = '''
     (?P<major>\d+)
     \.
