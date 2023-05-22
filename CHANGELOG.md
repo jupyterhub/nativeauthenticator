@@ -6,6 +6,38 @@ The changelog should be updated using the tool `github-activity --heading-level=
 To install and configure it, see https://github.com/executablebooks/github-activity#readme.
 -->
 
+## 1.2
+
+### 1.2.0 - 2023-05-22
+
+The release adds support for JupyterHub 4.
+
+([full changelog](https://github.com/jupyterhub/nativeauthenticator/compare/1.1.0...1.2.0))
+
+#### Enhancements made
+
+- Register native as an jupyterhub authenticator class [#247](https://github.com/jupyterhub/nativeauthenticator/pull/247) ([@consideRatio](https://github.com/consideRatio))
+
+#### Maintenance and upkeep improvements
+
+- Add test as optional dependency, refactor fixtures to conftest.py, fix code coverage setup [#245](https://github.com/jupyterhub/nativeauthenticator/pull/245) ([@consideRatio](https://github.com/consideRatio))
+- pre-commit: add autoflake, use isort over reorder-python-imports [#244](https://github.com/jupyterhub/nativeauthenticator/pull/244) ([@consideRatio](https://github.com/consideRatio))
+- maint: transition to pypi trusted workflow release, put tbump conf in pyproject.toml [#243](https://github.com/jupyterhub/nativeauthenticator/pull/243) ([@consideRatio](https://github.com/consideRatio))
+- Add xsrf token to the login, signup, and password changing pages [#239](https://github.com/jupyterhub/nativeauthenticator/pull/239) ([@agostof](https://github.com/agostof))
+- Use XSRF tokens for cross-site protections [#236](https://github.com/jupyterhub/nativeauthenticator/pull/236) ([@djangoliv](https://github.com/djangoliv))
+- dependabot: rename to .yaml [#235](https://github.com/jupyterhub/nativeauthenticator/pull/235) ([@consideRatio](https://github.com/consideRatio))
+- dependabot: monthly updates of github actions [#233](https://github.com/jupyterhub/nativeauthenticator/pull/233) ([@consideRatio](https://github.com/consideRatio))
+
+#### Continuous integration improvements
+
+- ci: pin sqlalchemy 1 on jupyterhub 1 and 2 [#240](https://github.com/jupyterhub/nativeauthenticator/pull/240) ([@minrk](https://github.com/minrk))
+
+#### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterhub/nativeauthenticator/graphs/contributors?from=2022-09-09&to=2023-05-21&type=c))
+
+[@agostof](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aagostof+updated%3A2022-09-09..2023-05-21&type=Issues) | [@consideRatio](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3AconsideRatio+updated%3A2022-09-09..2023-05-21&type=Issues) | [@djangoliv](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Adjangoliv+updated%3A2022-09-09..2023-05-21&type=Issues) | [@minrk](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aminrk+updated%3A2022-09-09..2023-05-21&type=Issues)
+
 ## 1.1
 
 ### 1.1.0 - 2022-09-09
