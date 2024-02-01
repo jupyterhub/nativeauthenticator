@@ -67,4 +67,4 @@ jobs:
           pytest --maxfail=2 --cov=nativeauthenticator
 
       # GitHub action reference: https://github.com/codecov/codecov-action
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
