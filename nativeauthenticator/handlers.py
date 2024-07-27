@@ -164,25 +164,6 @@ class SignUpHandler(LocalBase):
                 else:
                     self.authenticator.log.error("Failed reCaptcha")
 
-        if assume_user_is_human:
-            user_info = {
-                "username": self.get_body_argument("username", strip=False),
-                "password": self.get_body_argument("signup_password", strip=False),
-                "password_confirmation": self.get_body_argument(
-                    "signup_password_confirmation", strip=False
-                ),
-                "email": self.get_body_argument("email", "", strip=False),
-                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
-            }
-            username_already_taken = self.authenticator.user_exists(
-                user_info["username"]
-            )
-
-            user = self.authenticator.create_user(**user_info)
-        else:
-            username_already_taken = False
-            user = None
-
         # Collect various information for precise (error) messages.
         password = self.get_body_argument("signup_password", strip=False)
         confirmation = self.get_body_argument(
@@ -190,6 +171,23 @@ class SignUpHandler(LocalBase):
         )
         confirmation_matches = password == confirmation
         user_is_admin = user_info["username"] in self.authenticator.admin_users
+
+        if assume_user_is_human:
+            user_info = {
+                "username": self.get_body_argument("username", strip=False),
+                "password": self.get_body_argument("signup_password", strip=False),
+                "email": self.get_body_argument("email", "", strip=False),
+                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
+            }
+            username_already_taken = self.authenticator.user_exists(
+                user_info["username"]
+            )
+
+            if not username_already_taken and confirmation_matches:
+                user = self.authenticator.create_user(**user_info)
+        else:
+            username_already_taken = False
+            user = None
 
         # Call helper function from above for precise alert-level and message.
         alert, message = self.get_result_message(
