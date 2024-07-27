@@ -291,13 +291,10 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, password, password_confirmation, **kwargs):
+    def create_user(self, username, password, **kwargs):
         username = self.normalize_username(username)
 
         if self.user_exists(username) or not self.validate_username(username):
-            return
-
-        if not password == password_confirmation:
             return
 
         if not self.is_password_strong(password):
@@ -432,7 +429,7 @@ class NativeAuthenticator(Authenticator):
         with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
-                new_user = self.create_user(user.decode(), password, password)
+                new_user = self.create_user(user.decode(), password)
                 if not new_user:
                     error = (
                         f"User {user} was not created. Check password "
