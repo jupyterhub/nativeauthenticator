@@ -168,7 +168,9 @@ class SignUpHandler(LocalBase):
             user_info = {
                 "username": self.get_body_argument("username", strip=False),
                 "password": self.get_body_argument("signup_password", strip=False),
-		"password_confirmation": self.get_body_argument("signup_password_confirmation", strip=False),
+                "password_confirmation": self.get_body_argument(
+                    "signup_password_confirmation", strip=False
+                ),
                 "email": self.get_body_argument("email", "", strip=False),
                 "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
             }
