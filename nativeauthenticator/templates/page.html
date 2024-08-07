@@ -2,8 +2,8 @@
 
 {% block nav_bar_left_items %}
     {{ super() }}
-    <li><a href="{{base_url}}change-password">Change Password</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{base_url}}change-password">Change Password</a></li>
     {% if user.admin %}
-        <li><a href="{{base_url}}authorize">Authorize Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{base_url}}authorize">Authorize Users</a></li>
     {% endif %}
 {% endblock %}
