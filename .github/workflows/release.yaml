@@ -25,7 +25,7 @@ on:
 
 jobs:
   build-release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       # id-token=write is required for pypa/gh-action-pypi-publish, and the PyPI
       # project needs to be configured to trust this workflow.
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: install build package
         run: |
