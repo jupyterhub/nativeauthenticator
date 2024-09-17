@@ -6,6 +6,40 @@ The changelog should be updated using the tool `github-activity --heading-level=
 To install and configure it, see https://github.com/executablebooks/github-activity#readme.
 -->
 
+## 1.3
+
+### 1.3.0 - 2024-09-17
+
+With this release, `jupyterhub` 4.1.6 and Python 3.9 or higher becomes required.
+
+([full changelog](https://github.com/jupyterhub/nativeauthenticator/compare/1.2.0...1.3.0))
+
+#### Bugs fixed
+
+- Fix user was added on sign-up even if password didn't match confirmation [#275](https://github.com/jupyterhub/nativeauthenticator/pull/275) ([@consideRatio](https://github.com/consideRatio), [@minrk](https://github.com/minrk))
+- Fix page.html menu bar [#270](https://github.com/jupyterhub/nativeauthenticator/pull/270) ([@paolocarinci](https://github.com/paolocarinci), [@manics](https://github.com/manics), [@lambdaTotoro](https://github.com/lambdaTotoro))
+
+#### Maintenance and upkeep improvements
+
+- Update .flake8 config to match other jupyterhub repos [#276](https://github.com/jupyterhub/nativeauthenticator/pull/276) ([@consideRatio](https://github.com/consideRatio))
+- Require jupyterhub 4.1.6+ and Python 3.9+ [#274](https://github.com/jupyterhub/nativeauthenticator/pull/274) ([@consideRatio](https://github.com/consideRatio), [@minrk](https://github.com/minrk))
+- Update rtd build environment etc [#273](https://github.com/jupyterhub/nativeauthenticator/pull/273) ([@consideRatio](https://github.com/consideRatio))
+
+#### Continuous integration improvements
+
+- build(deps): bump codecov/codecov-action from 3 to 4 [#263](https://github.com/jupyterhub/nativeauthenticator/pull/263) ([@consideRatio](https://github.com/consideRatio))
+- build(deps): bump actions/setup-python from 4 to 5 [#260](https://github.com/jupyterhub/nativeauthenticator/pull/260) ([@consideRatio](https://github.com/consideRatio))
+- build(deps): bump actions/checkout from 3 to 4 [#254](https://github.com/jupyterhub/nativeauthenticator/pull/254) ([@consideRatio](https://github.com/consideRatio))
+
+#### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyterhub/nativeauthenticator/graphs/contributors?from=2023-05-22&to=2024-09-17&type=c))
+
+@consideRatio ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3AconsideRatio+updated%3A2023-05-22..2024-09-17&type=Issues)) | @lambdaTotoro ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3AlambdaTotoro+updated%3A2023-05-22..2024-09-17&type=Issues)) | @manics ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Amanics+updated%3A2023-05-22..2024-09-17&type=Issues)) | @minrk ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aminrk+updated%3A2023-05-22..2024-09-17&type=Issues)) | @paolocarinci ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Apaolocarinci+updated%3A2023-05-22..2024-09-17&type=Issues))
+
 ## 1.2
 
 ### 1.2.0 - 2023-05-22
