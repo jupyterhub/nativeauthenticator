@@ -1,11 +1,16 @@
-[flake8]
-# Adjustments to comply with black autoformatting as described here:
-# https://black.readthedocs.io/en/latest/guides/using_black_with_other_tools.html#flake8
+# flake8 is used for linting Python code setup to automatically run with
+# pre-commit.
 #
-extend-ignore = E203, E501
-max-line-length = 88
+# ref: https://flake8.pycqa.org/en/latest/user/configuration.html
+#
 
-# Project specific adjustments
-#
+[flake8]
+# Ignore style and complexity
+# E: style errors
+# W: style warnings
+# C: complexity
+# D: docstring warnings (unused pydocstyle extension)
+ignore = E, C, W, D
 builtins =
     c
+    get_config
