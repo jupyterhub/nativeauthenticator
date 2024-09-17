@@ -164,30 +164,28 @@ class SignUpHandler(LocalBase):
                 else:
                     self.authenticator.log.error("Failed reCaptcha")
 
-        # Collect various information for precise (error) messages.
+        # initialize user_info
+        user_info = {
+            "username": self.get_body_argument("username", strip=False),
+            "password": self.get_body_argument("signup_password", strip=False),
+            "email": self.get_body_argument("email", "", strip=False),
+            "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
+        }
+        username = user_info["username"]
+
+        # summarize info
         password = self.get_body_argument("signup_password", strip=False)
         confirmation = self.get_body_argument(
             "signup_password_confirmation", strip=False
         )
         confirmation_matches = password == confirmation
-        user_is_admin = user_info["username"] in self.authenticator.admin_users
+        user_is_admin = username in self.authenticator.admin_users
+        username_already_taken = self.authenticator.user_exists(username)
 
-        if assume_user_is_human:
-            user_info = {
-                "username": self.get_body_argument("username", strip=False),
-                "password": self.get_body_argument("signup_password", strip=False),
-                "email": self.get_body_argument("email", "", strip=False),
-                "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
-            }
-            username_already_taken = self.authenticator.user_exists(
-                user_info["username"]
-            )
-
-            if not username_already_taken and confirmation_matches:
-                user = self.authenticator.create_user(**user_info)
-        else:
-            username_already_taken = False
-            user = None
+        # if everything seems ok, create a user
+        user = None
+        if assume_user_is_human and not username_already_taken and confirmation_matches:
+            user = self.authenticator.create_user(**user_info)
 
         # Call helper function from above for precise alert-level and message.
         alert, message = self.get_result_message(
