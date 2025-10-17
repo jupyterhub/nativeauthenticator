@@ -169,7 +169,7 @@ c.NativeAuthenticator.import_from_firstuse = True
 By default, Native Authenticator assumes that the path for the database is the same directory. If that's not the case, you can change the path the file through this variables:
 
 ```python
-c.NativeAuthenticator.firstuse_dbm_path = '/home/user/passwords.dbm'
+c.NativeAuthenticator.firstuse_db_path = '/home/user/passwords.dbm'
 ```
 
 Native Authenticator ensures that usernames are sanitized, so they won't have commas
