@@ -58,3 +58,16 @@ c.Authenticator.allow_all = True
 
 These different options are detailed in [JupyterHub "Getting started" tutorial](https://jupyterhub.readthedocs.io/en/stable/tutorial/getting-started/authenticators-users-basics.html#authentication-and-user-basics).
 
+## Usage with Docker
+
+As users are stored in the JupyterHub database, user persistence when using Docker requires to persist JupyterHub database in a volume. For example:
+
+```sh
+docker run -p 8000:8000 -d --name jupyterhub -v path/to/data:/data quay.io/jupyterhub/jupyterhub
+```
+
+and setting in the configuration file:
+
+```py
+c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
+```
