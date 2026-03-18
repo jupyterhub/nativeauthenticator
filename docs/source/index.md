@@ -14,7 +14,7 @@ NativeAuthenticator provides the following features:
 - Option of protection against scripting attacks via reCAPTCHA;
 - Option for users with an org-internal e-mail address to self-approve via secure link;
 
-# Indices and tables
+## Indices and tables
 
 ```{toctree}
 :caption: 'Contents:'
