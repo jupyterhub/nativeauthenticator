@@ -30,3 +30,31 @@ To remedy this, you merely need to add the column to your `jupyterhub.sqlite` da
 ```shell
 sqlite3 /path/to/your/jupyterhub.sqlite "ALTER TABLE users_info ADD login_email_sent Boolean NOT NULL DEFAULT (0)"
 ```
+
+## Unable to log in with user account
+
+Once a user has signed up, logging in issues can occur if the user is not allowed in JupyterHub configuration.
+
+Either set the `allowed_users` option in the configuration file:
+
+```py
+c.Authenticator.allowed_users = {"user1", "user2", "new_user"}
+```
+
+However, setting this option in the configuration file has two drawbacks:
+
+- admin users must also been present in this list to be able to login, even if they are present in `admin_users` list;
+- this option lock the user list. Only listed users can sign up and log in. If another user needs to sign up, it must be added to `allowed_users` list and JupyterHub must be restarted with:
+
+```sh
+jupyterhub -f /etc/jupyterhub/jupyterhub_config.py
+```
+
+Another option is to set `allow_all` option in the configuration file:
+
+```py
+c.Authenticator.allow_all = True
+```
+
+These different options are detailed in [JupyterHub "Getting started" tutorial](https://jupyterhub.readthedocs.io/en/stable/tutorial/getting-started/authenticators-users-basics.html#authentication-and-user-basics).
+

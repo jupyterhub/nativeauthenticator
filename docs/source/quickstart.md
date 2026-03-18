@@ -55,7 +55,13 @@ The admin must access the authorization panel and authorize the user so they be 
 
 ## Adding new users
 
-To create a new user one must go to `/hub/signup` and sign up with a username and a password. The information asked for on signup can change depending on admin configuration, but all fields are obligatory. By default, when a new user is created on the system they will need an administrator authorization to access the system.
+To create a new user one must go to `/hub/signup` and sign up with a username and a password. The information asked for on signup can change depending on admin configuration (see [Optional Configuration](options.md)), but all fields are required. By default, when a new user is created on the system they will need an administrator authorization to access the system. This feature requires the option `allow_all` in the configuration file:
+
+```py
+c.Authenticator.allow_all = True
+```
+
+More details are available in [Troubleshooting](troubleshooting.md#unable-to-log-in-with-user-account) documentation page.
 
 It is important to note that **admin accounts must also be created through signup**. However, usernames listed in the config file as admins (see below) will automatically have authorization to enter the system.
 
