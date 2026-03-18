@@ -1,6 +1,6 @@
 # Welcome to Native Authenticator's documentation!
 
-This is a relatively simple authenticator for small or medium-sized [JupyterHub](https://github.com/jupyterhub/) applications. Signup and authentication are implemented as native to JupyterHub without relying on external services.
+This is a relatively simple authenticator for small or medium-sized [JupyterHub](https://github.com/jupyterhub/) applications. Signup and authentication are implemented as native to JupyterHub without relying on external services. It uses the JupyterHub database rather than PAM (see [this note](https://github.com/jupyterhub/firstuseauthenticator?tab=readme-ov-file#why-have-a-password-db-and-not-use-pam-) from JupyterHub First Use Authenticator).
 
 NativeAuthenticator provides the following features:
 
