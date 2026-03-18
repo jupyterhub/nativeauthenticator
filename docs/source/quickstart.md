@@ -2,7 +2,7 @@
 
 ## Installation
 
-NativeAuthenticator is a authenticator plugin for [JupyterHub](https://github.com/jupyterhub/).
+NativeAuthenticator is an authenticator plugin for [JupyterHub](https://github.com/jupyterhub/).
 
 It is available on [PyPI](https://pypi.org/project/jupyterhub-nativeauthenticator/). The easiest way to install it is via pip:
 
@@ -30,7 +30,7 @@ Also, change the default authenticator class to NativeAuthenticator:
 c.JupyterHub.authenticator_class = 'native'
 ```
 
-Lastly, you need to add the following to the configuration file as well:
+Lastly, you need to add the following to the configuration file as well to enable NativeAuthenticator specific pages in the Hub interface:
 
 ```python
 import os, nativeauthenticator
@@ -75,7 +75,7 @@ To authorize new users to enter the system or to manage those that already have 
 
 From here, you can also discard users that attempted to sign up but whom you do not want to authorize. Users that are discarded will not be notified.
 
-To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**  
+To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**
 Make sure to delete these separately, otherwise someone else could sign up with the same username later and inadvertently gain access to data that is not theirs.
 
 ## Changing your own password

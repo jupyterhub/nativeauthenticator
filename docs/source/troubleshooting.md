@@ -7,7 +7,7 @@ If you find yourself running into issues that are not resolved with the advice f
 ## Unable to log in with admin account
 
 We often hear about problems with logging in with admin accounts on a fresh install. Note that adding an account into the `admin_users` configuration as shown below does not also create that account.
-You still need to sign up an account of that name and set a password (see also the [relevant documentation](https://native-authenticator.readthedocs.io/en/latest/quickstart.html#adding-new-users)).
+You still need to sign up an account of that name and set a password (see also the [relevant documentation](quickstart.md#adding-new-users)).
 If the problem persists, make sure that your JupyterHub is using the correct configuration file.
 
 ```python
