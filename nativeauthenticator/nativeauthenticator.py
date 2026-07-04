@@ -291,11 +291,26 @@ class NativeAuthenticator(Authenticator):
     def user_exists(self, username):
         return self.get_user(username) is not None
 
-    def create_user(self, username, password, **kwargs):
+    def create_user(self, username, password, from_firstuse=False, **kwargs):
+
+        # variable added to enable skipping adding existing users
+        add_to_db = True
+
         username = self.normalize_username(username)
 
-        if self.user_exists(username) or not self.validate_username(username):
+        # fail if the username is not valid
+        if not self.validate_username(username):
             return
+
+        # If the user already exists, we normally return an error,
+        # except if importing from a FirstUseAuthenticator database, in which case it silently fails to import the user.
+        # This is to handle the case when users do not wish to delete their FirstUseAuthenticator database after the first import,
+        # in which case the re-import at each hub reload could cause any password changes done after to be overwritten, or constant reload failures.
+        if self.user_exists(username):
+            if from_firstuse:
+                add_to_db = False  # only returned when importing passwords.dbm, so it should not affect any other code.
+            else:
+                return  # fail if the user exists and it is not a FirstUseAuthenticator import
 
         if not self.is_password_strong(password):
             return
@@ -303,7 +318,10 @@ class NativeAuthenticator(Authenticator):
         if not self.enable_signup:
             return
 
-        encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        if not from_firstuse:
+            encoded_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        else:
+            encoded_password = password.encode()
         infos = {"username": username, "password": encoded_password}
         infos.update(kwargs)
 
@@ -326,8 +344,9 @@ class NativeAuthenticator(Authenticator):
                 self.send_approval_email(user_info.email, url)
                 user_info.login_email_sent = True
 
-        self.db.add(user_info)
-        self.db.commit()
+        if add_to_db:
+            self.db.add(user_info)
+            self.db.commit()
         return user_info
 
     def generate_approval_url(self, username, when=None):
@@ -429,7 +448,7 @@ class NativeAuthenticator(Authenticator):
         with dbm.open(self.firstuse_db_path, "c", 0o600) as db:
             for user in db.keys():
                 password = db[user].decode()
-                new_user = self.create_user(user.decode(), password)
+                new_user = self.create_user(user.decode(), password, from_firstuse=True)
                 if not new_user:
                     error = (
                         f"User {user} was not created. Check password "
