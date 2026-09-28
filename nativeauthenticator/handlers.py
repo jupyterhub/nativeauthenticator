@@ -482,9 +482,7 @@ class LoginHandler(LoginHandler, LocalBase):
         for arg in self.request.arguments:
             data[arg] = self.get_argument(arg, strip=False)
 
-        auth_timer = self.statsd.timer("login.authenticate").start()
         user = await self.login_user(data)
-        auth_timer.stop(send=False)
 
         if user:
             # register current user for subsequent requests to user
