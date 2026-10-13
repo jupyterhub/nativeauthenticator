@@ -2,7 +2,7 @@
 
 ## Installation
 
-NativeAuthenticator is a authenticator plugin for [JupyterHub](https://github.com/jupyterhub/).
+NativeAuthenticator is an authenticator plugin for [JupyterHub](https://github.com/jupyterhub/).
 
 It is available on [PyPI](https://pypi.org/project/jupyterhub-nativeauthenticator/). The easiest way to install it is via pip:
 
@@ -30,7 +30,7 @@ Also, change the default authenticator class to NativeAuthenticator:
 c.JupyterHub.authenticator_class = 'native'
 ```
 
-Lastly, you need to add the following to the configuration file as well:
+Lastly, you need to add the following to the configuration file as well to enable NativeAuthenticator specific pages in the Hub interface:
 
 ```python
 import os, nativeauthenticator
@@ -55,7 +55,13 @@ The admin must access the authorization panel and authorize the user so they be 
 
 ## Adding new users
 
-To create a new user one must go to `/hub/signup` and sign up with a username and a password. The information asked for on signup can change depending on admin configuration, but all fields are obligatory. By default, when a new user is created on the system they will need an administrator authorization to access the system.
+To create a new user one must go to `/hub/signup` and sign up with a username and a password. The information asked for on signup can change depending on admin configuration (see [Optional Configuration](options.md)), but all fields are required. By default, when a new user is created on the system they will need an administrator authorization to access the system. This feature requires the option `allow_all` in the configuration file:
+
+```py
+c.Authenticator.allow_all = True
+```
+
+More details are available in [Troubleshooting](troubleshooting.md#unable-to-log-in-with-user-account) documentation page.
 
 It is important to note that **admin accounts must also be created through signup**. However, usernames listed in the config file as admins (see below) will automatically have authorization to enter the system.
 
@@ -75,7 +81,7 @@ To authorize new users to enter the system or to manage those that already have 
 
 From here, you can also discard users that attempted to sign up but whom you do not want to authorize. Users that are discarded will not be notified.
 
-To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**  
+To delete existing (authorized) users, first un-authorize and then discard them. Note that while discarding users will delete them from the database for both JupyterHub and NativeAuthenticator, **it will not delete data for accounts on the machine that is running JupyterHub!**
 Make sure to delete these separately, otherwise someone else could sign up with the same username later and inadvertently gain access to data that is not theirs.
 
 ## Changing your own password
