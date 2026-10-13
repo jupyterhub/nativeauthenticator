@@ -456,7 +456,7 @@ class ChangePasswordAdminHandler(LocalBase):
 class LoginHandler(LoginHandler, LocalBase):
     """Responsible for rendering the /hub/login page."""
 
-    def _render(self, login_error=None, username=None):
+    def _render(self, login_error=None, username=None, **kwargs):
         """For 'normal' rendering."""
 
         return self.render_template(
@@ -472,6 +472,7 @@ class LoginHandler(LoginHandler, LocalBase):
                 self.authenticator.login_url(self.hub.base_url),
                 {"next": self.get_argument("next", "")},
             ),
+            **kwargs,
         )
 
     async def post(self):
@@ -482,9 +483,7 @@ class LoginHandler(LoginHandler, LocalBase):
         for arg in self.request.arguments:
             data[arg] = self.get_argument(arg, strip=False)
 
-        auth_timer = self.statsd.timer("login.authenticate").start()
         user = await self.login_user(data)
-        auth_timer.stop(send=False)
 
         if user:
             # register current user for subsequent requests to user
