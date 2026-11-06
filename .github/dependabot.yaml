@@ -15,3 +15,5 @@ updates:
       interval: monthly
       time: "05:00"
       timezone: Etc/UTC
+    cooldown:
+      default-days: 7
