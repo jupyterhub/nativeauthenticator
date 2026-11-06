@@ -1,3 +1,48 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jupyterhub-nativeauthenticator"
+version = "1.3.1.dev"
+description = "JupyterHub Native Authenticator"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+authors = [
+    {name = "Leticia Portella", email = "leportella@protonmail.com"},
+    {name = "Jupyter Development Team", email = "jupyter@googlegroups.com"},
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "bcrypt",
+    "jupyterhub >=4.1.6",
+    "onetimepass",
+]
+
+[project.urls]
+Source = "https://github.com/jupyterhub/nativeauthenticator"
+
+[project.optional-dependencies]
+test = [
+    "notebook >=6.4.1",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+]
+
+[project.entry-points."jupyterhub.authenticators"]
+native = "nativeauthenticator:NativeAuthenticator"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nativeauthenticator"]
+
 # autoflake is used for autoformatting Python code
 #
 # ref: https://github.com/PyCQA/autoflake#readme
@@ -15,12 +60,6 @@ remove-unused-variables = true
 #
 [tool.black]
 skip-string-normalization = true
-target_version = [
-    "py39",
-    "py310",
-    "py311",
-    "py312",
-]
 
 
 # isort is used for autoformatting Python code
