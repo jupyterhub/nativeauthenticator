@@ -23,4 +23,5 @@ NativeAuthenticator provides the following features:
 quickstart
 options
 troubleshooting
+changelog
 ```
