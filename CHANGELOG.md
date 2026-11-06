@@ -6,6 +6,37 @@ The changelog should be updated using the tool `github-activity --heading-level=
 To install and configure it, see https://github.com/executablebooks/github-activity#readme.
 -->
 
+## 1.4
+
+### 1.4.0 - 2026-11-06
+
+1.4.0 fixes compatibility with JupyterHub 6 and requires Python 3.10.
+
+([full changelog](https://github.com/jupyterhub/nativeauthenticator/compare/1.3.0...1.4.0))
+
+#### Bugs fixed
+
+- Fix login with JupyterHub 6 [#302](https://github.com/jupyterhub/nativeauthenticator/pull/302) ([@arunkothari84](https://github.com/arunkothari84), [@minrk](https://github.com/minrk))
+
+#### Maintenance and upkeep improvements
+
+- update workflows with zizmor [#305](https://github.com/jupyterhub/nativeauthenticator/pull/305) ([@minrk](https://github.com/minrk))
+- update package metadata (pyproject.toml), require Python 3.10 [#304](https://github.com/jupyterhub/nativeauthenticator/pull/304) ([@minrk](https://github.com/minrk))
+
+#### Documentation improvements
+
+- doc: improve documentation [#294](https://github.com/jupyterhub/nativeauthenticator/pull/294) ([@mlbiche](https://github.com/mlbiche), [@minrk](https://github.com/minrk))
+- docs: fix configuration typo [#287](https://github.com/jupyterhub/nativeauthenticator/pull/287) ([@consideRatio](https://github.com/consideRatio))
+
+#### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyterhub/nativeauthenticator/graphs/contributors?from=2024-09-17&to=2026-11-06&type=c))
+
+@ampx-mg ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aampx-mg+updated%3A2024-09-17..2026-11-06&type=Issues)) | @arunkothari84 ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aarunkothari84+updated%3A2024-09-17..2026-11-06&type=Issues)) | @consideRatio ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3AconsideRatio+updated%3A2024-09-17..2026-11-06&type=Issues)) | @krzysztof-kuba-finqbit ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Akrzysztof-kuba-finqbit+updated%3A2024-09-17..2026-11-06&type=Issues)) | @manics ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Amanics+updated%3A2024-09-17..2026-11-06&type=Issues)) | @minrk ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Aminrk+updated%3A2024-09-17..2026-11-06&type=Issues)) | @mlbiche ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Amlbiche+updated%3A2024-09-17..2026-11-06&type=Issues)) | @yuvipanda ([activity](https://github.com/search?q=repo%3Ajupyterhub%2Fnativeauthenticator+involves%3Ayuvipanda+updated%3A2024-09-17..2026-11-06&type=Issues))
+
 ## 1.3
 
 ### 1.3.0 - 2024-09-17
