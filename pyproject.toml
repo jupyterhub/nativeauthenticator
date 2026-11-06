@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jupyterhub-nativeauthenticator"
-version = "1.3.1.dev"
+version = "1.4.0"
 description = "JupyterHub Native Authenticator"
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -89,7 +89,7 @@ testpaths = ["nativeauthenticator/tests"]
 github_url = "https://github.com/jupyterhub/nativeauthenticator"
 
 [tool.tbump.version]
-current = "1.3.1.dev"
+current = "1.4.0"
 regex = '''
     (?P<major>\d+)
     \.
